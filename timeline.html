@@ -3,6 +3,7 @@
   <meta charset="utf-8">
   <!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
   <!-- http://curran.github.io/screencasts/splittingCharts/examples/viewer/#/17 -->
+  <!-- http://bl.ocks.org/mbostock/3885705 transitions-->
   <meta name="viewport" content="minimal-ui">
   <style>
     body {
@@ -41,7 +42,7 @@
   </body>
 
 
-  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/d3.v3.js"></script>
   <script>
     "use strict";
     
@@ -77,12 +78,16 @@
     var deliveries=[];
     var startingX;
     var duration, variation;
-
+    var yDeliveryScale;
     
     //scales
     var xScale = d3.time.scale.utc()
           .domain([+new Date(2000, 0, 1),                 +new Date(2000, 0, 1,24)])
           .range( [0,                                     xAxisWidth]);
+
+    // var yInnerScale = d3.scale.linear()
+    //       .domain(1,7)
+    //       .range(0,6*rowHeight);
 
     var viewportScale = d3.time.scale.utc()
           .domain([+new Date(2000, 0, 1)+unixStartHours,  +new Date(2000, 0, 1,24)-unixStartHours])
@@ -98,12 +103,17 @@
       duration  = 4;
       variation = Math.random() * 3;
 
-      deliveries.push({  x1: xScale(new Date(2000, 0, 1,8+(17*.2-i*.2)+variation)),            y1: 20 + i*rowHeight, 
-                         x2: xScale(new Date(2000, 0, 1,8+(17*.2-i*.2)+variation + duration)), y2: 20 + i*rowHeight,
+      deliveries.push({  startTime: new Date(2000, 0, 1,8+(17*.2-i*.2)+variation),            y1: 20 + i*rowHeight, 
+                         endTime:   new Date(2000, 0, 1,8+(17*.2-i*.2)+variation + duration), y2: 20 + i*rowHeight,
+                         deliveryIndex: 17-i,
                          station:Math.round(i/2.5)
                        });
     }
-
+    console.table(deliveries);
+    // var nested = d3.nest()
+    //       .key(function (d){ return d['station']; })
+    //       .entries(deliveries)
+    // console.log(nested);
 
 
     // interactivity functions - not using atm, but was functioning
@@ -179,9 +189,9 @@
 
       // Update
       deliveries
-        .attr("x1", function(d) { return d.x1; })
+        .attr("x1", function(d) { return xScale(d.startTime); })
         .attr("y1", function(d) { return d.y1; })
-        .attr("x2", function(d) { return d.x2; })
+        .attr("x2", function(d) { return xScale(d.endTime); })
         .attr("y2", function(d) { return d.y2; })
         .attr("class", "delivery");
 
