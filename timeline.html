@@ -7,7 +7,7 @@
   <meta name="viewport" content="minimal-ui">
   <style>
     body {
-      background-color: red;
+      background-color: #0C0C1A;
       margin:           0px;
       padding:          0px;
       overflow:         hidden;
@@ -15,37 +15,38 @@
 
     .axis line {
       fill:         none;
-      stroke:       gray;
+      stroke:       #ffffff;
       stroke-width: 1.6px;
     }
     .axis path {
       fill:            none;
-      stroke:          #000;
+      stroke:          #ffffff;
       stroke-width:    2.5px;
       shape-rendering: crispEdges;
     }
     .axis text {
-      font: 10px sans-serif;
+      font: 12px sans-serif;
+      shape-rendering: crispEdges;
+      stroke-width:    1px;
+      stroke: white;
+      font-color: #fff;
     }
     .stations {
-      stroke: red;
-      stroke-width:2px;
     }
     .station{
-      fill:green;
-      fill-opacity:.2;
-      stroke:          red;
-      stroke-width:    1px;
-
+      fill:#0C0C1A;
+    }
+    .station:nth-child(even) {
+      fill:#1A3047;
     }
 
     .delivery {
       stroke:          steelblue;
-      stroke-width:    2px;
+      stroke-width:    1px;
     }
 
     svg {
-      background-color: #bbb
+      background-color: #0C0C1A
     }
   </style>
   
@@ -58,7 +59,7 @@
     "use strict";
     
     //User Defined Variables
-    var rowHeight   = 26;
+    var rowHeight   = 45;
     var xAxisHeight = 30;
     var xAxisWidth  = 3000;
     var margin      = {top: 0, right: 0, bottom: 30, left: 0};
@@ -88,7 +89,7 @@
     //Variables (to be used)
     var deliveries=[];
     var startingX;
-    var duration, variation;
+    var duration, variation, variationMinutes;
     var yDeliveryScale;
     
     //scales
@@ -110,42 +111,14 @@
     //Create Data
     for(var i = 17; i > 0; i--){
       duration  = 4;
-      variation = Math.random() * 3;
+      variation = Math.random() * 1;
+      variationMinutes = Math.random()*60;
 
-      deliveries.push({  startTime: new Date(2000, 0, 1,12+(17*.2-i*.2)+variation), 
-                         endTime:   new Date(2000, 0, 1,12+(17*.2-i*.2)+variation + duration),
+      deliveries.push({  startTime: new Date(2000, 0, 1,12+(i*.2)+variation,variationMinutes), 
+                         endTime:   new Date(2000, 0, 1,12+(i*.2)+variation + duration,variationMinutes),
                          station:Math.round(i/2.5)
                        });
     }
-    console.table(deliveries);
-    // var nested = d3.nest()
-    //       .key(function (d){ return d['station']; })
-    //       .entries(deliveries)
-    // console.log(nested);
-
-
-    // interactivity functions - not using atm, but was functioning
-      // var xAxisTranslation = d3.behavior.zoom()
-      //     .scaleExtent([1, 6])
-      //     .translate([startingX,0])
-      //     .on("zoom", moveXAxis);
-
-      // function moveXAxis(a) {
-      //   var eventxTranslation = d3.event.translate[0];
-      //   var lBound = (-1*xAxisWidth) + outerWidth;
-      //   var rBound = 0;
-
-      //   if (lBound < eventxTranslation && eventxTranslation < rBound) {
-      //     gAxis.attr("transform", "translate(" + [eventxTranslation,(innerHeight - margin.top - margin.bottom)] + ")scale(1)");
-      //     rows.attr("transform", "translate(" + [eventxTranslation,margin.top] + ")scale(1)");
-      //   } else {
-      //     var translation = [
-      //                         Math.max(Math.min(eventxTranslation, rBound), lBound),
-      //                         0
-      //                       ];
-      //     xAxisTranslation.translate(translation);
-      //   };
-      // }
 
     //Structure
     var svg = d3.select("body").append("svg")
@@ -182,6 +155,7 @@
       //data manipulation
       var stationCounts =[0,0,0,0,0,0,0,0];
       var stationStackedCount=[0,0,0,0,0,0,0,0]
+      var stationStacked=[];
       for(var i =0;i<data.length;i++){
         console.log(data[i].station);
         stationCounts[data[i].station]++;
@@ -196,26 +170,22 @@
         stationStackedCount[i] = stationStackedCount[i-1]+ stationCounts[i];
       };
       var stationStacked = [];
-      stationStacked[0]={"y1":0,"y2":stationStackedCount[0]}
+      stationStacked[0]={"y0":0,"y":stationCounts[0]}
       for (var i = 1; i < stationStackedCount.length; i++) {
         stationStacked[i] = {
-                              "y1":stationStackedCount[i-1],
-                              "y2":stationStackedCount[i]
+                              "y0":stationStackedCount[i-1],
+                              "y":stationCounts[i]
                             };
       };
-
-      console.log(stationCounts);
-      console.log(stationStackedCount);
-      console.log(stationStacked);
 
       var stationsS = stationsG.selectAll(".station").data(stationStacked);
       stationsS.enter().append("rect"); // stations should never exit
 
       stationsS
           .attr("x", function(d,i) { return 0;})
-          .attr("y", function(d,i) { return d.y1*rowHeight+ (rowHeight/2);})
+          .attr("y", function(d,i) { return d.y0*rowHeight+ (rowHeight/2);})
           .attr("width",innerWidth)
-          .attr("height", function(d,i) { return d.y2*rowHeight;})
+          .attr("height", function(d,i) { return d.y*rowHeight;})
           .attr("class", "station");
 
 
