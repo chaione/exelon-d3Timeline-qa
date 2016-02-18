@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
+  <meta name="viewport" content="minimal-ui">
+  <style>
+    body {
+      background-color: red;
+      margin:           0px;
+      padding:          0px;
+      overflow:         hidden;
+    }
+
+    .axis line {
+      fill:         none;
+      stroke:       gray;
+      stroke-width: 1.6px;
+    }
+    .axis path {
+      fill:            none;
+      stroke:          #000;
+      stroke-width:    2.5px;
+      shape-rendering: crispEdges;
+    }
+    .axis text {
+      font: 10px sans-serif;
+    }
+
+    .row line {
+      stroke:          steelblue;
+      stroke-width:    2px;
+      shape-rendering: crispEdges;
+    }
+
+    .delivery {
+      stroke:          steelblue;
+      stroke-width:    2px;
+    }
+
+    svg {
+      background-color: #bbb
+    }
+  </style>
+  
+  <body>
+  </body>
+
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script>
+    "use strict";
+    
+    //User Defined Variables
+      var rowHeight   = 25;
+      var xAxisHeight = 30;
+      var xAxisWidth  = 3000;
+      var margin      = {top: 10, right: 0, bottom: 30, left: 0};
+      var outerWidth  = document.documentElement.clientWidth;
+      var outerHeight = document.documentElement.clientHeight;
+
+    //Calculated Variables
+      var innerWidth     = outerWidth   - margin.left - margin.right;
+      var innerHeight    = outerHeight  - margin.top  - margin.bottom;
+      var unixHour       = 1000*60*60;
+      var unixMinute     = 1000*60;
+      var vpStartHours   = (outerWidth/2)/(xAxisWidth/24);  //startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
+      var unixStartHours = unixHour * vpStartHours; 
+      var now            = new Date(Date.now());
+      var nowHours       = now.getHours();
+      var nowMinutes     = now.getMinutes();
+
+    //Variables (to be used)
+      var deliveries=[];
+      var startingX;
+      var duration, variation;
+
+    
+    //scales
+      var xScale = d3.time.scale.utc()
+            .domain([+new Date(2000, 0, 1),                 +new Date(2000, 0, 1,24)])
+            .range( [0,                                     xAxisWidth]);
+
+      var viewportScale = d3.time.scale.utc()
+            .domain([+new Date(2000, 0, 1)+unixStartHours,  +new Date(2000, 0, 1,24)-unixStartHours])
+            .range( [0,                                     -1*xAxisWidth+outerWidth]);
+
+
+    startingX = viewportScale(new Date(2000,0,1,nowHours,nowMinutes));
+
+    
+
+    //Create Data
+      for(var i = 17; i > 0; i--){
+        duration  = 4;
+        variation = Math.random() * 3;
+
+        deliveries.push({  x1: xScale(new Date(2000, 0, 1,8+(17*.2-i*.2)+variation)), y1: 20 + i*rowHeight, 
+                           x2: xScale(new Date(2000, 0, 1,8+(17*.2-i*.2)+variation + duration)), y2: 20 + i*rowHeight});
+      }
+
+    // interactivity functions - not using atm, but was functioning
+      // var xAxisTranslation = d3.behavior.zoom()
+      //     .scaleExtent([1, 6])
+      //     .translate([startingX,0])
+      //     .on("zoom", moveXAxis);
+
+      // function moveXAxis(a) {
+      //   var eventxTranslation = d3.event.translate[0];
+      //   var lBound = (-1*xAxisWidth) + outerWidth;
+      //   var rBound = 0;
+
+      //   if (lBound < eventxTranslation && eventxTranslation < rBound) {
+      //     gAxis.attr("transform", "translate(" + [eventxTranslation,(innerHeight - margin.top - margin.bottom)] + ")scale(1)");
+      //     rows.attr("transform", "translate(" + [eventxTranslation,margin.top] + ")scale(1)");
+      //   } else {
+      //     var translation = [
+      //                         Math.max(Math.min(eventxTranslation, rBound), lBound),
+      //                         0
+      //                       ];
+      //     xAxisTranslation.translate(translation);
+      //   };
+      // }
+
+    //Structure
+      var svg = d3.select("body").append("svg")
+            .attr("width",  outerWidth)
+            .attr("height", outerHeight);
+
+      var g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var deliveriesG = g.append("g")
+            .attr("class", "deliveries")
+            .attr('transform', 'translate(' + startingX + "," + 0 + ')');
+
+      var xAxisG = g.append("g")
+            .attr("class", "x axis")
+            .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+
+      var yAxisG = g.append("g")
+            .attr("class", "y axis");
+        
+
+    //Helper Fucntions
+      var xAxis = d3.svg.axis()
+            .ticks(d3.time.hours, 1)
+            .tickFormat(d3.time.format('%H'))
+            .scale(xScale);
+
+
+
+    function render(data){
+
+
+      xAxisG.call(xAxis);
+      yAxisG.append("line")
+          .style("stroke-dasharray", ("2, 2"))
+          .attr("x1", innerWidth/2)
+          .attr("y1", margin.top)
+          .attr("x2", outerWidth/2)
+          .attr("y2", innerHeight);
+
+      // Bind data
+        var deliveries = deliveriesG.selectAll(".delivery").data(data);
+
+      // Enter
+        deliveries.enter().append("line");
+
+      // Exit
+        deliveries.exit().remove();
+
+      // Update
+        deliveries
+          .attr("x1", function(d) { return d.x1; })
+          .attr("y1", function(d) { return d.y1; })
+          .attr("x2", function(d) { return d.x2; })
+          .attr("y2", function(d) { return d.y2; })
+          .attr("class", "delivery");
+
+    }
+
+    render(deliveries);
+
+  </script>
+</html>
+
