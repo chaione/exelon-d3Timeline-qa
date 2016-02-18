@@ -85,9 +85,13 @@
           .domain([+new Date(2000, 0, 1),                 +new Date(2000, 0, 1,24)])
           .range( [0,                                     xAxisWidth]);
 
-    // var yInnerScale = d3.scale.linear()
-    //       .domain(1,7)
-    //       .range(0,6*rowHeight);
+    var yDeliveryTopScale = d3.scale.linear()
+          .domain([1,7])
+          .range([0,6*rowHeight]);
+
+    var yDeliveryBottomScale = d3.scale.linear()
+          .domain([1,7])
+          .range([0,6*rowHeight+rowHeight]);
 
     var viewportScale = d3.time.scale.utc()
           .domain([+new Date(2000, 0, 1)+unixStartHours,  +new Date(2000, 0, 1,24)-unixStartHours])
@@ -103,11 +107,11 @@
       duration  = 4;
       variation = Math.random() * 3;
 
-      deliveries.push({  startTime: new Date(2000, 0, 1,8+(17*.2-i*.2)+variation),            y1: 20 + i*rowHeight, 
-                         endTime:   new Date(2000, 0, 1,8+(17*.2-i*.2)+variation + duration), y2: 20 + i*rowHeight,
-                         deliveryIndex: 17-i,
+      deliveries.push({  startTime: new Date(2000, 0, 1,8+(17*.2-i*.2)+variation), 
+                         endTime:   new Date(2000, 0, 1,8+(17*.2-i*.2)+variation + duration),
                          station:Math.round(i/2.5)
                        });
+
     }
     console.table(deliveries);
     // var nested = d3.nest()
@@ -189,10 +193,10 @@
 
       // Update
       deliveries
-        .attr("x1", function(d) { return xScale(d.startTime); })
-        .attr("y1", function(d) { return d.y1; })
-        .attr("x2", function(d) { return xScale(d.endTime); })
-        .attr("y2", function(d) { return d.y2; })
+        .attr("x1", function(d,i) { return xScale(d.startTime); })
+        .attr("y1", function(d,i) { return yDeliveryTopScale(i); })
+        .attr("x2", function(d,i) { return xScale(d.endTime); })
+        .attr("y2", function(d,i) { return yDeliveryTopScale(i); })
         .attr("class", "delivery");
 
     }
