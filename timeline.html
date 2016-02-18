@@ -91,6 +91,9 @@
     var startingX;
     var duration, variation, variationMinutes;
     var yDeliveryScale;
+    var stationCounts =[];
+    var stationStackedCount=[];
+    var stationStacked=[];
     
     //scales
     var xScale = d3.time.scale.utc()
@@ -153,11 +156,11 @@
     function render(data){
 
       //data manipulation
-      var stationCounts =[0,0,0,0,0,0,0,0];
-      var stationStackedCount=[0,0,0,0,0,0,0,0]
-      var stationStacked=[];
+      stationCounts =[0,0,0,0,0,0,0,0];
+      stationStackedCount=[0,0,0,0,0,0,0,0]
+      stationStacked=[];
+
       for(var i =0;i<data.length;i++){
-        console.log(data[i].station);
         stationCounts[data[i].station]++;
       }
 
@@ -169,14 +172,19 @@
       for (var i = 1; i < stationCounts.length; i++) {
         stationStackedCount[i] = stationStackedCount[i-1]+ stationCounts[i];
       };
-      var stationStacked = [];
-      stationStacked[0]={"y0":0,"y":stationCounts[0]}
+
+      stationStacked[0]={
+                          "y0":0,
+                          "y":stationCounts[0],
+                          "name": stations[0]}
       for (var i = 1; i < stationStackedCount.length; i++) {
         stationStacked[i] = {
                               "y0":stationStackedCount[i-1],
-                              "y":stationCounts[i]
+                              "y":stationCounts[i],
+                              "name":stations[i]
                             };
       };
+      console.log(stationStacked);
 
       var stationsS = stationsG.selectAll(".station").data(stationStacked);
       stationsS.enter().append("rect"); // stations should never exit
