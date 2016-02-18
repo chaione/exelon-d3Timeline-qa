@@ -47,10 +47,10 @@
     "use strict";
     
     //User Defined Variables
-    var rowHeight   = 25;
+    var rowHeight   = 26;
     var xAxisHeight = 30;
     var xAxisWidth  = 3000;
-    var margin      = {top: 10, right: 0, bottom: 30, left: 0};
+    var margin      = {top: 0, right: 0, bottom: 30, left: 0};
     var outerWidth  = document.documentElement.clientWidth;
     var outerHeight = document.documentElement.clientHeight;
     var stations =  {
@@ -85,13 +85,9 @@
           .domain([+new Date(2000, 0, 1),                 +new Date(2000, 0, 1,24)])
           .range( [0,                                     xAxisWidth]);
 
-    var yDeliveryTopScale = d3.scale.linear()
+    var yDeliveryScale = d3.scale.linear()
           .domain([1,7])
-          .range([0,6*rowHeight]);
-
-    var yDeliveryBottomScale = d3.scale.linear()
-          .domain([1,7])
-          .range([0,6*rowHeight+rowHeight]);
+          .range([1+rowHeight,7*rowHeight]);
 
     var viewportScale = d3.time.scale.utc()
           .domain([+new Date(2000, 0, 1)+unixStartHours,  +new Date(2000, 0, 1,24)-unixStartHours])
@@ -100,18 +96,15 @@
 
     startingX = viewportScale(new Date(2000,0,1,nowHours,nowMinutes));
 
-    
-
     //Create Data
     for(var i = 17; i > 0; i--){
       duration  = 4;
       variation = Math.random() * 3;
 
-      deliveries.push({  startTime: new Date(2000, 0, 1,8+(17*.2-i*.2)+variation), 
-                         endTime:   new Date(2000, 0, 1,8+(17*.2-i*.2)+variation + duration),
+      deliveries.push({  startTime: new Date(2000, 0, 1,12+(17*.2-i*.2)+variation), 
+                         endTime:   new Date(2000, 0, 1,12+(17*.2-i*.2)+variation + duration),
                          station:Math.round(i/2.5)
                        });
-
     }
     console.table(deliveries);
     // var nested = d3.nest()
@@ -169,11 +162,34 @@
           .tickFormat(d3.time.format('%H'))
           .scale(xScale);
 
-
-
     function render(data){
 
+      //data manipulation
+      var stationCounts =[0,0,0,0,0,0,0,0];
+      var stationStackedCount=[0,0,0,0,0,0,0,0]
+      for(var i =0;i<data.length;i++){
+        console.log(data[i].station);
+        stationCounts[data[i].station]++;
+      }
 
+      for (var i = 0; i < stationCounts.length; i++) { //make sure they have at least 1
+        stationCounts[i] = stationCounts[i] || 1;
+      };
+
+      stationStackedCount[0] = stationCounts[0];
+      for (var i = 1; i < stationCounts.length; i++) {
+        stationStackedCount[i] = stationStackedCount[i-1]+ stationCounts[i];
+      };
+
+
+      console.log(stationCounts);
+      console.log(stationStackedCount);
+      var nested = d3.nest()
+          .key(function (d){ return d['station']; })
+          .entries(data);
+      console.log('nested',nested);
+
+      //setup axii
       xAxisG.call(xAxis);
       yAxisG.append("line")
           .style("stroke-dasharray", ("2, 2"))
@@ -183,20 +199,20 @@
           .attr("y2", innerHeight);
 
       // Bind data
-      var deliveries = deliveriesG.selectAll(".delivery").data(data);
+      var deliveriesS = deliveriesG.selectAll(".delivery").data(data);
 
       // Enter
-      deliveries.enter().append("line");
+      deliveriesS.enter().append("line");
 
       // Exit
-      deliveries.exit().remove();
+      deliveriesS.exit().remove();
 
       // Update
-      deliveries
+      deliveriesS
         .attr("x1", function(d,i) { return xScale(d.startTime); })
-        .attr("y1", function(d,i) { return yDeliveryTopScale(i); })
+        .attr("y1", function(d,i) { return yDeliveryScale(i+1); })
         .attr("x2", function(d,i) { return xScale(d.endTime); })
-        .attr("y2", function(d,i) { return yDeliveryTopScale(i); })
+        .attr("y2", function(d,i) { return yDeliveryScale(i+1); })
         .attr("class", "delivery");
 
     }
