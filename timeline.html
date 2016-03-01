@@ -139,8 +139,6 @@
         .translate([startingX,0])
         .on("zoom", moveXAxis);
 
-     
-
     function moveXAxis(a,b) {
       var eventxTranslation = d3.event.translate[0];
       var eventyTranslation = d3.event.translate[1];
@@ -150,7 +148,6 @@
       xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
       
       if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
-        console.log('TRANSITION');
         var translation = [
                             Math.max(Math.min(eventxTranslation, panBounds.right), panBounds.left),
                             Math.max(Math.min(eventyTranslation, panBounds.top)  , panBounds.bottom),
@@ -160,7 +157,7 @@
         xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
         xAxisTranslation.translate(translation);
       }
-      
+
     }
 
     //Structure
