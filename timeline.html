@@ -140,12 +140,14 @@
     function moveXAxis(a) {
       console.log(d3.event.translate);
       var eventxTranslation = d3.event.translate[0];
+      var eventyTranslation = d3.event.translate[1];
       var lBound = (-1*xAxisWidth) + outerWidth;
       var rBound = 0;
 
       if (lBound < eventxTranslation && eventxTranslation < rBound) {
-        deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,margin.top] + ")scale(1)");
-        xAxisGroup.attr("transform", "translate(" + [eventxTranslation,margin.top] + ")scale(1)");
+        deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
+        stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
+        xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
       } else {
         var translation = [
                             Math.max(Math.min(eventxTranslation, rBound), lBound),
@@ -158,27 +160,27 @@
     //Structure
     var svg = d3.select("body").append("svg")
           .attr("width",  outerWidth)
-          .attr("height", outerHeight);
+          .attr("height", outerHeight)
+          .call(xAxisTranslation);;
 
-    var stationsGroup = svg.append("g")
-          .attr("class", "stations")
-          .attr('transform', 'translate(' + 0 + "," + 0 + ')')
-          .call(xAxisTranslation);
-          ;
+        var stationsGroup = svg.append("g")
+              .attr("class", "stations")
+              .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+              
 
-    var g = svg.append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        var g = svg.append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var deliveriesGroup = g.append("g")
-          .attr("class", "deliveries")
-          .attr('transform', 'translate(' + startingX + "," + 0 + ')');
+            var deliveriesGroup = g.append("g")
+                  .attr("class", "deliveries")
+                  .attr('transform', 'translate(' + startingX + "," + 0 + ')');
 
-    var xAxisGroup = g.append("g")
-          .attr("class", "x axis")
-          .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+            var xAxisGroup = g.append("g")
+                  .attr("class", "x axis")
+                  .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
-    var yAxisGroup = g.append("g")
-          .attr("class", "y axis");
+            var yAxisGroup = g.append("g")
+                  .attr("class", "y axis");
         
 
     //Helper Fucntions
