@@ -71,14 +71,15 @@
     var margin      = {top: 0, right: 0, bottom: 30, left: 0};
     var outerWidth  = document.documentElement.clientWidth;
     var outerHeight = document.documentElement.clientHeight;
-    var stations =  {
-                      1:"En Route",
-                      2:"Sierra One",
-                      3:"Shed",
+    var stations =   {
+                      0:"En Route",
+                      1:"Sierra One",
+                      2:"Shed",
+                      3:"Transit",
                       4:"Stinger Gate",
                       5:"Sally Port",
                       6:"Warehouse",
-                      7:"Transit"
+                      7:"PA"
                     }
 
     //Calculated Variables
@@ -129,6 +130,31 @@
                        });
     }
 
+
+    //interactivity
+    var xAxisTranslation = d3.behavior.zoom()
+        .scaleExtent([1, 6])
+        .translate([startingX,0])
+        .on("zoom", moveXAxis);
+
+    function moveXAxis(a) {
+      console.log(d3.event.translate);
+      var eventxTranslation = d3.event.translate[0];
+      var lBound = (-1*xAxisWidth) + outerWidth;
+      var rBound = 0;
+
+      if (lBound < eventxTranslation && eventxTranslation < rBound) {
+        deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,margin.top] + ")scale(1)");
+        xAxisGroup.attr("transform", "translate(" + [eventxTranslation,margin.top] + ")scale(1)");
+      } else {
+        var translation = [
+                            Math.max(Math.min(eventxTranslation, rBound), lBound),
+                            0
+                          ];
+        xAxisTranslation.translate(translation);
+      };
+    }
+
     //Structure
     var svg = d3.select("body").append("svg")
           .attr("width",  outerWidth)
@@ -136,7 +162,9 @@
 
     var stationsGroup = svg.append("g")
           .attr("class", "stations")
-          .attr('transform', 'translate(' + 0 + "," + 0 + ')');
+          .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+          .call(xAxisTranslation);
+          ;
 
     var g = svg.append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -158,6 +186,11 @@
           .ticks(d3.time.hours, 1)
           .tickFormat(d3.time.format('%H'))
           .scale(xScale);
+
+
+
+
+
 
     function render(data){
 
@@ -221,8 +254,6 @@
           .attr("y1", margin.top)
           .attr("x2", outerWidth/2)
           .attr("y2", innerHeight);
-
-
 
 
       // Bind data
