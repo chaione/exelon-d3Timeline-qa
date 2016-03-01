@@ -142,14 +142,9 @@
      
 
     function moveXAxis(a,b) {
-      console.log('asdf');
-      console.log(d3.event);
-      console.log(b);
-      console.log(d3.event.translate);
       var eventxTranslation = d3.event.translate[0];
       var eventyTranslation = d3.event.translate[1];
 
-      
       deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
       stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
       xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
@@ -164,8 +159,8 @@
         stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
         xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
         xAxisTranslation.translate(translation);
-
       }
+      
     }
 
     //Structure
@@ -238,17 +233,14 @@
                               "name":stations[i]
                             };
       };
-      
-      stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) + (stationStacked[stationStackedCount.length-1].y * rowHeight);
 
+      stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) + (stationStacked[stationStackedCount.length-1].y * rowHeight);
       panBounds = {
                     top:    0,
                     right:  0,
                     bottom: (-1*stationHeight) + innerHeight - xAxisHeight,
                     left:   (-1*xAxisWidth) + outerWidth
                   }
-      console.log(panBounds);
-      console.log(stationStacked);
 
       //setup stations overlay and text  NOTE - stations is outside of the zoomable section, as not to change it too
       var stationsSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
