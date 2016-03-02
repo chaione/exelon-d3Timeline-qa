@@ -143,6 +143,24 @@
                         delivery: i,
                         station:Math.round(i/3),
                       });
+
+      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+1, 44), 
+                        endTime:   new Date(2000, 0, 1,8+(i*.2)+2, 20),
+                        delivery: i,
+                        station:Math.round(i/3),
+                      });
+
+      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+2,22), 
+                        endTime:   new Date(2000, 0, 1,8+(i*.2)+4,12),
+                        delivery: i,
+                        station:Math.round(i/3),
+                      });
+
+      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+4,15), 
+                        endTime:   new Date(2000, 0, 1,8+(i*.2)+4,40),
+                        delivery: i,
+                        station:Math.round(i/3),
+                      });
     }
     var deliveries = d3.nest()
           .key(function(d) { return d.station; })
@@ -324,7 +342,48 @@
     
 
     render(deliveries);
+    function resize() { 
+       console.log('reasize');
+       console.log(document.documentElement.clientWidth);
+       console.log(document.documentElement.clientHeight);
+       outerWidth  = document.documentElement.clientWidth;
+       outerHeight = document.documentElement.clientHeight;
+      innerWidth     = outerWidth   - margin.left - margin.right;
+      innerHeight    = outerHeight  - margin.top  - margin.bottom;
+      svg.remove();
+       svg = d3.select("body").append("svg")
+          .attr("width",  outerWidth)
+          .attr("height", outerHeight)
+          .call(xAxisTranslation);;
 
+         stationsGroup = svg.append("g")
+              .attr("class", "stations")
+              .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+              
+
+         g = svg.append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+             deliveriesGroup = g.append("g")
+                  .attr("class", "deliveries")
+                  .attr('transform', 'translate(' + startingX + "," + 0 + ')');
+
+             xAxisGroup = g.append("g")
+                  .attr("class", "x axis")
+                  .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+
+             yAxisGroup = g.append("g")
+                  .attr("class", "y axis");
+
+      svg.attr("width", outerWidth).attr("height", outerHeight);
+      render(deliveries);
+
+      deliveriesGroup.attr("transform", "translate(" + [startingX,0] + ")scale(1)");
+      stationsGroup.attr("transform", "translate(" + [0,0] + ")scale(1)");
+      xAxisGroup.attr("transform", "translate(" + [startingX,innerHeight] + ")scale(1)");
+    }
+
+    window.onresize = resize;
   </script>
 </html>
 
