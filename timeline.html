@@ -122,33 +122,33 @@
     startingX = viewportScale(new Date(2000,0,1,nowHours,nowMinutes));
 
     //Create Data
-    for(var i = 17; i > 0; i--){
-      duration  = 4;
+    for(var i = 21; i > 0; i--){
       variation =        Math.random() * 1;
       variationMinutes = Math.random() * 60;
 
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2), 5), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2),25),
-                        station:Math.round(i/2.5),
+                        delivery: i,
+                        station:Math.round(i/3),
                       });
 
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2),28), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2),48),
-                        station:Math.round(i/2.5),
+                        delivery: i,
+                        station:Math.round(i/3),
                       });
 
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2),56), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2)+1,40),
-                        station:Math.round(i/2.5),
+                        delivery: i,
+                        station:Math.round(i/3),
                       });
     }
-    console.log(workflows);
     var deliveries = d3.nest()
-          .key(function (d){ return d.station; })
+          .key(function(d) { return d.station; })
+          .key(function(d) { return d.delivery; })
           .entries(workflows);
 
-    console.log(deliveries)
-    // debugger;
 
     //interactivity
     var xAxisTranslation = d3.behavior.zoom()
@@ -210,17 +210,19 @@
           .scale(xScale);
 
     function stationCalculations(data){
+      console.log('----stationCalculations');
+      console.log(data);
       stationCounts =[0,0,0,0,0,0,0,0];
-      stationStackedCount=[0,0,0,0,0,0,0,0]
+      stationStackedCount=[0,0,0,0,0,0,0,0];
       stationStacked=[];
 
-      for(var i =0;i<data.length;i++){
-        stationCounts[data[i].station]++;
+      for(var i =0;i<data.length;i++){ //how many deliveries per station
+        if(data[i].values.length >= 1){
+          stationCounts[i] = data[i].values.length;
+        } else {
+          stationCounts[i] = 1;
+        }
       }
-
-      for (var i = 0; i < stationCounts.length; i++) { //make sure they have at least 1
-        stationCounts[i] = stationCounts[i] || 1;
-      };
 
       stationStackedCount[0] = stationCounts[0];
       for (var i = 1; i < stationCounts.length; i++) {
@@ -287,25 +289,34 @@
 
 
       // Bind data
-      var deliveriesSelectAll = deliveriesGroup.selectAll(".delivery").data(data);
-      deliveriesSelectAll.enter().append("g").attr("class", "delivery");
-      deliveriesSelectAll.exit().remove();
+      var stationSelectAll2 = deliveriesGroup.selectAll(".station").data(data);
+      stationSelectAll2.enter().append("g").attr("class", "stationf");
+      stationSelectAll2.exit().remove();
 
-      // Enter
+      var deliveriesSelectAll = stationSelectAll2.selectAll(".deliverie").data(function(d){
+        return d.values;
+      });
+      deliveriesSelectAll.enter().append("g").attr("class", "deliverie");
+
+
       var workflowsSelectAll = deliveriesSelectAll.selectAll(".workflow").data(function(d){
         return d.values;
       });
+      // Enter
+      
       workflowsSelectAll.enter().append("line");
 
       // Exit
       workflowsSelectAll.exit().remove();
 
+
+
       // Update
       workflowsSelectAll
           .attr("x1", function(d,i) { return xScale(d.startTime); })
-          .attr("y1", function(d,i) { return yDeliveryScale(d.station); })
+          .attr("y1", function(d,i) { return yDeliveryScale(d.delivery); })
           .attr("x2", function(d,i) { return xScale(d.endTime); })
-          .attr("y2", function(d,i) { return yDeliveryScale(d.station); })
+          .attr("y2", function(d,i) { return yDeliveryScale(d.delivery); })
           .attr("class", "workflow");
 
     }
