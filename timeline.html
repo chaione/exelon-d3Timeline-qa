@@ -43,7 +43,7 @@
       fill: white;
     }
 
-    .delivery {
+    .workflow {
       stroke:          steelblue;
       stroke-width:    1px;
     }
@@ -96,6 +96,7 @@
     //Variables (to be used)
     var stationHeight;
     var deliveries=[];
+    var workflows=[];
     var startingX;
     var duration, variation, variationMinutes;
     var yDeliveryScale;
@@ -123,35 +124,31 @@
     //Create Data
     for(var i = 17; i > 0; i--){
       duration  = 4;
-      variation = Math.random() * 1;
-      variationMinutes = Math.random()*60;
+      variation =        Math.random() * 1;
+      variationMinutes = Math.random() * 60;
 
-      deliveries.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+variation,variationMinutes), 
-                         endTime:   new Date(2000, 0, 1,8+(i*.2)+variation + duration,variationMinutes),
-                         station:Math.round(i/2.5),
-                         stationStartTimes:[
-                                              0,
-                                              5,
-                                              55,
-                                              65,
-                                              105,
-                                              125,
-                                              155,
-                                              180
-                                            ],
-                          stationEndTimes: [
-                                            4,
-                                            52,
-                                            62,
-                                            98,
-                                            123,
-                                            151,
-                                            173,
-                                            195
-                                            ]
-                         });
+      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2), 5), 
+                        endTime:   new Date(2000, 0, 1,8+(i*.2),25),
+                        station:Math.round(i/2.5),
+                      });
+
+      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2),28), 
+                        endTime:   new Date(2000, 0, 1,8+(i*.2),48),
+                        station:Math.round(i/2.5),
+                      });
+
+      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2),56), 
+                        endTime:   new Date(2000, 0, 1,8+(i*.2)+1,40),
+                        station:Math.round(i/2.5),
+                      });
     }
+    console.log(workflows);
+    var deliveries = d3.nest()
+          .key(function (d){ return d.station; })
+          .entries(workflows);
 
+    console.log(deliveries)
+    // debugger;
 
     //interactivity
     var xAxisTranslation = d3.behavior.zoom()
@@ -291,20 +288,25 @@
 
       // Bind data
       var deliveriesSelectAll = deliveriesGroup.selectAll(".delivery").data(data);
-
-      // Enter
-      deliveriesSelectAll.enter().append("line");
-
-      // Exit
+      deliveriesSelectAll.enter().append("g").attr("class", "delivery");
       deliveriesSelectAll.exit().remove();
 
+      // Enter
+      var workflowsSelectAll = deliveriesSelectAll.selectAll(".workflow").data(function(d){
+        return d.values;
+      });
+      workflowsSelectAll.enter().append("line");
+
+      // Exit
+      workflowsSelectAll.exit().remove();
+
       // Update
-      deliveriesSelectAll
+      workflowsSelectAll
           .attr("x1", function(d,i) { return xScale(d.startTime); })
-          .attr("y1", function(d,i) { return yDeliveryScale(i+1); })
+          .attr("y1", function(d,i) { return yDeliveryScale(d.station); })
           .attr("x2", function(d,i) { return xScale(d.endTime); })
-          .attr("y2", function(d,i) { return yDeliveryScale(i+1); })
-          .attr("class", "delivery");
+          .attr("y2", function(d,i) { return yDeliveryScale(d.station); })
+          .attr("class", "workflow");
 
     }
 
