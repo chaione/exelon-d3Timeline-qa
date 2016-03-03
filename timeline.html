@@ -129,44 +129,53 @@
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2), 5), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2),25),
                         delivery: i,
-                        station:Math.round(i/3),
+                        station:Math.round(0),
+                        currentStation:i
                       });
 
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2),28), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2),48),
                         delivery: i,
-                        station:Math.round(i/3),
+                        station:Math.round(1),
                       });
 
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2),56), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2)+1,40),
                         delivery: i,
-                        station:Math.round(i/3),
+                        station:Math.round(2),
                       });
 
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+1, 44), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2)+2, 20),
                         delivery: i,
-                        station:Math.round(i/3),
+                        station:Math.round(3),
                       });
 
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+2,22), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2)+4,12),
                         delivery: i,
-                        station:Math.round(i/3),
+                        station:Math.round(4),
                       });
 
       workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+4,15), 
                         endTime:   new Date(2000, 0, 1,8+(i*.2)+4,40),
                         delivery: i,
-                        station:Math.round(i/3),
+                        station:Math.round(5),
+                      });
+      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+4,42), 
+                        endTime:   new Date(2000, 0, 1,8+(i*.2)+5,10),
+                        delivery: i,
+                        station:Math.round(6),
+                      });
+      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+5,14), 
+                        endTime:   new Date(2000, 0, 1,8+(i*.2)+5,36),
+                        delivery: i,
+                        station:Math.round(7),
                       });
     }
     var deliveries = d3.nest()
-          .key(function(d) { return d.station; })
           .key(function(d) { return d.delivery; })
           .entries(workflows);
-
 
     //interactivity
     var xAxisTranslation = d3.behavior.zoom()
@@ -234,13 +243,21 @@
       stationStackedCount=[0,0,0,0,0,0,0,0];
       stationStacked=[];
 
-      for(var i =0;i<data.length;i++){ //how many deliveries per station
-        if(data[i].values.length >= 1){
-          stationCounts[i] = data[i].values.length;
-        } else {
-          stationCounts[i] = 1;
+      // for(var i =0;i<data.length;i++){ //how many deliveries per station
+      //   if(data[i].values.length >= 1){
+      //     stationCounts[i] = data[i].values.length;
+      //   } else {
+      //     stationCounts[i] = 1;
+      //   }
+      // }
+      for(var i = 0;i<data.length;i++){
+        for(var j = 0; j<data[i].values.length;j++){
+            stationCounts[data[i].values[j].station]++;
         }
       }
+      for (var i = 0; i < stationCounts.length; i++) { //make sure they have at least 1
+        stationCounts[i] = stationCounts[i] || 1;
+      };
 
       stationStackedCount[0] = stationCounts[0];
       for (var i = 1; i < stationCounts.length; i++) {
@@ -274,7 +291,8 @@
 
 
     function render(data){
-
+    console.log('render',data);
+    debugger;
       //data manipulation
       stationCalculations(data);
 
@@ -307,14 +325,14 @@
 
 
       // Bind data
-      var stationSelectAll2 = deliveriesGroup.selectAll(".station").data(data);
-      stationSelectAll2.enter().append("g").attr("class", "stationf");
-      stationSelectAll2.exit().remove();
-
-      var deliveriesSelectAll = stationSelectAll2.selectAll(".deliverie").data(function(d){
-        return d.values;
-      });
+      var deliveriesSelectAll = deliveriesGroup.selectAll(".deliverie").data(data);
       deliveriesSelectAll.enter().append("g").attr("class", "deliverie");
+      deliveriesSelectAll.exit().remove();
+
+      // var deliveriesSelectAll = stationSelectAll2.selectAll(".deliverie").data(function(d){
+      //   return d.values;
+      // });
+      // deliveriesSelectAll.enter().append("g").attr("class", "deliverie");
 
 
       var workflowsSelectAll = deliveriesSelectAll.selectAll(".workflow").data(function(d){
@@ -342,6 +360,7 @@
     
 
     render(deliveries);
+
     function resize() { 
        console.log('reasize');
        console.log(document.documentElement.clientWidth);
