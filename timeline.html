@@ -217,7 +217,6 @@
         var stationsGroup = svg.append("g")
               .attr("class", "stations")
               .attr('transform', 'translate(' + 0 + "," + 0 + ')')
-              
 
         var g = svg.append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -226,12 +225,14 @@
                   .attr("class", "deliveries")
                   .attr('transform', 'translate(' + startingX + "," + 0 + ')');
 
+              var yAxisGroup = deliveriesGroup.append("g")
+                  .attr("class", "y axis");
+
             var xAxisGroup = g.append("g")
                   .attr("class", "x axis")
                   .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
-            var yAxisGroup = g.append("g")
-                  .attr("class", "y axis");
+            
         
 
     //Helper Fucntions
@@ -374,10 +375,10 @@
       xAxisGroup.call(xAxis);
       yAxisGroup.append("line")
           .style("stroke-dasharray", ("2, 2"))
-          .attr("x1", innerWidth/2)
+          .attr("x1", xScale(now))
           .attr("y1", margin.top)
-          .attr("x2", outerWidth/2)
-          .attr("y2", innerHeight);
+          .attr("x2", xScale(now))
+          .attr("y2", stationHeight+ xAxisHeight);
 
 
       // Bind data
@@ -391,7 +392,7 @@
       deliveriesSelectAll.enter().append("g").attr("class", "deliverie");
       deliveriesSelectAll
           .attr('transform', function(d){
-            return 'translate(' + 0 + "," + yDeliveryScale(d.yIndex)+ ')';
+            return 'translate(' + 0 + "," + yDeliveryScale(d.yIndex+1)+ ')';
           })
 
       var workflowsSelectAll = deliveriesSelectAll.selectAll(".workflow").data(function(d){
@@ -410,14 +411,12 @@
       workflowsSelectAll
           .attr("x1", function(d,i) { return xScale(d.startTime); })
           .attr("y1", function(d,i) { 
-              console.log(d);
-              console.log(i);
-              return 1;
+              return 0;
               // return yDeliveryScale(d.yIndex); 
             })
           .attr("x2", function(d,i) { return xScale(d.endTime); })
           .attr("y2", function(d,i) { 
-            return 1;
+            return 0;
             // return yDeliveryScale(d.yIndex); 
           })
           .attr("class", "workflow");
