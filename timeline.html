@@ -90,9 +90,11 @@
     var vpStartHours   = (outerWidth/2)/(xAxisWidth/24);  //startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
     var unixStartHours = unixHour * vpStartHours; 
     var now            = new Date(Date.now());
+    var nowYear        = now.getFullYear();
+    var nowMonth       = now.getMonth();
+    var nowDay         = now.getDay()-1;
     var nowHours       = now.getHours();
     var nowMinutes     = now.getMinutes();
-
     //Variables (to be used)
     var stationHeight;
     var deliveries=[];
@@ -104,10 +106,10 @@
     var stationStackedCount=[];
     var stationStacked=[];
     var panBounds;
-    
+
     //scales
     var xScale = d3.time.scale.utc()
-          .domain([+new Date(2000, 0, 1),                 +new Date(2000, 0, 1,24)])
+          .domain([+new Date(nowYear, nowMonth, nowDay),                 +new Date(nowYear, nowMonth, nowDay,24)])
           .range( [0,                                     xAxisWidth]);
 
     var yDeliveryScale = d3.scale.linear()
@@ -115,67 +117,70 @@
           .range([1+rowHeight,7*rowHeight]);
 
     var viewportScale = d3.time.scale.utc()
-          .domain([+new Date(2000, 0, 1)+unixStartHours,  +new Date(2000, 0, 1,24)-unixStartHours])
+          .domain([+new Date(nowYear, nowMonth, nowDay)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay,24)-unixStartHours])
           .range( [0,                                     -1*xAxisWidth+outerWidth]);
 
 
-    startingX = viewportScale(new Date(2000,0,1,nowHours,nowMinutes));
+    startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
 
     //Create Data
     for(var i = 21; i > 0; i--){
       variation =        Math.random() * 1;
       variationMinutes = Math.random() * 60;
-
-      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2), 5), 
-                        endTime:   new Date(2000, 0, 1,8+(i*.2),25),
+      var thisMonth = 2;
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2), 5), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2),25),
                         delivery: i,
                         station:Math.round(0),
                         currentStation:i
                       });
 
-      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2),28), 
-                        endTime:   new Date(2000, 0, 1,8+(i*.2),48),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2),28), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2),48),
                         delivery: i,
                         station:Math.round(1),
                       });
 
-      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2),56), 
-                        endTime:   new Date(2000, 0, 1,8+(i*.2)+1,40),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2),56), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+1,40),
                         delivery: i,
                         station:Math.round(2),
                       });
 
-      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+1, 44), 
-                        endTime:   new Date(2000, 0, 1,8+(i*.2)+2, 20),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+1, 44), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+2, 20),
                         delivery: i,
                         station:Math.round(3),
                       });
 
-      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+2,22), 
-                        endTime:   new Date(2000, 0, 1,8+(i*.2)+4,12),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+2,22), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+4,12),
                         delivery: i,
                         station:Math.round(4),
                       });
 
-      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+4,15), 
-                        endTime:   new Date(2000, 0, 1,8+(i*.2)+4,40),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+4,15), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+4,40),
                         delivery: i,
                         station:Math.round(5),
                       });
-      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+4,42), 
-                        endTime:   new Date(2000, 0, 1,8+(i*.2)+5,10),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+4,42), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+5,10),
                         delivery: i,
                         station:Math.round(6),
                       });
-      workflows.push({  startTime: new Date(2000, 0, 1,8+(i*.2)+5,14), 
-                        endTime:   new Date(2000, 0, 1,8+(i*.2)+5,36),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+5,14), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+5,36),
                         delivery: i,
                         station:Math.round(7),
                       });
     }
+
     var deliveries = d3.nest()
           .key(function(d) { return d.delivery; })
           .entries(workflows);
+
+
 
     //interactivity
     var xAxisTranslation = d3.behavior.zoom()
@@ -235,6 +240,36 @@
           .ticks(d3.time.hours, 1)
           .tickFormat(d3.time.format('%H'))
           .scale(xScale);
+     //update data w/ current station
+    function updateCurrentStation(data){
+      var currentStation = 0;
+
+      var now = new Date(Date.now());
+      var workflow;
+
+
+      for (var i = 0; i < data.length; i++) {
+        currentStation = 0;
+
+        for (var j = 0; j < data[i].values.length; j++) {
+           workflow = data[i].values[j];
+          // debugger;
+          if(isTimeBetweenTime(now,workflow.startTime,workflow.endTime)){
+            currentStation = j;
+            console.log('YES IT IS');
+          }
+          console.log(now);
+          console.log(workflow);
+        }
+        
+
+        data[i].currentStation = currentStation;
+      };
+    }
+
+    function isTimeBetweenTime(time, start,end){
+      return start <= time && time <= end;
+    }
 
     function stationCalculations(data){
       console.log('----stationCalculations');
@@ -243,6 +278,11 @@
       stationStackedCount=[0,0,0,0,0,0,0,0];
       stationStacked=[];
 
+
+     
+
+
+
       // for(var i =0;i<data.length;i++){ //how many deliveries per station
       //   if(data[i].values.length >= 1){
       //     stationCounts[i] = data[i].values.length;
@@ -250,10 +290,9 @@
       //     stationCounts[i] = 1;
       //   }
       // }
+
       for(var i = 0;i<data.length;i++){
-        for(var j = 0; j<data[i].values.length;j++){
-            stationCounts[data[i].values[j].station]++;
-        }
+            stationCounts[data[i].currentStation]++;
       }
       for (var i = 0; i < stationCounts.length; i++) { //make sure they have at least 1
         stationCounts[i] = stationCounts[i] || 1;
@@ -290,10 +329,12 @@
 
 
 
+
+
     function render(data){
-    console.log('render',data);
-    debugger;
       //data manipulation
+      updateCurrentStation(data);
+      console.log(data);
       stationCalculations(data);
 
       //setup stations overlay and text  NOTE - stations is outside of the zoomable section, as not to change it too
