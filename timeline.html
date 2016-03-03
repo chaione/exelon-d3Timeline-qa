@@ -46,6 +46,7 @@
     .workflow {
       stroke:          steelblue;
       stroke-width:    1px;
+      display:relative;
     }
 
     svg {
@@ -122,55 +123,53 @@
 
 
     startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
-
+    var startOfDayHour = 12;
     //Create Data
     for(var i = 21; i > 0; i--){
       variation =        Math.random() * 1;
       variationMinutes = Math.random() * 60;
-      var thisMonth = 2;
-      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2), 5), 
-                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2),25),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2), 5), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),25),
                         delivery: i,
                         station:Math.round(0),
-                        currentStation:i
                       });
 
-      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2),28), 
-                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2),48),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),28), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),48),
                         delivery: i,
                         station:Math.round(1),
                       });
 
-      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2),56), 
-                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+1,40),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),56), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+1,40),
                         delivery: i,
                         station:Math.round(2),
                       });
 
-      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+1, 44), 
-                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+2, 20),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+1, 44), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+2, 20),
                         delivery: i,
                         station:Math.round(3),
                       });
 
-      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+2,22), 
-                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+4,12),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+2,22), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,12),
                         delivery: i,
                         station:Math.round(4),
                       });
 
-      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+4,15), 
-                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+4,40),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,15), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,40),
                         delivery: i,
                         station:Math.round(5),
                       });
-      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+4,42), 
-                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+5,10),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,42), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,10),
                         delivery: i,
                         station:Math.round(6),
                       });
-      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,8+(i*.2)+5,14), 
-                        endTime:   new Date(nowYear, nowMonth, nowDay,8+(i*.2)+5,36),
+      workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,14), 
+                        endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,36),
                         delivery: i,
                         station:Math.round(7),
                       });
@@ -240,6 +239,7 @@
           .ticks(d3.time.hours, 1)
           .tickFormat(d3.time.format('%H'))
           .scale(xScale);
+
      //update data w/ current station
     function updateCurrentStation(data){
       var currentStation = 0;
@@ -256,40 +256,22 @@
           // debugger;
           if(isTimeBetweenTime(now,workflow.startTime,workflow.endTime)){
             currentStation = j;
-            console.log('YES IT IS');
           }
-          console.log(now);
-          console.log(workflow);
         }
-        
-
+      
         data[i].currentStation = currentStation;
       };
+      return data;
     }
 
     function isTimeBetweenTime(time, start,end){
       return start <= time && time <= end;
     }
 
-    function stationCalculations(data){
-      console.log('----stationCalculations');
-      console.log(data);
+    function stationLabelsCalculations(data){
       stationCounts =[0,0,0,0,0,0,0,0];
       stationStackedCount=[0,0,0,0,0,0,0,0];
       stationStacked=[];
-
-
-     
-
-
-
-      // for(var i =0;i<data.length;i++){ //how many deliveries per station
-      //   if(data[i].values.length >= 1){
-      //     stationCounts[i] = data[i].values.length;
-      //   } else {
-      //     stationCounts[i] = 1;
-      //   }
-      // }
 
       for(var i = 0;i<data.length;i++){
             stationCounts[data[i].currentStation]++;
@@ -327,15 +309,48 @@
     }
 
 
+    function stackDataCalculations(stationData) {
+      for (var i = 0; i < stationData.length; i++) {
+        for (var j = 0; j < stationData[i].values.length; j++) {
+          // var currStation = stationDeliveries[j].currentStation;
+          if(i==0){
+            stationData[i].values[j].yIndex = j;
+          } else {
+            stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key] + j;
+          }
 
 
+        };
+      };
+
+      return stationData;
+    }
+
+
+    function compare(a,b) {
+      if (a.currentStation < b.currentStation)
+        return -1;
+      else if (a.currentStation > b.currentStation)
+        return 1;
+      else 
+        return 0;
+    }
 
 
     function render(data){
       //data manipulation
-      updateCurrentStation(data);
-      console.log(data);
-      stationCalculations(data);
+      data = updateCurrentStation(data);
+      stationLabelsCalculations(data);
+
+      data = data.sort(compare);
+      // groupByStation
+      var data = d3.nest()
+          .key(function(d) { return d.currentStation; })
+          .entries(data);
+
+      
+
+      data = stackDataCalculations(data);
 
       //setup stations overlay and text  NOTE - stations is outside of the zoomable section, as not to change it too
       var stationsSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
@@ -366,15 +381,18 @@
 
 
       // Bind data
-      var deliveriesSelectAll = deliveriesGroup.selectAll(".deliverie").data(data);
+      var stationsSelectAll2 = deliveriesGroup.selectAll(".station").data(data);
+      stationsSelectAll2.enter().append("g").attr("class", "station");
+      stationsSelectAll2.exit().remove();
+
+      var deliveriesSelectAll = stationsSelectAll2.selectAll(".deliverie").data(function(d){
+        return d.values;
+      });
       deliveriesSelectAll.enter().append("g").attr("class", "deliverie");
-      deliveriesSelectAll.exit().remove();
-
-      // var deliveriesSelectAll = stationSelectAll2.selectAll(".deliverie").data(function(d){
-      //   return d.values;
-      // });
-      // deliveriesSelectAll.enter().append("g").attr("class", "deliverie");
-
+      deliveriesSelectAll
+          .attr('transform', function(d){
+            return 'translate(' + 0 + "," + yDeliveryScale(d.yIndex)+ ')';
+          })
 
       var workflowsSelectAll = deliveriesSelectAll.selectAll(".workflow").data(function(d){
         return d.values;
@@ -391,9 +409,17 @@
       // Update
       workflowsSelectAll
           .attr("x1", function(d,i) { return xScale(d.startTime); })
-          .attr("y1", function(d,i) { return yDeliveryScale(d.delivery); })
+          .attr("y1", function(d,i) { 
+              console.log(d);
+              console.log(i);
+              return 1;
+              // return yDeliveryScale(d.yIndex); 
+            })
           .attr("x2", function(d,i) { return xScale(d.endTime); })
-          .attr("y2", function(d,i) { return yDeliveryScale(d.delivery); })
+          .attr("y2", function(d,i) { 
+            return 1;
+            // return yDeliveryScale(d.yIndex); 
+          })
           .attr("class", "workflow");
 
     }
