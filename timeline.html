@@ -308,25 +308,20 @@
                     left:   (-1*xAxisWidth) + outerWidth
                   }
 
-      console.log(stationCounts);
-      console.log(stationStackedCount);
-      console.log(stationStacked);
     }
 
     //we set the starting yIndex. of each Delivery
     function stackDataCalculations(stationData) {
-      console.log(stationStackedCount);
 
       for (var i = 0; i < stationData.length; i++) {
-          console.log('stationData['+i+']: ', stationData[i]);
+          // console.log('stationData['+i+']: ', stationData[i]);
         for (var j = 0; j < stationData[i].values.length; j++) {
           // var currStation = stationDeliveries[j].currentStation;
-          console.log('stationData['+i+'].values['+j+']: ', stationData[i].values[j]);
+          // console.log('stationData['+i+'].values['+j+']: ', stationData[i].values[j]);
           // debugger;
           if(i==0){
             stationData[i].values[j].yIndex = j;
           } else {
-            console.log(stationData[i]);
             stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key-1] + j;
           }
 
@@ -351,9 +346,7 @@
     function render(data){
       //data manipulation
       data = updateCurrentStation(data);
-      console.log(data);
       stationLabelsCalculations(data);
-
       data = data.sort(compare);
       // groupByStation
       var data = d3.nest()
@@ -363,7 +356,6 @@
       
 
       data = stackDataCalculations(data);
-      console.log('stationData',data);
 
       //setup stations overlay and text  NOTE - stations is outside of the zoomable section, as not to change it too
       var stationsSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
@@ -440,9 +432,6 @@
     render(deliveries);
 
     function resize() { 
-       console.log('reasize');
-       console.log(document.documentElement.clientWidth);
-       console.log(document.documentElement.clientHeight);
        outerWidth  = document.documentElement.clientWidth;
        outerHeight = document.documentElement.clientHeight;
       innerWidth     = outerWidth   - margin.left - margin.right;
@@ -465,12 +454,12 @@
                   .attr("class", "deliveries")
                   .attr('transform', 'translate(' + startingX + "," + 0 + ')');
 
+                yAxisGroup = deliveriesGroup.append("g")
+                  .attr("class", "y axis");
+
              xAxisGroup = g.append("g")
                   .attr("class", "x axis")
                   .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
-
-             yAxisGroup = g.append("g")
-                  .attr("class", "y axis");
 
       svg.attr("width", outerWidth).attr("height", outerHeight);
       render(deliveries);
