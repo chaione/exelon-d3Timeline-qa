@@ -75,12 +75,11 @@
     var stations =   {
                       0:"En Route",
                       1:"Sierra One",
-                      2:"Shed",
-                      3:"Transit",
-                      4:"Stinger Gate",
-                      5:"Sally Port",
-                      6:"Warehouse",
-                      7:"PA"
+                      2:"Stinger Gate",
+                      3:"Sally Port",
+                      4:"Warehouse",
+                      5:"PA",
+                      6:"Exit"
                     }
 
     //Calculated Variables
@@ -139,30 +138,11 @@
 
     //interactivity
     var xAxisTranslation = d3.behavior.zoom()
-        .scaleExtent([1, 6])
-        .translate([startingX,0])
-        .on("zoom", moveXAxis);
+          .scaleExtent([1, 6])
+          .translate([startingX,0])
+          .on("zoom", moveXAxis);
 
-    function moveXAxis(a,b) {
-      var eventxTranslation = d3.event.translate[0];
-      var eventyTranslation = d3.event.translate[1];
-
-      deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
-      stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
-      xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
-      
-      if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
-        var translation = [
-                            Math.max(Math.min(eventxTranslation, panBounds.right), panBounds.left),
-                            Math.max(Math.min(eventyTranslation, panBounds.top)  , panBounds.bottom),
-                          ];
-        deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
-        stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
-        xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
-        xAxisTranslation.translate(translation);
-      }
-    }
-
+  
     //Structure
     var svg = d3.select("body").append("svg")
           .attr("width",  outerWidth)
@@ -181,16 +161,24 @@
                   .attr('transform', 'translate(' + startingX + "," + 0 + ')');
 
                 var yAxisGroup = deliveriesGroup.append("g")
-                    .attr("class", "y axis");
+                      .attr("class", "y axis");
 
             var xAxisGroup = g.append("g")
                   .attr("class", "x axis")
                   .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
      
+    
+    render(deliveries);
+
+    window.onresize = resize;
+
+
+
+    //utility
     function render(data){
       //data manipulation
-      data = updateCurrentStationCalc(data);
+      data                    = updateCurrentStationCalc(data);
       var stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
       var stationStackedCount = stationStackedCountCalc(stationCounts);
       var stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
@@ -274,42 +262,35 @@
           .attr("class", "workflow");
     }
 
-    render(deliveries);
-
-    window.onresize = resize;
-
-
-
-    //utility
     function resize() { 
-       outerWidth  = document.documentElement.clientWidth;
-       outerHeight = document.documentElement.clientHeight;
+      outerWidth  = document.documentElement.clientWidth;
+      outerHeight = document.documentElement.clientHeight;
       innerWidth     = outerWidth   - margin.left - margin.right;
       innerHeight    = outerHeight  - margin.top  - margin.bottom;
       svg.remove();
-       svg = d3.select("body").append("svg")
-          .attr("width",  outerWidth)
-          .attr("height", outerHeight)
-          .call(xAxisTranslation);;
+      svg = d3.select("body").append("svg")
+        .attr("width",  outerWidth)
+        .attr("height", outerHeight)
+        .call(xAxisTranslation);;
 
-         stationsGroup = svg.append("g")
-              .attr("class", "stations")
-              .attr('transform', 'translate(' + 0 + "," + 0 + ')')
-              
+        stationsGroup = svg.append("g")
+            .attr("class", "stations")
+            .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+            
 
-         g = svg.append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-             deliveriesGroup = g.append("g")
-                  .attr("class", "deliveries")
-                  .attr('transform', 'translate(' + startingX + "," + 0 + ')');
+            deliveriesGroup = g.append("g")
+                .attr("class", "deliveries")
+                .attr('transform', 'translate(' + startingX + "," + 0 + ')');
 
                 yAxisGroup = deliveriesGroup.append("g")
                   .attr("class", "y axis");
 
-             xAxisGroup = g.append("g")
-                  .attr("class", "x axis")
-                  .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+            xAxisGroup = g.append("g")
+                .attr("class", "x axis")
+                .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
       svg.attr("width", outerWidth).attr("height", outerHeight);
       render(deliveries);
@@ -319,31 +300,71 @@
       xAxisGroup.attr("transform", "translate(" + [startingX,innerHeight] + ")scale(1)");
     }
 
+    function moveXAxis(a,b) {
+      var eventxTranslation = d3.event.translate[0];
+      var eventyTranslation = d3.event.translate[1];
+
+      deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
+      stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
+      xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
+      
+      if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
+        var translation = [
+                            Math.max(Math.min(eventxTranslation, panBounds.right), panBounds.left),
+                            Math.max(Math.min(eventyTranslation, panBounds.top)  , panBounds.bottom),
+                          ];
+        deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
+        stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
+        xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
+        xAxisTranslation.translate(translation);
+      }
+    }
+
+
     function updateCurrentStationCalc(data){//update every delivery w/ its current station
       var workflow;
       var currentStation = 0;
 
       var now = new Date(Date.now());
-
-
+      console.log('updateCurrentStationCalc',data);
+      // debugger;
+      //assums workflows are in ascending order
       for (var i = 0; i < data.length; i++) {
         currentStation = 0;
+
 
         for (var j = 0; j < data[i].values.length; j++) {
            workflow = data[i].values[j];
           // debugger;
           if(isTimeBetweenTime(now,workflow.startTime,workflow.endTime)){
-            currentStation = j;
+            currentStation = workflow.station;
+            // debugger;
           }
         }
       
+        if(currentStation == 0){
+          var firstWorkflowOfDelivery = data[i].values[0];
+          var lastWorkflowOfDelivery = data[i].values[data[i].values.length-1];
+          
+          if (firstWorkflowOfDelivery.startTime > now) {
+            currentStation = 0; // first station
+          };
+
+
+          if (lastWorkflowOfDelivery.endTime < now) {
+            currentStation = 6; // last station
+          };
+        }
+
         data[i].currentStation = currentStation;
+
+
       };
       return data;
     }
 
     function stationCountCalc(data){ // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-      var stationCounts =[0,0,0,0,0,0,0,0];      //[7, 5, 5, 1, 4, 1, 1, 1]
+      var stationCounts =[0,0,0,0,0,0,0];      //[7, 5, 5, 1, 4, 1, 1, 1]
 
       for(var i = 0;i<data.length;i++){
         stationCounts[data[i].currentStation]++;
@@ -356,7 +377,7 @@
     }
 
     function stationStackedCountCalc(stationCounts){ //[7, 12, 17, 18, 22, 23, 24, 25]
-      var stationStackedCount=[0,0,0,0,0,0,0,0]; 
+      var stationStackedCount=[0,0,0,0,0,0,0]; 
       
       stationStackedCount[0] = stationCounts[0];
       for (var i = 1; i < stationCounts.length; i++) {
@@ -417,11 +438,6 @@
       for(var i = 21; i > 0; i--){
         variation =        Math.random() * 1;
         variationMinutes = Math.random() * 60;
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2), 5), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),25),
-                          delivery: i,
-                          station:Math.round(0),
-                        });
 
         workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),28), 
                           endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),48),
@@ -457,11 +473,7 @@
                           delivery: i,
                           station:Math.round(6),
                         });
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,14), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,36),
-                          delivery: i,
-                          station:Math.round(7),
-                        });
+
       }
       return workflows;
     }
