@@ -123,7 +123,7 @@
 
 
     startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
-    var startOfDayHour = 12;
+    var startOfDayHour = 8;
     //Create Data
     for(var i = 21; i > 0; i--){
       variation =        Math.random() * 1;
@@ -270,9 +270,9 @@
     }
 
     function stationLabelsCalculations(data){
-      stationCounts =[0,0,0,0,0,0,0,0];
-      stationStackedCount=[0,0,0,0,0,0,0,0];
-      stationStacked=[];
+      stationCounts =[0,0,0,0,0,0,0,0];      //[7, 5, 5, 1, 4, 1, 1, 1]
+      stationStackedCount=[0,0,0,0,0,0,0,0]; //[7, 12, 17, 18, 22, 23, 24, 25]
+      stationStacked=[];                     //[Object(name:EnRoute, y:7,y0:0),Object...]
 
       for(var i = 0;i<data.length;i++){
             stationCounts[data[i].currentStation]++;
@@ -307,17 +307,27 @@
                     bottom: (-1*stationHeight) + innerHeight - xAxisHeight,
                     left:   (-1*xAxisWidth) + outerWidth
                   }
+
+      console.log(stationCounts);
+      console.log(stationStackedCount);
+      console.log(stationStacked);
     }
 
-
+    //we set the starting yIndex. of each Delivery
     function stackDataCalculations(stationData) {
+      console.log(stationStackedCount);
+
       for (var i = 0; i < stationData.length; i++) {
+          console.log('stationData['+i+']: ', stationData[i]);
         for (var j = 0; j < stationData[i].values.length; j++) {
           // var currStation = stationDeliveries[j].currentStation;
+          console.log('stationData['+i+'].values['+j+']: ', stationData[i].values[j]);
+          // debugger;
           if(i==0){
             stationData[i].values[j].yIndex = j;
           } else {
-            stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key] + j;
+            console.log(stationData[i]);
+            stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key-1] + j;
           }
 
 
@@ -341,6 +351,7 @@
     function render(data){
       //data manipulation
       data = updateCurrentStation(data);
+      console.log(data);
       stationLabelsCalculations(data);
 
       data = data.sort(compare);
@@ -352,6 +363,7 @@
       
 
       data = stackDataCalculations(data);
+      console.log('stationData',data);
 
       //setup stations overlay and text  NOTE - stations is outside of the zoomable section, as not to change it too
       var stationsSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
