@@ -71,7 +71,7 @@
     var margin      = {top: 0, right: 0, bottom: 30, left: 0};
     var outerWidth  = document.documentElement.clientWidth;
     var outerHeight = document.documentElement.clientHeight;
-    var startOfDayHour = 8; //used for fake data
+    var startOfDayHour = 4; //used for fake data
     var stations =   {
                       0:"En Route",
                       1:"Sierra One",
@@ -95,8 +95,6 @@
     var nowDay         = now.getDate();
     var nowHours       = now.getHours();
     var nowMinutes     = now.getMinutes();
-    console.log(now);
-    debugger;
     //Variables (to be used)
     var stationHeight;
     var deliveries=[];
@@ -131,7 +129,7 @@
 
     //Create Data
     var workflowsFakeData = generateWorkflows(startOfDayHour);
-    console.log(workflowsFakeData);
+
     var deliveries = d3.nest()  //group by delivery
           .key(function(d) { return d.delivery; })
           .entries(workflowsFakeData);
@@ -198,7 +196,7 @@
           .entries(data);
 
       data = stackDeliveriesCalc(stationStackedCount,data); // set the yIndex for every delivery (make sure )
-
+      console.log('stackDeliveriesCalc',data);
 
       // Setup stations overlay and text
       var stationsSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
@@ -216,7 +214,6 @@
           .text(function(d,i){return d.name})
           .attr("class","name")
           .attr("font-size", stationTextHeight + "px");
-
 
       // Setup axii
       xAxisGroup.call(xAxis);
@@ -411,11 +408,7 @@
 
       for (var i = 0; i < stationData.length; i++) {
         for (var j = 0; j < stationData[i].values.length; j++) {
-          if(i==0){
-            stationData[i].values[j].yIndex = j;
-          } else {
             stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key-1] + j;
-          }
         }
       }
 
