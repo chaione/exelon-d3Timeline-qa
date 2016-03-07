@@ -92,9 +92,11 @@
     var now            = new Date(Date.now());
     var nowYear        = now.getFullYear();
     var nowMonth       = now.getMonth();
-    var nowDay         = now.getDay()-1;
+    var nowDay         = now.getDate();
     var nowHours       = now.getHours();
     var nowMinutes     = now.getMinutes();
+    console.log(now);
+    debugger;
     //Variables (to be used)
     var stationHeight;
     var deliveries=[];
@@ -127,10 +129,9 @@
           .tickFormat(d3.time.format('%H'))
           .scale(xScale);
 
-
     //Create Data
     var workflowsFakeData = generateWorkflows(startOfDayHour);
-    
+    console.log(workflowsFakeData);
     var deliveries = d3.nest()  //group by delivery
           .key(function(d) { return d.delivery; })
           .entries(workflowsFakeData);
