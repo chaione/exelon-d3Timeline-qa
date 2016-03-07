@@ -71,7 +71,7 @@
     var margin      = {top: 0, right: 0, bottom: 30, left: 0};
     var outerWidth  = document.documentElement.clientWidth;
     var outerHeight = document.documentElement.clientHeight;
-    var startOfDayHour = 4; //used for fake data
+    var startOfDayHour = 14; //used for fake data
     var stations =   {
                       0:"En Route",
                       1:"Sierra One",
@@ -258,6 +258,16 @@
             // return yDeliveryScale(d.yIndex); 
           })
           .attr("class", "workflow");
+
+      var workflowsSelectAllText = deliveriesSelectAll.selectAll(".workflow").data(function(d){
+        return d.values;
+      });
+      workflowsSelectAllText.insert().append("text");
+      workflowsSelectAllText
+          .attr("x",function(d,i){  return xScale(d.endTime); })
+          .attr("y",1)
+          .text("d1");
+
     }
 
     function resize() { 
@@ -333,7 +343,13 @@
 
         for (var j = 0; j < data[i].values.length; j++) {
            workflow = data[i].values[j];
+
           // debugger;
+          // if(now < workflow.endTime){
+          //   currentStation = workflow.station;
+          //   console.log(currentStation);
+          // }
+
           if(isTimeBetweenTime(now,workflow.startTime,workflow.endTime)){
             currentStation = workflow.station;
             // debugger;
@@ -355,6 +371,7 @@
         }
 
         data[i].currentStation = currentStation;
+        console.log("setStation:" + currentStation);
 
 
       };
@@ -363,6 +380,7 @@
 
     function stationCountCalc(data){ // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
       var stationCounts =[0,0,0,0,0,0,0];      //[7, 5, 5, 1, 4, 1, 1, 1]
+
 
       for(var i = 0;i<data.length;i++){
         stationCounts[data[i].currentStation]++;
@@ -408,7 +426,12 @@
 
       for (var i = 0; i < stationData.length; i++) {
         for (var j = 0; j < stationData[i].values.length; j++) {
-            stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key-1] + j;
+console.log(i);
+            if(stationData[i].key == 0){
+              stationData[i].values[j].yIndex = j;
+            }else {
+              stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key-1] + j;
+            }
         }
       }
 
@@ -461,11 +484,6 @@
                           endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,40),
                           delivery: i,
                           station:Math.round(5),
-                        });
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,42), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,10),
-                          delivery: i,
-                          station:Math.round(6),
                         });
 
       }
