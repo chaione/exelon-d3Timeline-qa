@@ -64,14 +64,14 @@
     //User Defined Variables
     var rowHeight   = 45;
     var xAxisHeight = 30;
-    var xAxisWidth  = 3000;
+    var xAxisWidth  = 4500;
     var stationTextHeight = 20;
     var stationTextPadding = {top: 10, right: 0, bottom: 0, left: 10};
 
     var margin      = {top: 0, right: 0, bottom: 30, left: 0};
     var outerWidth  = document.documentElement.clientWidth;
     var outerHeight = document.documentElement.clientHeight;
-    var startOfDayHour = 12; //used for fake data
+    var startOfDayHour = 7; //used for fake data
     var stations =   {
                       0:"En Route",
                       1:"Sierra One",
@@ -109,7 +109,7 @@
 
     //scales
     var xScale = d3.time.scale.utc()
-          .domain([+new Date(nowYear, nowMonth, nowDay),                 +new Date(nowYear, nowMonth, nowDay,24)])
+          .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                 +new Date(nowYear, nowMonth, nowDay+1,12)])
           .range( [0,                                     xAxisWidth]);
 
     var yDeliveryScale = d3.scale.linear()
@@ -117,7 +117,7 @@
           .range([1+rowHeight,7*rowHeight]);
 
     var viewportScale = d3.time.scale.utc()
-          .domain([+new Date(nowYear, nowMonth, nowDay)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay,24)-unixStartHours])
+          .domain([+new Date(nowYear, nowMonth, nowDay-1,12)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay+1,12)-unixStartHours])
           .range( [0,                                     -1*xAxisWidth+outerWidth]);
           
     startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
@@ -167,15 +167,17 @@
                   .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
      
-    
-    render(deliveries);
 
+    render(deliveries);
+    // setInterval(render(deliveries), 100);
+    // setInterval(function() {render(deliveries),10000});
     window.onresize = resize;
 
 
 
     //utility
     function render(data){
+      console.log('render');
       //data manipulation
       data                    = updateCurrentStationCalc(data);
       var stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
@@ -223,8 +225,7 @@
           .attr("y1", margin.top)
           .attr("x2", xScale(now))
           .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
-      console.log('setting yaxis');  
-
+      
 
       // Setup Stations
       var stationsSelectAll2 = deliveriesGroup.selectAll(".station").data(data);
@@ -292,8 +293,6 @@
       deliveriesGroup.attr("transform", "translate(" + [startingX,0] + ")scale(1)");
       stationsGroup.attr("transform", "translate(" + [0,0] + ")scale(1)");
       xAxisGroup.attr("transform", "translate(" + [startingX,innerHeight] + ")scale(1)");
-
-      
     }
 
     function moveXAxis(a,b) {
@@ -303,12 +302,12 @@
       deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
       stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
       xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
-      
       if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
         var translation = [
                             Math.max(Math.min(eventxTranslation, panBounds.right), panBounds.left),
                             Math.max(Math.min(eventyTranslation, panBounds.top)  , panBounds.bottom),
                           ];
+
         deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
         stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
         xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
@@ -337,26 +336,23 @@
             }
           }
 
-          // if(isTimeBetweenTime(now,workflow.startTime,workflow.endTime)){
-          //   currentStation = workflow.station;
-          //   // debugger;
-          // }
         }
-      
-        if(currentStation == 0){
+
+        if(currentStation == 1){
           var firstWorkflowOfDelivery = data[i].values[0];
-          var lastWorkflowOfDelivery = data[i].values[data[i].values.length-1];
-          
+
           if (firstWorkflowOfDelivery.startTime > now) {
             currentStation = 0; // first station
           };
-
+        }
+      
+        if(currentStation == 0){
+          var lastWorkflowOfDelivery = data[i].values[data[i].values.length-1];
 
           if (lastWorkflowOfDelivery.endTime < now) {
             currentStation = 6; // last station
           };
         }
-
         data[i].currentStation = currentStation;
 
 
