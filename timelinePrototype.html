@@ -294,25 +294,50 @@
     }
 
     function moveXAxis(a,b) {
+      console.log('moveXAxis');
       var eventxTranslation = d3.event.translate[0];
       var eventyTranslation = d3.event.translate[1];
-      
+
       deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
       stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
       xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
 
       if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
-        var translation = [
-                            Math.max(Math.min(eventxTranslation, panBounds.right), panBounds.left),
-                            Math.max(Math.min(eventyTranslation, panBounds.top)  , panBounds.bottom),
-                          ];
+        // var translation = [
+        //                     Math.max(Math.min(eventxTranslation, panBounds.right), panBounds.left),
+        //                     Math.max(Math.min(eventyTranslation, panBounds.top)  , panBounds.bottom),
+        //                   ];
+          var maxShiftFromTop = stationHeight>outerHeight?panBounds.bottom:0;
+          var translation = [
+            Math.max(Math.min(eventxTranslation, panBounds.right),  panBounds.left),
+            Math.max(Math.min(eventyTranslation, panBounds.top),    maxShiftFromTop)
+            ///if panBounds bottom is 0, then on pages that do scroll, it will always snap to top
+            ///if there is no max, then you can scroll indefinitely
+          ];
+        // }else {
 
-        deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
-        stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
-        xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
-        xAxisTranslation.translate(translation); 
+        //   var translation = [
+        //     Math.max(Math.min(eventxTranslation, panBounds.right),  panBounds.left),
+        //     Math.max(Math.min(eventyTranslation, panBounds.top),    0),
+        //     ///if panBounds bottom is 0, then on pages that do scroll, it will always snap to top
+        //     ///if there is no max, then you can scroll indefinitely
+        //   ];
 
-      }
+
+          console.log('translation:',translation);
+          deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
+          stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
+          xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
+          xAxisTranslation.translate(translation); 
+
+
+
+        
+        }
+                          
+        
+
+      
     }
 
 
@@ -442,24 +467,25 @@
         delivery:1,
         station:1
       },
-        {
-          startTime: new Date(nowYear, nowMonth, nowDay, 6,13),
-          endTime: new Date(nowYear, nowMonth, nowDay,   6,17),
-          delivery:1,
-          station:2
-        },
-          {
-            startTime: new Date(nowYear, nowMonth, nowDay, 6,18),
-            endTime: new Date(nowYear, nowMonth, nowDay,   7,2),
-            delivery:1,
-            station:3
-          },
-            {
-            startTime: new Date(nowYear, nowMonth, nowDay, 7,10),
-            endTime: new Date(nowYear, nowMonth, nowDay,   7,40),
-            delivery:1,
-            station:5
-        },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 6,13),
+        endTime: new Date(nowYear, nowMonth, nowDay,   6,17),
+        delivery:1,
+        station:2
+      },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 6,18),
+        endTime: new Date(nowYear, nowMonth, nowDay,   7,2),
+        delivery:1,
+        station:3
+      },
+      {
+      startTime: new Date(nowYear, nowMonth, nowDay, 7,10),
+      endTime: new Date(nowYear, nowMonth, nowDay,   7,40),
+      delivery:1,
+      station:5
+      },
+
 
       {
         startTime: new Date(nowYear, nowMonth, nowDay, 6,0),
@@ -467,24 +493,25 @@
         delivery:2,
         station:1
       },
-        {
-          startTime: new Date(nowYear, nowMonth, nowDay, 7,5),
-          endTime: new Date(nowYear, nowMonth, nowDay,   7,9),
-          delivery:2,
-          station:2
-        },
-          {
-            startTime: new Date(nowYear, nowMonth, nowDay, 7,10),
-            endTime: new Date(nowYear, nowMonth, nowDay,   7,35),
-            delivery:2,
-            station:3
-          },
-            {
-            startTime: new Date(nowYear, nowMonth, nowDay, 7,45),
-            endTime: new Date(nowYear, nowMonth, nowDay,   8,5),
-            delivery:2,
-            station:5
-        },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 7,5),
+        endTime: new Date(nowYear, nowMonth, nowDay,   7,9),
+        delivery:2,
+        station:2
+      },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 7,10),
+        endTime: new Date(nowYear, nowMonth, nowDay,   7,35),
+        delivery:2,
+        station:3
+      },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 7,45),
+        endTime: new Date(nowYear, nowMonth, nowDay,   8,5),
+        delivery:2,
+        station:5
+      },
+
 
       {
         startTime: new Date(nowYear, nowMonth, nowDay, 6,0),
@@ -492,24 +519,24 @@
         delivery:3,
         station:1
       },
-        {
-          startTime: new Date(nowYear, nowMonth, nowDay, 7,40),
-          endTime: new Date(nowYear, nowMonth, nowDay,   7,44),
-          delivery:3,
-          station:2
-        },
-          {
-            startTime: new Date(nowYear, nowMonth, nowDay, 7,45),
-            endTime: new Date(nowYear, nowMonth, nowDay,   8,4),
-            delivery:3,
-            station:3
-          },
-            {
-            startTime: new Date(nowYear, nowMonth, nowDay, 8,10),
-            endTime: new Date(nowYear, nowMonth, nowDay,   8,30),
-            delivery:3,
-            station:5
-        },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 7,40),
+        endTime: new Date(nowYear, nowMonth, nowDay,   7,42),
+        delivery:3,
+        station:2
+      },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 7,45),
+        endTime: new Date(nowYear, nowMonth, nowDay,   8,9),
+        delivery:3,
+        station:4
+      },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 8,10),
+        endTime: new Date(nowYear, nowMonth, nowDay,   8,30),
+        delivery:3,
+        station:5
+      },
 
       {
         startTime: new Date(nowYear, nowMonth, nowDay, 6,0),
@@ -517,24 +544,24 @@
         delivery:4,
         station:1
       },
-        {
-          startTime: new Date(nowYear, nowMonth, nowDay, 8,5),
-          endTime: new Date(nowYear, nowMonth, nowDay,   8,9),
-          delivery:4,
-          station:2
-        },
-          {
-            startTime: new Date(nowYear, nowMonth, nowDay, 8,10),
-            endTime: new Date(nowYear, nowMonth, nowDay,   8,35),
-            delivery:4,
-            station:3
-          },
-            {
-            startTime: new Date(nowYear, nowMonth, nowDay, 8,35),
-            endTime: new Date(nowYear, nowMonth, nowDay,   9,30),
-            delivery:4,
-            station:5
-        }
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 8,5),
+        endTime: new Date(nowYear, nowMonth, nowDay,   8,9),
+        delivery:4,
+        station:2
+      },  
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 8,10),
+        endTime: new Date(nowYear, nowMonth, nowDay,   8,35),
+        delivery:4,
+        station:3
+      },
+      {
+        startTime: new Date(nowYear, nowMonth, nowDay, 8,35),
+        endTime: new Date(nowYear, nowMonth, nowDay,   9,30),
+        delivery:4,
+        station:5
+      }
           
 
 
