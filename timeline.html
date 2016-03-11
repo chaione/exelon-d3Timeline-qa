@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <meta charset="utf-8">
-  <!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
   <!-- http://curran.github.io/screencasts/splittingCharts/examples/viewer/#/17 -->
   <!-- http://bl.ocks.org/mbostock/3885705 transitions-->
   <meta name="viewport" content="minimal-ui">
@@ -72,6 +73,8 @@
     var margin      = {top: 0, right: 0, bottom: 30, left: 0};
     var outerWidth  = document.documentElement.clientWidth;
     var outerHeight = document.documentElement.clientHeight;
+    console.log(outerWidth);
+    console.log(outerHeight);
     var startOfDayHour = 7; //used for fake data
     var stations =   {
                       0:"En Route",
@@ -138,7 +141,7 @@
 
     //interactivity
     var xAxisTranslation = d3.behavior.zoom()
-          .scaleExtent([1, 6])
+          .scaleExtent([1, 1])
           .translate([startingX,0])
           .on("zoom", moveXAxis);
 
@@ -258,6 +261,8 @@
     function resize() {
       outerWidth  = document.documentElement.clientWidth;
       outerHeight = document.documentElement.clientHeight;
+      console.log(outerWidth);
+      console.log(outerHeight);
       innerWidth     = outerWidth   - margin.left - margin.right;
       innerHeight    = outerHeight  - margin.top  - margin.bottom;
       svg.remove();
@@ -470,6 +475,28 @@
       }
       return workflows;
     }
+
+    //safari rotate bug fix
+    (function(doc) {
+
+      var addEvent = 'addEventListener',
+          type = 'gesturestart',
+          qsa = 'querySelectorAll',
+          scales = [1, 1],
+          meta = qsa in doc ? doc[qsa]('meta[name=viewport]') : [];
+
+      function fix() {
+        meta.content = 'width=device-width,minimum-scale=' + scales[0] + ',maximum-scale=' + scales[1];
+        doc.removeEventListener(type, fix, true);
+      }
+
+      if ((meta = meta[meta.length - 1]) && addEvent in doc) {
+        fix();
+        scales = [.25, 1.6];
+        doc[addEvent](type, fix, true);
+      }
+
+    }(document));
   </script>
 </html>
 
