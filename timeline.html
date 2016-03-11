@@ -65,23 +65,22 @@
     //User Defined Variables
     var rowHeight   = 45;
     var xAxisHeight = 30;
-    var xAxisWidth  = 3000;
+    var xAxisWidth  = 4500;
     var stationTextHeight = 20;
     var stationTextPadding = {top: 10, right: 0, bottom: 0, left: 10};
 
     var margin      = {top: 0, right: 0, bottom: 30, left: 0};
     var outerWidth  = document.documentElement.clientWidth;
     var outerHeight = document.documentElement.clientHeight;
-    var startOfDayHour = 8; //used for fake data
+    var startOfDayHour = 7; //used for fake data
     var stations =   {
                       0:"En Route",
                       1:"Sierra One",
-                      2:"Shed",
-                      3:"Transit",
-                      4:"Stinger Gate",
-                      5:"Sally Port",
-                      6:"Warehouse",
-                      7:"PA"
+                      2:"Stinger Gate",
+                      3:"Sally Port",
+                      4:"Warehouse",
+                      5:"PA",
+                      6:"Exit"
                     }
 
     //Calculated Variables
@@ -94,7 +93,7 @@
     var now            = new Date(Date.now());
     var nowYear        = now.getFullYear();
     var nowMonth       = now.getMonth();
-    var nowDay         = now.getDay()-1;
+    var nowDay         = now.getDate();
     var nowHours       = now.getHours();
     var nowMinutes     = now.getMinutes();
     //Variables (to be used)
@@ -111,7 +110,7 @@
 
     //scales
     var xScale = d3.time.scale.utc()
-          .domain([+new Date(nowYear, nowMonth, nowDay),                 +new Date(nowYear, nowMonth, nowDay,24)])
+          .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                 +new Date(nowYear, nowMonth, nowDay+1,12)])
           .range( [0,                                     xAxisWidth]);
 
     var yDeliveryScale = d3.scale.linear()
@@ -119,7 +118,7 @@
           .range([1+rowHeight,7*rowHeight]);
 
     var viewportScale = d3.time.scale.utc()
-          .domain([+new Date(nowYear, nowMonth, nowDay)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay,24)-unixStartHours])
+          .domain([+new Date(nowYear, nowMonth, nowDay-1,12)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay+1,12)-unixStartHours])
           .range( [0,                                     -1*xAxisWidth+outerWidth]);
           
     startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
@@ -129,10 +128,9 @@
           .tickFormat(d3.time.format('%H'))
           .scale(xScale);
 
-
     //Create Data
     var workflowsFakeData = generateWorkflows(startOfDayHour);
-    
+
     var deliveries = d3.nest()  //group by delivery
           .key(function(d) { return d.delivery; })
           .entries(workflowsFakeData);
@@ -140,30 +138,11 @@
 
     //interactivity
     var xAxisTranslation = d3.behavior.zoom()
-        .scaleExtent([1, 6])
-        .translate([startingX,0])
-        .on("zoom", moveXAxis);
+          .scaleExtent([1, 6])
+          .translate([startingX,0])
+          .on("zoom", moveXAxis);
 
-    function moveXAxis(a,b) {
-      var eventxTranslation = d3.event.translate[0];
-      var eventyTranslation = d3.event.translate[1];
-
-      deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
-      stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
-      xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
-      
-      if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
-        var translation = [
-                            Math.max(Math.min(eventxTranslation, panBounds.right), panBounds.left),
-                            Math.max(Math.min(eventyTranslation, panBounds.top)  , panBounds.bottom),
-                          ];
-        deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
-        stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
-        xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
-        xAxisTranslation.translate(translation);
-      }
-    }
-
+  
     //Structure
     var svg = d3.select("body").append("svg")
           .attr("width",  outerWidth)
@@ -182,16 +161,26 @@
                   .attr('transform', 'translate(' + startingX + "," + 0 + ')');
 
                 var yAxisGroup = deliveriesGroup.append("g")
-                    .attr("class", "y axis");
+                      .attr("class", "y axis");
 
             var xAxisGroup = g.append("g")
                   .attr("class", "x axis")
                   .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
      
+
+    render(deliveries);
+    // setInterval(render(deliveries), 100);
+    // setInterval(function() {render(deliveries),10000});
+    window.onresize = resize;
+
+
+
+    //utility
     function render(data){
+      console.log('render');
       //data manipulation
-      data = updateCurrentStationCalc(data);
+      data                    = updateCurrentStationCalc(data);
       var stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
       var stationStackedCount = stationStackedCountCalc(stationCounts);
       var stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
@@ -207,10 +196,10 @@
       
       var data = d3.nest() // groupByStation
           .key(function(d) { return d.currentStation; })
+          .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
           .entries(data);
 
       data = stackDeliveriesCalc(stationStackedCount,data); // set the yIndex for every delivery (make sure )
-
 
       // Setup stations overlay and text
       var stationsSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
@@ -229,7 +218,6 @@
           .attr("class","name")
           .attr("font-size", stationTextHeight + "px");
 
-
       // Setup axii
       xAxisGroup.call(xAxis);
       yAxisGroup.append("line")
@@ -237,8 +225,8 @@
           .attr("x1", xScale(now))
           .attr("y1", margin.top)
           .attr("x2", xScale(now))
-          .attr("y2", stationHeight+ xAxisHeight);
-
+          .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
+      
 
       // Setup Stations
       var stationsSelectAll2 = deliveriesGroup.selectAll(".station").data(data);
@@ -263,54 +251,42 @@
       workflowsSelectAll.exit().remove();
       workflowsSelectAll
           .attr("x1", function(d,i) { return xScale(d.startTime); })
-          .attr("y1", function(d,i) { 
-              return 0;
-              // return yDeliveryScale(d.yIndex); 
-            })
+          .attr("y1", function(d,i) { return 0;})
           .attr("x2", function(d,i) { return xScale(d.endTime); })
-          .attr("y2", function(d,i) { 
-            return 0;
-            // return yDeliveryScale(d.yIndex); 
-          })
+          .attr("y2", function(d,i) { return 0;})
           .attr("class", "workflow");
+
     }
 
-    render(deliveries);
-
-    window.onresize = resize;
-
-
-
-    //utility
     function resize() { 
-       outerWidth  = document.documentElement.clientWidth;
-       outerHeight = document.documentElement.clientHeight;
+      outerWidth  = document.documentElement.clientWidth;
+      outerHeight = document.documentElement.clientHeight;
       innerWidth     = outerWidth   - margin.left - margin.right;
       innerHeight    = outerHeight  - margin.top  - margin.bottom;
       svg.remove();
-       svg = d3.select("body").append("svg")
-          .attr("width",  outerWidth)
-          .attr("height", outerHeight)
-          .call(xAxisTranslation);;
+      svg = d3.select("body").append("svg")
+        .attr("width",  outerWidth)
+        .attr("height", outerHeight)
+        .call(xAxisTranslation);;
 
-         stationsGroup = svg.append("g")
-              .attr("class", "stations")
-              .attr('transform', 'translate(' + 0 + "," + 0 + ')')
-              
+        stationsGroup = svg.append("g")
+            .attr("class", "stations")
+            .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+            
 
-         g = svg.append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-             deliveriesGroup = g.append("g")
-                  .attr("class", "deliveries")
-                  .attr('transform', 'translate(' + startingX + "," + 0 + ')');
+            deliveriesGroup = g.append("g")
+                .attr("class", "deliveries")
+                .attr('transform', 'translate(' + startingX + "," + 0 + ')');
 
                 yAxisGroup = deliveriesGroup.append("g")
                   .attr("class", "y axis");
 
-             xAxisGroup = g.append("g")
-                  .attr("class", "x axis")
-                  .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+            xAxisGroup = g.append("g")
+                .attr("class", "x axis")
+                .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
       svg.attr("width", outerWidth).attr("height", outerHeight);
       render(deliveries);
@@ -320,31 +296,74 @@
       xAxisGroup.attr("transform", "translate(" + [startingX,innerHeight] + ")scale(1)");
     }
 
+    function moveXAxis(a,b) {
+      var eventxTranslation = d3.event.translate[0];
+      var eventyTranslation = d3.event.translate[1];
+
+      deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
+      stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
+      xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
+      if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
+        var translation = [
+                            Math.max(Math.min(eventxTranslation, panBounds.right), panBounds.left),
+                            Math.max(Math.min(eventyTranslation, panBounds.top)  , panBounds.bottom),
+                          ];
+
+        deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
+        stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
+        xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
+      }
+    }
+
+
     function updateCurrentStationCalc(data){//update every delivery w/ its current station
       var workflow;
       var currentStation = 0;
-
+      var isCurrentUpdated = false;
       var now = new Date(Date.now());
 
-
+      //assums workflows are in ascending order
       for (var i = 0; i < data.length; i++) {
         currentStation = 0;
-
+        isCurrentUpdated = false;
         for (var j = 0; j < data[i].values.length; j++) {
            workflow = data[i].values[j];
+
           // debugger;
-          if(isTimeBetweenTime(now,workflow.startTime,workflow.endTime)){
-            currentStation = j;
+          if(!isCurrentUpdated){
+            if(now < workflow.endTime){
+              currentStation = workflow.station;
+              isCurrentUpdated = true;
+            }
           }
+
+        }
+
+        if(currentStation == 1){
+          var firstWorkflowOfDelivery = data[i].values[0];
+
+          if (firstWorkflowOfDelivery.startTime > now) {
+            currentStation = 0; // first station
+          };
         }
       
+        if(currentStation == 0){
+          var lastWorkflowOfDelivery = data[i].values[data[i].values.length-1];
+
+          if (lastWorkflowOfDelivery.endTime < now) {
+            currentStation = 6; // last station
+          };
+        }
         data[i].currentStation = currentStation;
+
+
       };
       return data;
     }
 
     function stationCountCalc(data){ // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-      var stationCounts =[0,0,0,0,0,0,0,0];      //[7, 5, 5, 1, 4, 1, 1, 1]
+      var stationCounts =[0,0,0,0,0,0,0];      //[7, 5, 5, 1, 4, 1, 1, 1]
+
 
       for(var i = 0;i<data.length;i++){
         stationCounts[data[i].currentStation]++;
@@ -357,7 +376,7 @@
     }
 
     function stationStackedCountCalc(stationCounts){ //[7, 12, 17, 18, 22, 23, 24, 25]
-      var stationStackedCount=[0,0,0,0,0,0,0,0]; 
+      var stationStackedCount=[0,0,0,0,0,0,0]; 
       
       stationStackedCount[0] = stationCounts[0];
       for (var i = 1; i < stationCounts.length; i++) {
@@ -390,11 +409,11 @@
 
       for (var i = 0; i < stationData.length; i++) {
         for (var j = 0; j < stationData[i].values.length; j++) {
-          if(i==0){
-            stationData[i].values[j].yIndex = j;
-          } else {
-            stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key-1] + j;
-          }
+            if(stationData[i].key == 0){
+              stationData[i].values[j].yIndex = j;
+            }else {
+              stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key-1] + j;
+            }
         }
       }
 
@@ -418,11 +437,6 @@
       for(var i = 21; i > 0; i--){
         variation =        Math.random() * 1;
         variationMinutes = Math.random() * 60;
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2), 5), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),25),
-                          delivery: i,
-                          station:Math.round(0),
-                        });
 
         workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),28), 
                           endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),48),
@@ -453,16 +467,7 @@
                           delivery: i,
                           station:Math.round(5),
                         });
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,42), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,10),
-                          delivery: i,
-                          station:Math.round(6),
-                        });
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,14), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+5,36),
-                          delivery: i,
-                          station:Math.round(7),
-                        });
+
       }
       return workflows;
     }
