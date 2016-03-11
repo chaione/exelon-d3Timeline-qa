@@ -60,8 +60,8 @@
   <script src="http://d3js.org/d3.v3.js"></script>
   <script>
     "use strict";
-    console.log('Version 03 04 2016');
-    
+    console.log('Version 03 11 2016');
+
     //User Defined Variables
     var rowHeight   = 45;
     var xAxisHeight = 30;
@@ -89,7 +89,7 @@
     var unixHour       = 1000*60*60;
     var unixMinute     = 1000*60;
     var vpStartHours   = (outerWidth/2)/(xAxisWidth/24);  //startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
-    var unixStartHours = unixHour * vpStartHours; 
+    var unixStartHours = unixHour * vpStartHours;
     var now            = new Date(Date.now());
     var nowYear        = now.getFullYear();
     var nowMonth       = now.getMonth();
@@ -110,7 +110,7 @@
 
     //scales
     var xScale = d3.time.scale.utc()
-          .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                 +new Date(nowYear, nowMonth, nowDay+1,12)])
+          .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                +new Date(nowYear, nowMonth, nowDay+1,12)])
           .range( [0,                                     xAxisWidth]);
 
     var yDeliveryScale = d3.scale.linear()
@@ -120,7 +120,7 @@
     var viewportScale = d3.time.scale.utc()
           .domain([+new Date(nowYear, nowMonth, nowDay-1,12)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay+1,12)-unixStartHours])
           .range( [0,                                     -1*xAxisWidth+outerWidth]);
-          
+
     startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
 
     var xAxis = d3.svg.axis()
@@ -142,7 +142,6 @@
           .translate([startingX,0])
           .on("zoom", moveXAxis);
 
-  
     //Structure
     var svg = d3.select("body").append("svg")
           .attr("width",  outerWidth)
@@ -167,7 +166,6 @@
                   .attr("class", "x axis")
                   .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
-     
 
     render(deliveries);
     // setInterval(render(deliveries), 100);
@@ -185,7 +183,7 @@
       var stationStackedCount = stationStackedCountCalc(stationCounts);
       var stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
 
-      stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) + 
+      stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) +
                       (stationStacked[stationStackedCount.length-1].y * rowHeight);
       panBounds = { top:    0,
                     right:  0,
@@ -193,7 +191,7 @@
                     left:   (-1*xAxisWidth) + outerWidth};
 
       data = data.sort(compare);
-      
+
       var data = d3.nest() // groupByStation
           .key(function(d) { return d.currentStation; })
           .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
@@ -226,7 +224,7 @@
           .attr("y1", margin.top)
           .attr("x2", xScale(now))
           .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
-      
+
 
       // Setup Stations
       var stationsSelectAll2 = deliveriesGroup.selectAll(".station").data(data);
@@ -255,10 +253,9 @@
           .attr("x2", function(d,i) { return xScale(d.endTime); })
           .attr("y2", function(d,i) { return 0;})
           .attr("class", "workflow");
-
     }
 
-    function resize() { 
+    function resize() {
       outerWidth  = document.documentElement.clientWidth;
       outerHeight = document.documentElement.clientHeight;
       innerWidth     = outerWidth   - margin.left - margin.right;
@@ -272,7 +269,6 @@
         stationsGroup = svg.append("g")
             .attr("class", "stations")
             .attr('transform', 'translate(' + 0 + "," + 0 + ')')
-            
 
         g = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -314,7 +310,7 @@
         deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
         stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
         xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
-        xAxisTranslation.translate(translation); 
+        xAxisTranslation.translate(translation);
       }
     }
 
@@ -349,7 +345,7 @@
             currentStation = 0; // first station
           };
         }
-      
+
         if(currentStation == 0){
           var lastWorkflowOfDelivery = data[i].values[data[i].values.length-1];
 
@@ -379,8 +375,8 @@
     }
 
     function stationStackedCountCalc(stationCounts){ //[7, 12, 17, 18, 22, 23, 24, 25]
-      var stationStackedCount=[0,0,0,0,0,0,0]; 
-      
+      var stationStackedCount=[0,0,0,0,0,0,0];
+
       stationStackedCount[0] = stationCounts[0];
       for (var i = 1; i < stationCounts.length; i++) {
         stationStackedCount[i] = stationStackedCount[i-1]+ stationCounts[i];
@@ -428,7 +424,7 @@
         return -1;
       else if (a.currentStation > b.currentStation)
         return 1;
-      else 
+      else
         return 0;
     }
     function isTimeBetweenTime(time, start,end){
@@ -441,32 +437,32 @@
         variation =        Math.random() * 1;
         variationMinutes = Math.random() * 60;
 
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),28), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),48),
+        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),28),
+                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),48),
                           delivery: i,
                           station:Math.round(1),
                         });
 
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2),56), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+1,40),
+        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),56),
+                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1,40),
                           delivery: i,
                           station:Math.round(2),
                         });
 
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+1, 44), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+2, 20),
+        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1, 44),
+                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2, 20),
                           delivery: i,
                           station:Math.round(3),
                         });
 
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+2,22), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,12),
+        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2,22),
+                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,12),
                           delivery: i,
                           station:Math.round(4),
                         });
 
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,15), 
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*.2)+4,40),
+        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,15),
+                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,40),
                           delivery: i,
                           station:Math.round(5),
                         });
