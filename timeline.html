@@ -711,37 +711,32 @@
       for(var i = 21; i > 0; i--){
         variation =        Math.random() * 1;
         variationMinutes = Math.random() * 60;
-
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),28),
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),48),
+  // new Date(now.getTime() + 1*60000);
+        workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),28).getTime()+(i*6*60000)),
+                          endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),48).getTime()+(i*6*60000)),
                           delivery: i,
                           station:Math.round(1),
                         });
-
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),56),
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1,40),
+        workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),56).getTime()+(i*6*60000)),
+                          endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1,40).getTime()+(i*6*60000)),
                           delivery: i,
                           station:Math.round(2),
                         });
-
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1, 44),
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2, 20),
+        workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1, 44).getTime()+(i*6*60000)),
+                          endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2, 20).getTime()+(i*6*60000)),
                           delivery: i,
                           station:Math.round(3),
                         });
-
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2,22),
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,12),
+        workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2,22).getTime()+(i*6*60000)),
+                          endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,12).getTime()+(i*6*60000)),
                           delivery: i,
                           station:Math.round(4),
                         });
-
-        workflows.push({  startTime: new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,15),
-                          endTime:   new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,40),
+        workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,15).getTime()+(i*6*60000)),
+                          endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,40).getTime()+(i*6*60000)),
                           delivery: i,
                           station:Math.round(5),
                         });
-
       }
       return workflows;
     }
