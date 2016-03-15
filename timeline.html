@@ -417,6 +417,17 @@
                     }
                   });
 
+              header.append("svg:path")
+                  .attr("d", function(d) { return customShapes['lBook'](4);})
+                  .attr("class", function(d){
+                    if(d.startTime < now){
+                      return "bookEnd notReached";
+                    }
+                  })
+                  .attr("transform", function(d) {
+                    return "translate(" + xScale(d.startTime) + "," + 0 + ")"
+                  });;
+
 
               //on right side of now
               header.append("line")
