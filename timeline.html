@@ -32,6 +32,9 @@
       stroke: white;
       font-color: #fff;
     }
+    .bookEnd {
+      fill:white;
+    }
     .stations {
     }
     .station{
@@ -285,25 +288,28 @@
       var workflowsSelectAll = deliveriesSelectAll.selectAll(".workflow").data(function(d){
         return d.values;
       });
-      workflowsSelectAll.enter().append("line");
+      var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
       workflowsSelectAll.exit().remove();
-      workflowsSelectAll
+
+      workflowsSelectAllG.append("line")
           .attr("x1", function(d,i) { return xScale(d.startTime); })
           .attr("y1", function(d,i) { return 0;})
           .attr("x2", function(d,i) { return xScale(d.endTime); })
           .attr("y2", function(d,i) { return 0;})
           .attr("class", "workflow");
 
-      workflowsSelectAll.append("image")
-          .attr("d", function(d) { return customShapes.lBook;})
-          // .attr("xlink:href","img/icn-vehicle-common.svg")
-          // .attr("height", vehicleShapeH)
-          // .attr("width", vehicleShapeH)
-          // .attr("x",-1*(vehicleShapeH/2))
-          // .attr("y",-1*(vehicleShapeH/2))
-          .attr("class", "blah")
+      workflowsSelectAllG.append("svg:path")
+          .attr("d", function(d) { console.log('bookend');return customShapes['lBook'](4);})
+          .attr("class", "bookEnd")
           .attr("transform", function(d) {
-              return "translate(" + xScale(d.startTime); + "," + 0 + ")"
+              return "translate(" + xScale(d.startTime) + "," + 0 + ")"
+            });;
+
+      workflowsSelectAllG.append("svg:path")
+          .attr("d", function(d) { console.log('bookend');return customShapes['rBook'](4);})
+          .attr("class", "bookEnd")
+          .attr("transform", function(d) {
+              return "translate(" + xScale(d.endTime) + "," + 0 + ")"
             });;
     }
 
