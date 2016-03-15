@@ -179,6 +179,7 @@
     var nowDay         = now.getDate();
     var nowHours       = now.getHours();
     var nowMinutes     = now.getMinutes();
+    var vehicleShapeH  = rowHeight-10;
     //Variables (to be used)
     var stationHeight;
     var deliveries=[];
@@ -233,6 +234,16 @@
           .key(function(d) { return d.delivery; })
           .entries(workflowsFakeData);
 
+    deliveries.forEach(function(delivery) {
+      var type = Math.random();
+      if (type <.5){
+        delivery.vehicleType = 'icn-vehicle-bulk.png';
+      } else if(type < .75){
+        delivery.vehicleType = 'icn-vehicle-common.png';
+      } else {
+        delivery.vehicleType = 'icn-vehicle-noncommon.png';
+      }
+    });
 
     //interactivity
     var xAxisTranslation = d3.behavior.zoom()
@@ -363,14 +374,16 @@
       var deliveriesSelectAll = stationsSelectAll2.selectAll(".delivery").data(function(d){
         return d.values;
       });
-      deliveriesSelectAll.enter().append("g").attr("class", "delivery");
-      deliveriesSelectAll
+      var deliveriesSelectAllG = deliveriesSelectAll.enter().append("g").attr("class", "delivery");
+      deliveriesSelectAllG
           .attr('transform', function(d){
             return 'translate(' + 0 + "," + yDeliveryScale(d.yIndex+1)+ ')';
-          })
+          });
+
+      
 
       // Setup Workflows
-      var workflowsSelectAll = deliveriesSelectAll.selectAll(".workflow").data(function(d){
+      var workflowsSelectAll = deliveriesSelectAllG.selectAll(".workflow").data(function(d){
         return d.values;
       });
       var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
@@ -476,6 +489,22 @@
             }
             // console.log(header);
           });
+
+
+      var vehicleIconsG = deliveriesSelectAllG.append("g");
+      //setup Vehicle Icons
+      vehicleIconsG.append("image")
+          .attr("xlink:href",function(i){
+              return "img/" + i.vehicleType
+          })
+          .attr("height", vehicleShapeH)
+          .attr("width", vehicleShapeH)
+          .attr("x",-1*(vehicleShapeH/2))
+          .attr("y",-1*(vehicleShapeH/2))
+          .attr("class", "truckIconDiamond")
+          .attr("transform", function(d) {
+              return "translate(" + xScale(now) + "," + 0 + ")"
+            });;
       
     }
 
