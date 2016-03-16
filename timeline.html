@@ -155,7 +155,7 @@
     var outerHeight = document.documentElement.clientHeight;
     console.log(outerWidth);
     console.log(outerHeight);
-    var startOfDayHour = 7; //used for fake data
+    var startOfDayHour = 6; //used for fake data
     var stations =   {
                       0:"En Route",
                       1:"Sierra One",
@@ -394,7 +394,8 @@
             var header = d3.select(this);
             if(d.startTime <now && now < d.endTime)  //Workflow straddles now
             {
-              console.log(d);
+            console.log('straddles now');
+
               var state = Math.random();
 
               //leftside of now
@@ -486,7 +487,7 @@
                   });;
 
               header.append("svg:path")
-                  .attr("d", function(d) { console.log('bookend');return customShapes['rBook'](4);})
+                  .attr("d", function(d) { return customShapes['rBook'](4);})
                   .attr("class", function(d){
                     if(d.endTime < now){
                       return "bookEnd notReached";
@@ -530,7 +531,33 @@
       svg = d3.select("body").append("svg")
         .attr("width",  outerWidth)
         .attr("height", outerHeight)
-        .call(xAxisTranslation);;
+        .call(xAxisTranslation);
+
+        svgDefs = svg.append('defs');
+            var aheadGradient = svgDefs.append('linearGradient')
+                .attr('id', 'aheadGradient');
+            aheadGradient.append('stop')
+                .attr('class', 'color-ahead-left')
+                .attr('offset', '0');
+            aheadGradient.append('stop')
+                .attr('class', 'color-ahead-right')
+                .attr('offset', '1');
+            var lateGradient = svgDefs.append('linearGradient')
+                .attr('id', 'lateGradient');
+            lateGradient.append('stop')
+                .attr('class', 'color-late-left')
+                .attr('offset', '0');
+            lateGradient.append('stop')
+                .attr('class', 'color-late-right')
+                .attr('offset', '1');
+            var onTimeGradient = svgDefs.append('linearGradient')
+                .attr('id', 'onTimeGradient');
+            onTimeGradient.append('stop')
+                .attr('class', 'color-onTime-left')
+                .attr('offset', '0');
+            onTimeGradient.append('stop')
+                .attr('class', 'color-onTime-right')
+                .attr('offset', '1');
 
         stationsGroup = svg.append("g")
             .attr("class", "stations")
