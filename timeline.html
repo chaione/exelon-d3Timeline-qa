@@ -2,10 +2,11 @@
 <html>
   <meta charset="utf-8">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0">
 
   <!-- http://curran.github.io/screencasts/splittingCharts/examples/viewer/#/17 -->
   <!-- http://bl.ocks.org/mbostock/3885705 transitions-->
-  <meta name="viewport" content="minimal-ui">
+  <!-- <meta name="viewport" content="minimal-ui"> -->
   <style>
     body {
       background-color: #0C0C1A;
@@ -341,15 +342,15 @@
 
       // Setup stations overlay and text
       var stationsSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
-      stationsSelectAll.enter().append("g").attr("class", "station"); // stations should never exit
+      var stationsSelectAllG = stationsSelectAll.enter().append("g").attr("class", "station"); // stations should never exit
 
-      stationsSelectAll.append("rect")
+      stationsSelectAllG.append("rect")
           .attr("x", function(d,i) { return 0;})
           .attr("y", function(d,i) { return d.y0*rowHeight + (rowHeight/2);})
           .attr("width",innerWidth)
           .attr("height", function(d,i) { return d.y*rowHeight;})
 
-      stationsSelectAll.append("text")
+      stationsSelectAllG.append("text")
           .attr("x", function(d,i) { return stationTextPadding.left;})
           .attr("y", function(d,i) { return d.y0*rowHeight + (rowHeight/2) + stationTextHeight + stationTextPadding.top;})
           .text(function(d,i){return d.name})
@@ -364,7 +365,6 @@
           .attr("y1", margin.top)
           .attr("x2", xScale(now))
           .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
-
 
       // Setup Stations
       var stationsSelectAll2 = deliveriesGroup.selectAll(".station").data(data);
@@ -381,8 +381,6 @@
             return 'translate(' + 0 + "," + yDeliveryScale(d.yIndex+1)+ ')';
           });
 
-      
-
       // Setup Workflows
       var workflowsSelectAll = deliveriesSelectAllG.selectAll(".workflow").data(function(d){
         return d.values;
@@ -390,10 +388,10 @@
       var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
       workflowsSelectAll.exit().remove();
 
-      workflowsSelectAll
+      workflowsSelectAllG
           .each(function(d){
             var header = d3.select(this);
-            if(d.startTime <now && now < d.endTime)  //Workflow straddles now
+            if(d.startTime <now && now < d.endTime)  //current workflow
             {
               var state = Math.random();
 
@@ -431,14 +429,12 @@
 
               //on right side of now
               header.append("line")
-                  .style("stroke-dasharray", ("2, 2"))
-                  .style("stroke-width", 4)
                   .attr("x1", function(d,i) { return xScale(now); })
                   .attr("y1", function(d,i) { return 0;})
                   .attr("x2", function(d,i) { return xScale(d.endTime); })
                   .attr("y2", function(d,i) { return .001;})//IMPORTANT  if its flat its not displayed
-                  // .style("stroke", function(d) { return aheadGradient(d.); })
-                  // .attr('stroke', 'url(#mainGradient)');
+                  .style("stroke-dasharray", ("2, 2"))
+                  .style("stroke-width", 4)
                   .attr("class", function(d){
                     if(state<.25){
                       return "workflow aheadGradient" 
@@ -449,9 +445,7 @@
                     }
                   });
 
-
-
-            } else {  //workflow outside of now
+            } else {  //not active workflow
 
               header.append("line")
                   .attr("x1", function(d,i) { return xScale(d.startTime); })
@@ -496,7 +490,6 @@
                     return "translate(" + xScale(d.endTime) + "," + 0 + ")"
                   });;
 
-
             }
             // console.log(header);
           });
@@ -516,7 +509,6 @@
           .attr("transform", function(d) {
               return "translate(" + xScale(now) + "," + 0 + ")"
             });;
-      
     }
 
     function resize() {
@@ -535,68 +527,6 @@
       data = stackDeliveriesCalc(stationStackedCount,data);
 
       render(data);
-      // outerWidth  = document.documentElement.clientWidth;
-      // outerHeight = document.documentElement.clientHeight;
-      // console.log(outerWidth);
-      // console.log(outerHeight);
-      // innerWidth     = outerWidth   - margin.left - margin.right;
-      // innerHeight    = outerHeight  - margin.top  - margin.bottom;
-      // svg.remove();
-      // svg = d3.select("body").append("svg")
-      //   .attr("width",  outerWidth)
-      //   .attr("height", outerHeight)
-      //   .call(xAxisTranslation);
-
-      //   svgDefs = svg.append('defs');
-      //       var aheadGradient = svgDefs.append('linearGradient')
-      //           .attr('id', 'aheadGradient');
-      //       aheadGradient.append('stop')
-      //           .attr('class', 'color-ahead-left')
-      //           .attr('offset', '0');
-      //       aheadGradient.append('stop')
-      //           .attr('class', 'color-ahead-right')
-      //           .attr('offset', '1');
-      //       var lateGradient = svgDefs.append('linearGradient')
-      //           .attr('id', 'lateGradient');
-      //       lateGradient.append('stop')
-      //           .attr('class', 'color-late-left')
-      //           .attr('offset', '0');
-      //       lateGradient.append('stop')
-      //           .attr('class', 'color-late-right')
-      //           .attr('offset', '1');
-      //       var onTimeGradient = svgDefs.append('linearGradient')
-      //           .attr('id', 'onTimeGradient');
-      //       onTimeGradient.append('stop')
-      //           .attr('class', 'color-onTime-left')
-      //           .attr('offset', '0');
-      //       onTimeGradient.append('stop')
-      //           .attr('class', 'color-onTime-right')
-      //           .attr('offset', '1');
-
-      //   stationsGroup = svg.append("g")
-      //       .attr("class", "stations")
-      //       .attr('transform', 'translate(' + 0 + "," + 0 + ')')
-
-      //   g = svg.append("g")
-      //       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-      //       deliveriesGroup = g.append("g")
-      //           .attr("class", "deliveries")
-      //           .attr('transform', 'translate(' + startingX + "," + 0 + ')');
-
-      //           yAxisGroup = deliveriesGroup.append("g")
-      //             .attr("class", "y axis");
-
-      //       xAxisGroup = g.append("g")
-      //           .attr("class", "x axis")
-      //           .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
-
-      // svg.attr("width", outerWidth).attr("height", outerHeight);
-      // render(deliveries);
-
-      // deliveriesGroup.attr("transform", "translate(" + [startingX,0] + ")scale(1)");
-      // stationsGroup.attr("transform", "translate(" + [0,0] + ")scale(1)");
-      // xAxisGroup.attr("transform", "translate(" + [startingX,innerHeight] + ")scale(1)");
     }
 
     function moveXAxis(a,b) {
