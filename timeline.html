@@ -55,11 +55,23 @@
       stop-color:#C90C14;
     }
 
+
+    .color-maskingGradient-top {
+      stop-color:#1B1E23
+    }
+    .color-maskingGradient-bottom {
+      stop-color:#1B1E23
+    }
+
     .color-onTime-left {
       stop-color:#0581A6;
     }
     .color-onTime-right {
       stop-color:#C90C14;
+    }
+
+    .maskingGradient {
+      fill: url(#maskingGradient);
     }
 
     .stations {
@@ -262,6 +274,22 @@
 
         //gradients
         var svgDefs = svg.append('defs');
+            var maskingGradient = svgDefs.append('linearGradient')
+                .attr('id', 'maskingGradient')
+                .attr("x1", "0%")
+                .attr("y1", "100%")
+                .attr("x2", "0%")
+                .attr("y2", "0%");
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-top')
+                .attr('offset', '0');
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-bottom')
+                .attr('offset', '.15');
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-bottom')
+                .attr('offset', '1')
+                .attr('stop-opacity', '0');
             var aheadGradient = svgDefs.append('linearGradient')
                 .attr('id', 'aheadGradient');
             aheadGradient.append('stop')
@@ -303,10 +331,20 @@
                 var yAxisGroup = deliveriesGroup.append("g")
                       .attr("class", "y axis");
 
+            var xAxisMask = g.append("rect")
+                  .attr("x", 0)
+                  .attr("y", 0)
+                  .attr("width", outerWidth)
+                  .attr("height", xAxisHeight*3)
+                  .attr("class","maskingGradient");
+
             var xAxisGroup = g.append("g")
-                  .attr("class", "x axis")
+                  .attr("class", "x axis ")
                   .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
+         // svg.append('rect')
+            
+                 
     
 
     resize();
@@ -340,7 +378,9 @@
       // stationsGroup   .attr('transform', 'translate(' + 0 + "," + 0 + ')')
       // deliveriesGroup .attr("transform", "translate(" + [startingX,0] + ")scale(1)");
       xAxisGroup      .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
-
+      xAxisMask.attr('transform', 'translate(' + 0 + "," +  (outerHeight - (xAxisHeight*3)) + ')');
+      console.log('translate(' + 0 + "," +  (outerHeight - (xAxisHeight*3)) + ')');
+      console.log(innerHeight);
       // Setup stations overlay and text
       var stationsLabelSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
       var stationsLabelSelectAllG = stationsLabelSelectAll.enter().append("g").attr("class", "station"); // stations should never exit
