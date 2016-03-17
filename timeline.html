@@ -7,125 +7,8 @@
   <!-- http://curran.github.io/screencasts/splittingCharts/examples/viewer/#/17 -->
   <!-- http://bl.ocks.org/mbostock/3885705 transitions-->
   <!-- <meta name="viewport" content="minimal-ui"> -->
-  <style>
-    body {
-      background-color: #0C0C1A;
-      margin:           0px;
-      padding:          0px;
-      overflow:         hidden;
-    }
+  <link rel="stylesheet" type="text/css" href="styles.css">
 
-    .axis line {
-      fill:         none;
-      stroke:       #CEE5ED;
-      stroke-width: 1px;
-    }
-    .axis path {
-      fill:            none;
-      stroke:          #CEE5ED;
-      stroke-width:    2.5px;
-      shape-rendering: crispEdges;
-    }
-    .axis text {
-      font: 12px sans-serif;
-      shape-rendering: crispEdges;
-      stroke-width:    1px;
-      stroke: white;
-      font-color: #CEE5ED;
-    }
-
-    .bookEnd {
-      fill:#BFFFEA;
-    }
-    .bookend.notReached {
-      opacity:0;
-    }
-
-    .color-ahead-left {
-      stop-color:#0581A6;
-    }
-    .color-ahead-right {
-      stop-color:#05A9B8;
-    }
-
-    .color-late-left {
-      stop-color:#C90C14;
-    }
-    .color-late-right {
-      stop-color:#C90C14;
-    }
-
-
-    .color-maskingGradient-top {
-      stop-color:#1B1E23
-    }
-    .color-maskingGradient-bottom {
-      stop-color:#1B1E23
-    }
-
-    .color-onTime-left {
-      stop-color:#0581A6;
-    }
-    .color-onTime-right {
-      stop-color:#C90C14;
-    }
-
-    .maskingGradient {
-      fill: url(#maskingGradient);
-    }
-
-    .stations {
-    }
-    .station{
-      fill:#181F2B;
-    }
-    .station:nth-child(even) {
-      fill:#1B1E23;
-    }
-    .station .name{
-      fill: #BFFFEA;
-    }
-
-    .workflow {
-      stroke: #017AAA;
-      stroke-width:    1px;
-    }
-    .workflow.ahead {
-      stroke:#00B4C2;
-    }
-    .workflow.late {
-      stroke:#CF0C13;
-      stroke-width:    4px;
-    }
-    .workflow.notReached {
-      stroke:#363667;
-      stroke-width:    2px;
-    }
-
-    .workflow.aheadGradient {
-      stroke: url(#aheadGradient);
-      /*stroke-widtstroke-width: 4;h:1px;*/
-      fill:none;
-      stroke-width: 4;
-    }
-    .workflow.lateGradient {
-      stroke: url(#lateGradient);
-      
-    }
-    .workflow.onTimeGradient {
-      stroke: url(#onTimeGradient);
-      
-    }
-
-    .yAxis {
-      stroke:#D0D1D1;
-    }
-
-    svg {
-      background-color: #0C0C1A
-    }
-  </style>
-  
   <body>
   </body>
 
@@ -215,11 +98,7 @@
       rBook: function(r) {
         var points = [ [0,r], [0,-r], [-r,0], [0,r]];
         return d3.svg.line()(points);
-      },
-      // io: function(height, width) {
-      //   var points = [ [0,height], [width*.2,0], [width,0], [width*.8,height], [0,height] ]
-      //   return d3.svg.line()(points);
-      // }
+      }
     }
 
     //scales
@@ -379,17 +258,17 @@
       // deliveriesGroup .attr("transform", "translate(" + [startingX,0] + ")scale(1)");
       xAxisGroup      .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
       xAxisMask.attr('transform', 'translate(' + 0 + "," +  (outerHeight - (xAxisHeight*3)) + ')');
-      console.log('translate(' + 0 + "," +  (outerHeight - (xAxisHeight*3)) + ')');
-      console.log(innerHeight);
       // Setup stations overlay and text
       var stationsLabelSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
       var stationsLabelSelectAllG = stationsLabelSelectAll.enter().append("g").attr("class", "station"); // stations should never exit
 
-      stationsLabelSelectAllG.append("rect")
+      var stationsLabelSelectAllGRect = stationsLabelSelectAllG.append("rect");
+      console.log('possibly setting');
+      stationsLabelSelectAllGRect
           .attr("x", function(d,i) { return 0;})
           .attr("y", function(d,i) { return d.y0*rowHeight + (rowHeight/2);})
           .attr("width",innerWidth)
-          .attr("height", function(d,i) { return d.y*rowHeight;})
+          .attr("height", function(d,i) { console.log('WE ARE SETTING!');return d.y*rowHeight;})
 
       stationsLabelSelectAllG.append("text")
           .attr("x", function(d,i) { return stationTextPadding.left;})
