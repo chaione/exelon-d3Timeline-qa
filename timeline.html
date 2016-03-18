@@ -250,6 +250,67 @@
                     left:   (-1*xAxisWidth) + outerWidth};
 
       
+      //clear it out
+      svg.remove();
+            svg = d3.select("body").append("svg")
+              .attr("width",  outerWidth)
+              .attr("height", outerHeight)
+              .call(xAxisTranslation);;
+              stationsGroup = svg.append("g")
+                  .attr("class", "stations")
+                  .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+              g = svg.append("g")
+                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                  deliveriesGroup = g.append("g")
+                      .attr("class", "deliveries")
+                      .attr('transform', 'translate(' + startingX + "," + 0 + ')');
+                      yAxisGroup = deliveriesGroup.append("g")
+                        .attr("class", "y axis");
+                  xAxisGroup = g.append("g")
+                      .attr("class", "x axis")
+                      .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+            var svgDefs = svg.append('defs');
+                var maskingGradient = svgDefs.append('linearGradient')
+                    .attr('id', 'maskingGradient')
+                    .attr("x1", "0%")
+                    .attr("y1", "100%")
+                    .attr("x2", "0%")
+                    .attr("y2", "0%");
+                maskingGradient.append('stop')
+                    .attr('class', 'color-maskingGradient-top')
+                    .attr('offset', '0');
+                maskingGradient.append('stop')
+                    .attr('class', 'color-maskingGradient-bottom')
+                    .attr('offset', '.15');
+                maskingGradient.append('stop')
+                    .attr('class', 'color-maskingGradient-bottom')
+                    .attr('offset', '1')
+                    .attr('stop-opacity', '0');
+                var aheadGradient = svgDefs.append('linearGradient')
+                    .attr('id', 'aheadGradient');
+                aheadGradient.append('stop')
+                    .attr('class', 'color-ahead-left')
+                    .attr('offset', '0');
+                aheadGradient.append('stop')
+                    .attr('class', 'color-ahead-right')
+                    .attr('offset', '1');
+                var lateGradient = svgDefs.append('linearGradient')
+                    .attr('id', 'lateGradient');
+                lateGradient.append('stop')
+                    .attr('class', 'color-late-left')
+                    .attr('offset', '0');
+                lateGradient.append('stop')
+                    .attr('class', 'color-late-right')
+                    .attr('offset', '1');
+                var onTimeGradient = svgDefs.append('linearGradient')
+                    .attr('id', 'onTimeGradient');
+                onTimeGradient.append('stop')
+                    .attr('class', 'color-onTime-left')
+                    .attr('offset', '0');
+                onTimeGradient.append('stop')
+                    .attr('class', 'color-onTime-right')
+                    .attr('offset', '1');
+
       svg
           .attr("width", outerWidth)
           .attr("height", outerHeight);
@@ -257,18 +318,19 @@
       // stationsGroup   .attr('transform', 'translate(' + 0 + "," + 0 + ')')
       // deliveriesGroup .attr("transform", "translate(" + [startingX,0] + ")scale(1)");
       xAxisGroup      .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
-      xAxisMask.attr('transform', 'translate(' + 0 + "," +  (outerHeight - (xAxisHeight*3)) + ')');
+      xAxisMask       .attr('transform', 'translate(' + 0 + "," +  (outerHeight - (xAxisHeight*3)) + ')');
       // Setup stations overlay and text
       var stationsLabelSelectAll = stationsGroup.selectAll(".station").data(stationStacked);
       var stationsLabelSelectAllG = stationsLabelSelectAll.enter().append("g").attr("class", "station"); // stations should never exit
 
-      var stationsLabelSelectAllGRect = stationsLabelSelectAllG.append("rect");
-      console.log('possibly setting');
-      stationsLabelSelectAllGRect
+      stationsLabelSelectAllG.append("rect").attr("class","stationRect");
+      var stationsLabelStationRectSelectAll = stationsLabelSelectAll.selectAll(".stationRect");
+
+      stationsLabelStationRectSelectAll
           .attr("x", function(d,i) { return 0;})
           .attr("y", function(d,i) { return d.y0*rowHeight + (rowHeight/2);})
           .attr("width",innerWidth)
-          .attr("height", function(d,i) { console.log('WE ARE SETTING!');return d.y*rowHeight;})
+          .attr("height", function(d,i) {return d.y*rowHeight;})
 
       stationsLabelSelectAllG.append("text")
           .attr("x", function(d,i) { return stationTextPadding.left;})
@@ -307,7 +369,7 @@
       });
       var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
       workflowsSelectAll.exit().remove();
-
+      var workflowSelectAll5 = workflowsSelectAll.selectAll(".workflow");
       workflowsSelectAllG
           .each(function(d){
             var header = d3.select(this);
@@ -462,7 +524,6 @@
           Math.max(Math.min(eventxTranslation, panBounds.right),  panBounds.left),
           Math.max(Math.min(eventyTranslation, panBounds.top),    maxShiftFromTop)
         ];
-
         deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
         stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
         xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
