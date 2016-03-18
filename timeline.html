@@ -8,7 +8,7 @@
   <!-- http://bl.ocks.org/mbostock/3885705 transitions-->
   <!-- <meta name="viewport" content="minimal-ui"> -->
   <link rel="stylesheet" type="text/css" href="styles.css">
-
+  <script   src="https://code.jquery.com/jquery-2.2.2.min.js"   integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="   crossorigin="anonymous"></script>
   <body>
   </body>
 
@@ -62,7 +62,7 @@
                       5:"PA",
                       6:"Exit"
                     }
-
+    var pollrate = 5000;
     //Calculated Variables
     var innerWidth     = outerWidth   - margin.left - margin.right;
     var innerHeight    = outerHeight  - margin.top  - margin.bottom;
@@ -122,6 +122,7 @@
           .scale(xScale);
 
     //Create Data
+    var apiDeliveries = retrieveDeliveries();
     var workflowsFakeData = generateWorkflows(startOfDayHour);
 
     var deliveries = d3.nest()  //group by delivery
@@ -230,12 +231,18 @@
     // setInterval(render(deliveries), 100);
     // setInterval(function() {render(deliveries),10000});
     window.onresize = resize;
+            retrieveDeliveries();
 
-
+    // $(document).ready(function() {
+    //     setInterval(function() {
+    //         retrieveDeliveries();
+    //     }, pollrate);
+    // });
 
     //utility
     function render(data){
       console.log('render');
+      console.log(data);
       outerWidth  = document.documentElement.clientWidth;
       outerHeight = document.documentElement.clientHeight;
       innerWidth     = outerWidth   - margin.left - margin.right;
@@ -655,6 +662,44 @@
         console.log(xml.documentElement);
         return xml.documentElement;
       });
+    }
+
+    function retrieveDeliveries(){
+      console.log('retrieveDeliveries----------');
+
+      // stationId:0,
+      // deliveries[
+      //     {
+      //       deliveryId:,
+      //       workflows[
+      //         {
+      //           workflowId:13
+      //           "step": 2,
+      //           "processing-time": null,
+      //           "started-at": "2016-03-18T13:00:51.495Z",
+      //           "ended-at": null,
+      //           "eta": "2016-03-18T15:00:51.495Z",
+      //           "estimated-processing-time": 60,
+      //           "arrived-at": null
+      //         }
+      //       ]
+      //     },{
+
+      //     },{
+
+      //     }
+      // ]
+      $.ajax('https://exelon-api.herokuapp.com/v1/deliveries', {
+            success: function(data) {
+              console.log(data);
+               $('#main').html($(data).find('#main *'));
+               $('#notification-bar').text('The page has been successfully loaded');
+            },
+            error: function(e) {console.log(e);
+               $('#notification-bar').text('An error occurred');
+            }
+         });
+
     }
 
     function generateWorkflows(startOfDayHour){
