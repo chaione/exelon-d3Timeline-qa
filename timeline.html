@@ -62,7 +62,14 @@
                       5:"PA",
                       6:"Exit"
                     }
-    var pollrate = 5000;
+    var stationOrder =  [
+                          1,//Tatooine
+                          2,//Death Star
+                          3 //Great Temple
+                        ]
+    var pollrate = 15000;
+    var url = 'https://exelon-api.herokuapp.com/v1/';
+    var siteId = 1; //limerick
     //Calculated Variables
     var innerWidth     = outerWidth   - margin.left - margin.right;
     var innerHeight    = outerHeight  - margin.top  - margin.bottom;
@@ -78,6 +85,10 @@
     var nowMinutes     = now.getMinutes();
     var vehicleShapeH  = rowHeight-10;
     //Variables (to be used)
+    var data;
+    var apiDeliveries;
+    var deliveries;
+    var svg,stationsGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask;
     var stationCounts =[];
     var stationStackedCount=[];
     var stationStacked=[];
@@ -121,117 +132,29 @@
           .tickFormat(d3.time.format('%H'))
           .scale(xScale);
 
-    //Create Data
-    var apiDeliveries = retrieveDeliveries();
-    var workflowsFakeData = generateWorkflows(startOfDayHour);
-
-    var deliveries = d3.nest()  //group by delivery
-          .key(function(d) { return d.delivery; })
-          .entries(workflowsFakeData);
-
-    deliveries.forEach(function(delivery) {
-      var type = Math.random();
-      if (type <.5){
-        delivery.vehicleType = 'icn-vehicle-bulk.png';
-      } else if(type < .75){
-        delivery.vehicleType = 'icn-vehicle-common.png';
-      } else {
-        delivery.vehicleType = 'icn-vehicle-noncommon.png';
-      }
-    });
-
-    //interactivity
     var xAxisTranslation = d3.behavior.zoom()
           .scaleExtent([1, 1])
           .translate([startingX,0])
           .on("zoom", moveXAxis);
 
     //Structure
-    var svg = d3.select("body").append("svg")
-          .attr("width",  outerWidth)
-          .attr("height", outerHeight)
-          .call(xAxisTranslation);;
-
-        //gradients
-        var svgDefs = svg.append('defs');
-            var maskingGradient = svgDefs.append('linearGradient')
-                .attr('id', 'maskingGradient')
-                .attr("x1", "0%")
-                .attr("y1", "100%")
-                .attr("x2", "0%")
-                .attr("y2", "0%");
-            maskingGradient.append('stop')
-                .attr('class', 'color-maskingGradient-top')
-                .attr('offset', '0');
-            maskingGradient.append('stop')
-                .attr('class', 'color-maskingGradient-bottom')
-                .attr('offset', '.15');
-            maskingGradient.append('stop')
-                .attr('class', 'color-maskingGradient-bottom')
-                .attr('offset', '1')
-                .attr('stop-opacity', '0');
-            var aheadGradient = svgDefs.append('linearGradient')
-                .attr('id', 'aheadGradient');
-            aheadGradient.append('stop')
-                .attr('class', 'color-ahead-left')
-                .attr('offset', '0');
-            aheadGradient.append('stop')
-                .attr('class', 'color-ahead-right')
-                .attr('offset', '1');
-            var lateGradient = svgDefs.append('linearGradient')
-                .attr('id', 'lateGradient');
-            lateGradient.append('stop')
-                .attr('class', 'color-late-left')
-                .attr('offset', '0');
-            lateGradient.append('stop')
-                .attr('class', 'color-late-right')
-                .attr('offset', '1');
-            var onTimeGradient = svgDefs.append('linearGradient')
-                .attr('id', 'onTimeGradient');
-            onTimeGradient.append('stop')
-                .attr('class', 'color-onTime-left')
-                .attr('offset', '0');
-            onTimeGradient.append('stop')
-                .attr('class', 'color-onTime-right')
-                .attr('offset', '1');
-
-
-
-        var stationsGroup = svg.append("g")
-              .attr("class", "stations")
-              .attr('transform', 'translate(' + 0 + "," + 0 + ')')
-
-        var g = svg.append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-            var deliveriesGroup = g.append("g")
-                  .attr("class", "deliveries")
-                  .attr('transform', 'translate(' + startingX + "," + 0 + ')');
-
-                var yAxisGroup = deliveriesGroup.append("g")
-                      .attr("class", "y axis");
-
-            var xAxisMask = g.append("rect")
-                  .attr("x", 0)
-                  .attr("y", 0)
-                  .attr("width", outerWidth)
-                  .attr("height", xAxisHeight*3)
-                  .attr("class","maskingGradient");
-
-            var xAxisGroup = g.append("g")
-                  .attr("class", "x axis ")
-                  .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+    svg = setupSvgStructure()
 
          // svg.append('rect')
             
-                 
+                  
+    //Create Data
+    retrieveDeliveries();
+    // var workflowsFakeData = generateWorkflows(startOfDayHour);
+    // debugger;
+    // workflowsFakeData = apiDeliveries;
+
     
 
-    resize();
+    // resize();
     // setInterval(render(deliveries), 100);
-    // setInterval(function() {render(deliveries),10000});
+    setInterval(function() {console.log('bout to call render',data);render(data)},10000);
     window.onresize = resize;
-            retrieveDeliveries();
 
     // $(document).ready(function() {
     //     setInterval(function() {
@@ -239,10 +162,16 @@
     //     }, pollrate);
     // });
 
-    //utility
+    //Functions
     function render(data){
-      console.log('render');
-      console.log(data);
+      if(data=== undefined || data ==[]){
+        return false;
+      }
+      // debugger;
+      console.log('render-------------');
+      console.log(deliveries);
+
+      // console.log(data);
       outerWidth  = document.documentElement.clientWidth;
       outerHeight = document.documentElement.clientHeight;
       innerWidth     = outerWidth   - margin.left - margin.right;
@@ -496,12 +425,16 @@
           .attr("class", "truckIconDiamond")
           .attr("transform", function(d) {
               return "translate(" + xScale(now) + "," + 0 + ")"
-            });;
+            });
     }
 
     function resize() {
       console.log('resize');
+      if (deliveries== null) {return false};
+
       var data = deliveries;
+
+      //these functions depend
       data                = updateCurrentStationCalc(data);
       stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
       stationStackedCount = stationStackedCountCalc(stationCounts);
@@ -514,6 +447,7 @@
           .entries(data);
       data = stackDeliveriesCalc(stationStackedCount,data);
 
+      
       render(data);
     }
 
@@ -524,7 +458,7 @@
       deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
       stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
       xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
-
+      console.log(panBounds);
       if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
         var maxShiftFromTop = stationHeight>outerHeight?panBounds.bottom:0;
         var translation = [
@@ -582,6 +516,84 @@
 
       };
       return data;
+    }
+    function setupSvgStructure(){
+      svg = d3.select("body").append("svg")
+          .attr("width",  outerWidth)
+          .attr("height", outerHeight)
+          .call(xAxisTranslation);;
+
+        //gradients
+        var svgDefs = svg.append('defs');
+            var maskingGradient = svgDefs.append('linearGradient')
+                .attr('id', 'maskingGradient')
+                .attr("x1", "0%")
+                .attr("y1", "100%")
+                .attr("x2", "0%")
+                .attr("y2", "0%");
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-top')
+                .attr('offset', '0');
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-bottom')
+                .attr('offset', '.15');
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-bottom')
+                .attr('offset', '1')
+                .attr('stop-opacity', '0');
+            var aheadGradient = svgDefs.append('linearGradient')
+                .attr('id', 'aheadGradient');
+            aheadGradient.append('stop')
+                .attr('class', 'color-ahead-left')
+                .attr('offset', '0');
+            aheadGradient.append('stop')
+                .attr('class', 'color-ahead-right')
+                .attr('offset', '1');
+            var lateGradient = svgDefs.append('linearGradient')
+                .attr('id', 'lateGradient');
+            lateGradient.append('stop')
+                .attr('class', 'color-late-left')
+                .attr('offset', '0');
+            lateGradient.append('stop')
+                .attr('class', 'color-late-right')
+                .attr('offset', '1');
+            var onTimeGradient = svgDefs.append('linearGradient')
+                .attr('id', 'onTimeGradient');
+            onTimeGradient.append('stop')
+                .attr('class', 'color-onTime-left')
+                .attr('offset', '0');
+            onTimeGradient.append('stop')
+                .attr('class', 'color-onTime-right')
+                .attr('offset', '1');
+
+
+
+        stationsGroup = svg.append("g")
+              .attr("class", "stations")
+              .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+
+        g = svg.append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            deliveriesGroup = g.append("g")
+                  .attr("class", "deliveries")
+                  .attr('transform', 'translate(' + startingX + "," + 0 + ')');
+
+                yAxisGroup = deliveriesGroup.append("g")
+                      .attr("class", "y axis");
+
+            xAxisMask = g.append("rect")
+                  .attr("x", 0)
+                  .attr("y", 0)
+                  .attr("width", outerWidth)
+                  .attr("height", xAxisHeight*3)
+                  .attr("class","maskingGradient");
+
+            xAxisGroup = g.append("g")
+                  .attr("class", "x axis ")
+                  .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+
+      return svg;
     }
 
     function stationCountCalc(data){ // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
@@ -659,47 +671,166 @@
     function generateShapes(){
       d3.xml("img/icn-vehicle-common.svg", "image/svg+xml", function(error, xml) {
         if (error) throw error;
-        console.log(xml.documentElement);
+        // console.log(xml.documentElement);
         return xml.documentElement;
       });
     }
 
     function retrieveDeliveries(){
       console.log('retrieveDeliveries----------');
+      var self = this;
+      console.log(self);
+      // {
+      //   [{
+      //     stationId:0,
+      //     deliveries[{
+      //           deliveryId:,
+      //           workflows:[{
+      //               workflowId:13
+      //               "step": 2,
+      //               "processing-time": null,
+      //               "started-at": "2016-03-18T13:00:51.495Z",
+      //               "ended-at": null,
+      //               "eta": "2016-03-18T15:00:51.495Z",
+      //               "estimated-processing-time": 60,
+      //               "arrived-at": null,
+      //               events: [{
+      //                   eventId:
 
-      // stationId:0,
-      // deliveries[
-      //     {
-      //       deliveryId:,
-      //       workflows[
-      //         {
-      //           workflowId:13
-      //           "step": 2,
-      //           "processing-time": null,
-      //           "started-at": "2016-03-18T13:00:51.495Z",
-      //           "ended-at": null,
-      //           "eta": "2016-03-18T15:00:51.495Z",
-      //           "estimated-processing-time": 60,
-      //           "arrived-at": null
-      //         }
-      //       ]
-      //     },{
+      //                 }]
+      //             }],
+      //           communication: [{
+      //             id
 
-      //     },{
+      //           }]
+      //         },{
 
-      //     }
+      //         },{
+
+      //     }]
+      //   }]
+      // }
+
+      // workflows = 
+      // [{
+      //   id:
+      //   deliveryId
+      // }
+
       // ]
-      $.ajax('https://exelon-api.herokuapp.com/v1/deliveries', {
-            success: function(data) {
-              console.log(data);
-               $('#main').html($(data).find('#main *'));
-               $('#notification-bar').text('The page has been successfully loaded');
-            },
-            error: function(e) {console.log(e);
-               $('#notification-bar').text('An error occurred');
-            }
-         });
+      // forms = 
 
+      // communications = 
+
+
+
+
+      $.ajax({
+            url:url+'deliveries',
+            headers: { 
+              'X-SITE-ID': siteId,
+              'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ1NTAzNDQ3Mn0.p8lguJGQHf3aMjQfgLScyEz6_H_1o5IFg0zBV3SnFZM'
+            },
+            success: function(deliveries) {
+                console.log('success');
+                console.log(deliveries);
+
+                var locations = deliveries.included.filter(filterByLocations);
+                locations = locations.map(function(obj){
+                  var rObj = {};
+                  rObj[obj.id] = obj.attributes.name;
+                  return rObj;
+                });
+
+                var workflows = deliveries.included.filter(filterByWorkflows);
+                workflows = workflows.map(function(obj){
+                  obj.attributes.deliveryId = parseInt(obj.relationships.delivery.data.id);
+                  obj.attributes.startTime = new Date(obj.attributes.eta);
+                  obj.attributes.endTime = new Date(new Date(obj.attributes.eta).getTime() + obj.attributes['estimated-processing-time']*1000);
+                  // need to get delivery id
+                  // console.log(obj);
+                  // debugger;
+                  return obj.attributes;
+                });
+                console.log(workflows);
+
+
+
+
+                processApiData(workflows)
+
+                  // [0, 1, 2, 3, 4].filter(function(previousValue, currentValue, currentIndex, array) {
+                  //   return previousValue + currentValue;
+                  // });
+
+
+
+      // var kvArray = [{key:1, value:10}, {key:2, value:20}, {key:3, value: 30}];
+      // var reformattedArray = kvArray.map(function(obj){ 
+      //    var rObj = {};
+      //    rObj[obj.key] = obj.value;
+      //    return rObj;
+      // });
+
+                // var workflows = 
+            }
+
+          });
+
+    }
+    function processApiData(workflows){
+      deliveries = d3.nest()  //group by delivery
+            .key(function(d) { return d.deliveryId; })
+            .entries(workflows);
+
+      // debugger;
+
+      deliveries.forEach(function(delivery) {
+        var type = Math.random();
+        if (type <.5){
+          delivery.vehicleType = 'icn-vehicle-bulk.png';
+        } else if(type < .75){
+          delivery.vehicleType = 'icn-vehicle-common.png';
+        } else {
+          delivery.vehicleType = 'icn-vehicle-noncommon.png';
+        }
+      });
+      console.log('deliveries set!', deliveries);
+
+
+      data = deliveries;
+
+      //these functions depend
+      data                = updateCurrentStationCalc(data);
+      stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
+      stationStackedCount = stationStackedCountCalc(stationCounts);
+      stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
+      data = data.sort(compare);
+
+      data = d3.nest() // groupByStation
+          .key(function(d) { return d.currentStation; })
+          .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
+          .entries(data);
+      data = stackDeliveriesCalc(stationStackedCount,data);
+
+
+
+
+    }
+    function filterByLocations(includedObj) {
+      if (includedObj.type == "locations") {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    function filterByWorkflows(includedObj) {
+      if (includedObj.type == "workflows") {
+        return true;
+      } else {
+        return false;
+      }
     }
 
     function generateWorkflows(startOfDayHour){
@@ -707,33 +838,34 @@
       for(var i = 21; i > 0; i--){
         variation =        Math.random() * 1;
         variationMinutes = Math.random() * 60;
-  // new Date(now.getTime() + 1*60000);
+
         workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),28).getTime()+(i*6*60000)),
                           endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),48).getTime()+(i*6*60000)),
-                          delivery: i,
+                          deliveryId: i,
                           station:Math.round(1),
                         });
         workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),56).getTime()+(i*6*60000)),
                           endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1,40).getTime()+(i*6*60000)),
-                          delivery: i,
+                          deliveryId: i,
                           station:Math.round(2),
                         });
         workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1, 44).getTime()+(i*6*60000)),
                           endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2, 20).getTime()+(i*6*60000)),
-                          delivery: i,
+                          deliveryId: i,
                           station:Math.round(3),
                         });
         workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2,22).getTime()+(i*6*60000)),
                           endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,12).getTime()+(i*6*60000)),
-                          delivery: i,
+                          deliveryId: i,
                           station:Math.round(4),
                         });
         workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,15).getTime()+(i*6*60000)),
                           endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,40).getTime()+(i*6*60000)),
-                          delivery: i,
+                          deliveryId: i,
                           station:Math.round(5),
                         });
       }
+      console.log(workflows);
       return workflows;
     }
 
