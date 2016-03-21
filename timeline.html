@@ -745,6 +745,7 @@
                 var workflows = deliveries.included.filter(filterByWorkflows);
                 workflows = workflows.map(function(obj){
                   obj.attributes.deliveryId = parseInt(obj.relationships.delivery.data.id);
+                  obj.attributes.station = obj.attributes.step;
                   obj.attributes.startTime = new Date(obj.attributes.eta);
                   obj.attributes.endTime = new Date(new Date(obj.attributes.eta).getTime() + obj.attributes['estimated-processing-time']*1000*60);
                   // need to get delivery id
@@ -802,6 +803,8 @@
 
       //these functions depend
       data                = updateCurrentStationCalc(data);
+      console.log(data);
+
       stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
       stationStackedCount = stationStackedCountCalc(stationCounts);
       stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
