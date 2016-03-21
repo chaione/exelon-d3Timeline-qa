@@ -67,7 +67,7 @@
                           2,//Death Star
                           3 //Great Temple
                         ]
-    var pollrate = 15000;
+    var pollrate = 600000;
     var url = 'https://exelon-api.herokuapp.com/v1/';
     var siteId = 1; //limerick
     //Calculated Variables
@@ -153,7 +153,7 @@
 
     // resize();
     // setInterval(render(deliveries), 100);
-    setInterval(function() {console.log('bout to call render',data);render(data)},10000);
+    setInterval(function() {console.log('bout to call render',data);render(data)},pollrate);
     window.onresize = resize;
 
     // $(document).ready(function() {
@@ -185,7 +185,7 @@
                     bottom: (-1*stationHeight) + innerHeight - xAxisHeight,
                     left:   (-1*xAxisWidth) + outerWidth};
 
-      
+      console.log(data);
       //clear it out
       svg.remove();
             svg = d3.select("body").append("svg")
@@ -458,7 +458,7 @@
       deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
       stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
       xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
-      console.log(panBounds);
+
       if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
         var maxShiftFromTop = stationHeight>outerHeight?panBounds.bottom:0;
         var translation = [
@@ -746,13 +746,13 @@
                 workflows = workflows.map(function(obj){
                   obj.attributes.deliveryId = parseInt(obj.relationships.delivery.data.id);
                   obj.attributes.startTime = new Date(obj.attributes.eta);
-                  obj.attributes.endTime = new Date(new Date(obj.attributes.eta).getTime() + obj.attributes['estimated-processing-time']*1000);
+                  obj.attributes.endTime = new Date(new Date(obj.attributes.eta).getTime() + obj.attributes['estimated-processing-time']*1000*60);
                   // need to get delivery id
                   // console.log(obj);
                   // debugger;
                   return obj.attributes;
                 });
-                console.log(workflows);
+                console.log('imported workflows',workflows);
 
 
 
@@ -814,7 +814,7 @@
       data = stackDeliveriesCalc(stationStackedCount,data);
 
 
-
+      render(data);
 
     }
     function filterByLocations(includedObj) {
