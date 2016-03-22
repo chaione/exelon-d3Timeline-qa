@@ -66,6 +66,7 @@ var nowMinutes     = now.getMinutes();
 var vehicleShapeH  = rowHeight-10;
 //Variables (to be used)
 var data;
+var stationData;
 var apiDeliveries;
 var deliveries;
 var svg,stationsGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask;

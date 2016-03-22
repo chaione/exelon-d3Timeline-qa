@@ -36,7 +36,7 @@ function render(data){
                 left:   (-1*xAxisWidth) + outerWidth};
 
   console.log(data);
-  //clear it out
+  //clear it out (for now... hope to just update some day!)
   svg.remove();
   svg = setupSvgStructure();
 
@@ -214,26 +214,5 @@ function render(data){
 }
 
 
-function resize() {
-  console.log('resize');
-  if (deliveries== null) {return false};
 
-  var data = deliveries;
-
-  //these functions depend
-  data                = updateCurrentStationCalc(data);
-  stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
-  stationStackedCount = stationStackedCountCalc(stationCounts);
-  stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
-  data = data.sort(compare);
-
-  data = d3.nest() // groupByStation
-      .key(function(d) { return d.currentStation; })
-      .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
-      .entries(data);
-  data = stackDeliveriesCalc(stationStackedCount,data);
-
-  
-  render(data);
-}
 
