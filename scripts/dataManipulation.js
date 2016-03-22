@@ -23,42 +23,6 @@ function filterByWorkflows(includedObj) {
   }
 }
 
-function generateWorkflows(startOfDayHour){
-  var workflows=[];
-  for(var i = 21; i > 0; i--){
-    variation =        Math.random() * 1;
-    variationMinutes = Math.random() * 60;
-
-    workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),28).getTime()+(i*6*60000)),
-                      endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),48).getTime()+(i*6*60000)),
-                      deliveryId: i,
-                      station:Math.round(1),
-                    });
-    workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2),56).getTime()+(i*6*60000)),
-                      endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1,40).getTime()+(i*6*60000)),
-                      deliveryId: i,
-                      station:Math.round(2),
-                    });
-    workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+1, 44).getTime()+(i*6*60000)),
-                      endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2, 20).getTime()+(i*6*60000)),
-                      deliveryId: i,
-                      station:Math.round(3),
-                    });
-    workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+2,22).getTime()+(i*6*60000)),
-                      endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,12).getTime()+(i*6*60000)),
-                      deliveryId: i,
-                      station:Math.round(4),
-                    });
-    workflows.push({  startTime: new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,15).getTime()+(i*6*60000)),
-                      endTime:   new Date(new Date(nowYear, nowMonth, nowDay,startOfDayHour+(i*0.2)+4,40).getTime()+(i*6*60000)),
-                      deliveryId: i,
-                      station:Math.round(5),
-                    });
-  }
-  console.log(workflows);
-  return workflows;
-}
-
 function isTimeBetweenTime(time, start,end){
   return start <= time && time <= end;
 }
@@ -103,9 +67,9 @@ function resize() {
 
   //these functions depend
   data                = updateCurrentStationCalc(data);
-  stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
-  stationStackedCount = stationStackedCountCalc(stationCounts);
-  stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
+  stationCounts       = stationCountCalc(data);                                         // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
+  stationStackedCount = stationStackedCountCalc(stationCounts);                         // [7, 12, 17, 18, 22, 23, 24, 25]
+  stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations); // [Object(name:EnRoute, y:7,y0:0),Object...]
   data = data.sort(compare);
 
   data = d3.nest() // groupByStation
@@ -154,7 +118,7 @@ function retrieveDeliveries(){
 }
 
 function stationCountCalc(deliveriesData){ // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  var stationCounts =[0,0,0,0,0,0,0];      //[7, 5, 5, 1, 4, 1, 1, 1]
+  var stationCounts =[0,0,0,0,0,0,0];
 
   for(var i = 0;i<deliveriesData.length;i++){
     stationCounts[deliveriesData[i].currentStation]++;
@@ -182,14 +146,14 @@ function stationStackedCalc(stationCounts,stationStackedCount,stations){//stacks
 
   stationStacked[0]={
                       "y0":0,
-                      "y":stationCounts[0],
+                      "deliveryCount":stationCounts[0],
                       "name": stations[0]}
 
   //this needs to factor in zooming, or add it to zoom section
   for (var i = 1; i < stationStackedCount.length; i++) {
     stationStacked[i] = {
                           "y0":stationStackedCount[i-1],
-                          "y":stationCounts[i],
+                          "deliveryCount":stationCounts[i],
                           "name":stations[i]
                         };
   };

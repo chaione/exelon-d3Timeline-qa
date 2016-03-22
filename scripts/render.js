@@ -29,7 +29,7 @@ function render(data){
   
 
   stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) +
-                  (stationStacked[stationStackedCount.length-1].y * rowHeight);
+                  (stationStacked[stationStackedCount.length-1].deliveryCount * rowHeight);
   panBounds = { top:    0,
                 right:  0,
                 bottom: (-1*stationHeight) + innerHeight - xAxisHeight,
@@ -51,7 +51,7 @@ function render(data){
       .attr("x", function(d,i) { return 0;})
       .attr("y", function(d,i) { return d.y0*rowHeight + (rowHeight/2);})
       .attr("width",innerWidth)
-      .attr("height", function(d,i) {return d.y*rowHeight;})
+      .attr("height", function(d,i) {return d.deliveryCount*rowHeight;})
 
   stationsLabelSelectAllG.append("text")
       .attr("x", function(d,i) { return stationTextPadding.left;})
