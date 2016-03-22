@@ -38,7 +38,7 @@ function render(data){
   console.log(data);
   //clear it out (for now... hope to just update some day!)
   svg.remove();
-  svg = setupSvgStructure();
+  setupSvgStructure();
 
   // Setup stations overlay and text
   var stationsLabelSelectAll = stationsGroup.selectAll(".station").data(stationStacked);

@@ -1,39 +1,32 @@
 <!DOCTYPE html>
 <html>
   <meta charset="utf-8">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, minimum-scale=1.0">
-
-  <!-- http://curran.github.io/screencasts/splittingCharts/examples/viewer/#/17 -->
-  <!-- http://bl.ocks.org/mbostock/3885705 transitions-->
-  <!-- <meta name="viewport" content="minimal-ui"> -->
   <link rel="stylesheet" type="text/css" href="styles.css">
-  <script   src="https://code.jquery.com/jquery-2.2.2.min.js"   integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="   crossorigin="anonymous"></script>
-  <body>
-  </body>
-
-
+  <script src="https://code.jquery.com/jquery-2.2.2.min.js"   integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="   crossorigin="anonymous"></script>
   <script src="http://d3js.org/d3.v3.js"></script>
+
   <script src="scripts/initialization.js"></script>
   <script src="scripts/dataManipulation.js"></script>
   <script src="scripts/render.js"></script>
-
   <script>
     "use strict";
     console.log('Version 03 22 2016');
-    
+
     var xAxisTranslation = d3.behavior.zoom()
       .scaleExtent([1, 1])
       .translate([startingX,0])
       .on("zoom", moveXAxis);
 
     //Structure
-    svg = setupSvgStructure()
-                  
+    setupSvgStructure();
+
     //Create Data
     retrieveDeliveries();
     setInterval(function() {retrieveDeliveries()},pollrate);
     window.onresize = resize;
+
   </script>
+
+  <body></body>  
 </html>
 
