@@ -64,7 +64,7 @@ function isTimeBetweenTime(time, start,end){
 }
 
 function processApiData(workflowsData){
-  deliveriesData = d3.nest()  //group by delivery
+  var deliveriesData = d3.nest()  //group by delivery
         .key(function(d) { return d.deliveryId; })
         .entries(workflowsData);
 
@@ -93,7 +93,6 @@ function processApiData(workflowsData){
   stationData = stackDeliveriesCalc(stationStackedCount,stationData);
 
   render(stationData);
-
 }
 
 function resize() {
@@ -151,7 +150,7 @@ function retrieveDeliveries(){
             processApiData(apiWorkflows)
         }
       });
-
+  console.log('----------retrieveDeliveries');
 }
 
 function stationCountCalc(deliveriesData){ // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station

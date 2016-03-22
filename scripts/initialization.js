@@ -47,7 +47,7 @@ var stationOrder =  [
                       2,//Death Star
                       3 //Great Temple
                     ]
-var pollrate = 5000;
+var pollrate = 245000;
 var url = 'https://exelon-api.herokuapp.com/v1/';
 var siteId = 1; //limerick
 //Calculated Variables
@@ -63,6 +63,8 @@ var nowMonth       = now.getMonth();
 var nowDay         = now.getDate();
 var nowHours       = now.getHours();
 var nowMinutes     = now.getMinutes();
+now = new Date(nowYear, nowMonth, nowDay,10,30);// used for testing
+
 var vehicleShapeH  = rowHeight-10;
 var svg,stationsGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask;
 var stationCounts =[];
@@ -118,45 +120,45 @@ function setupSvgStructure(){
     //gradients
     var svgDefs = svg.append('defs');
         var maskingGradient = svgDefs.append('linearGradient')
-            .attr('id', 'maskingGradient')
-            .attr("x1", "0%")
-            .attr("y1", "100%")
-            .attr("x2", "0%")
-            .attr("y2", "0%");
-        maskingGradient.append('stop')
-            .attr('class', 'color-maskingGradient-top')
-            .attr('offset', '0');
-        maskingGradient.append('stop')
-            .attr('class', 'color-maskingGradient-bottom')
-            .attr('offset', '.15');
-        maskingGradient.append('stop')
-            .attr('class', 'color-maskingGradient-bottom')
-            .attr('offset', '1')
-            .attr('stop-opacity', '0');
+                .attr('id', 'maskingGradient')
+                .attr("x1", "0%")
+                .attr("y1", "100%")
+                .attr("x2", "0%")
+                .attr("y2", "0%");
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-top')
+                .attr('offset', '0');
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-bottom')
+                .attr('offset', '.15');
+            maskingGradient.append('stop')
+                .attr('class', 'color-maskingGradient-bottom')
+                .attr('offset', '1')
+                .attr('stop-opacity', '0');
         var aheadGradient = svgDefs.append('linearGradient')
-            .attr('id', 'aheadGradient');
-        aheadGradient.append('stop')
-            .attr('class', 'color-ahead-left')
-            .attr('offset', '0');
-        aheadGradient.append('stop')
-            .attr('class', 'color-ahead-right')
-            .attr('offset', '1');
+                .attr('id', 'aheadGradient');
+            aheadGradient.append('stop')
+                .attr('class', 'color-ahead-left')
+                .attr('offset', '0');
+            aheadGradient.append('stop')
+                .attr('class', 'color-ahead-right')
+                .attr('offset', '1');
         var lateGradient = svgDefs.append('linearGradient')
-            .attr('id', 'lateGradient');
-        lateGradient.append('stop')
-            .attr('class', 'color-late-left')
-            .attr('offset', '0');
-        lateGradient.append('stop')
-            .attr('class', 'color-late-right')
-            .attr('offset', '1');
+                .attr('id', 'lateGradient');
+            lateGradient.append('stop')
+                .attr('class', 'color-late-left')
+                .attr('offset', '0');
+            lateGradient.append('stop')
+                .attr('class', 'color-late-right')
+                .attr('offset', '1');
         var onTimeGradient = svgDefs.append('linearGradient')
-            .attr('id', 'onTimeGradient');
-        onTimeGradient.append('stop')
-            .attr('class', 'color-onTime-left')
-            .attr('offset', '0');
-        onTimeGradient.append('stop')
-            .attr('class', 'color-onTime-right')
-            .attr('offset', '1');
+                .attr('id', 'onTimeGradient');
+            onTimeGradient.append('stop')
+                .attr('class', 'color-onTime-left')
+                .attr('offset', '0');
+            onTimeGradient.append('stop')
+                .attr('class', 'color-onTime-right')
+                .attr('offset', '1');
 
 
 

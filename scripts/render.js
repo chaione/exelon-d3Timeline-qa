@@ -211,8 +211,6 @@ function render(data){
       .attr("transform", function(d) {
           return "translate(" + xScale(now) + "," + 0 + ")"
         });
+
+  console.log('-------------render');
 }
-
-
-
-
