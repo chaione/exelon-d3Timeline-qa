@@ -157,13 +157,20 @@ function render(data){
               .attr("y2", function(d,i) { return 0;})
               .attr("class", function(d){
                 if (d.startTime <now) {
-                  var state = Math.random();
-                  if(state<.25){
-                    return "workflow ahead" 
-                  } else if (state < .5){
-                    return "workflow late"
-                  } else {
-                    return "workflow"
+                  // var state = Math.random();
+                  // if(state<.25){
+                  //   return "workflow ahead" 
+                  // } else if (state < .5){
+                  //   return "workflow late"
+                  // } else {
+                  //   return "workflow"
+                  // }
+                  if(state==='late'){
+                    return "workflow late";
+                  }else if(state==='early'){
+                    return "workflow ahead";
+                  }else {
+                    return "workflow";
                   }
                 } else {
                   return "workflow notReached";

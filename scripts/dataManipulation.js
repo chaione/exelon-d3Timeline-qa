@@ -45,10 +45,10 @@ function processApiData(workflowsData){
 
   //these functions depend
   deliveriesData      = updateCurrentStationCalc(deliveriesData);
-  stationCounts       = stationCountCalc(deliveriesData);                                         // Gets the number of deliveries for every station
-  stationStackedCount = stationStackedCountCalc(stationCounts);
-  stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
-  deliveriesData = deliveriesData.sort(compare);
+  stationCounts       = stationCountCalc(deliveriesData);                                   // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
+  stationStackedCount = stationStackedCountCalc(stationCounts);                             // [7, 12, 17, 18, 22, 23, 24, 25]
+  stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);     // [{name:EnRoute, y:7,y0:0},Object...]
+  deliveriesData      = deliveriesData.sort(compare);
 
   stationData = d3.nest() // groupByStation
       .key(function(d) { return d.currentStation; })
@@ -61,25 +61,25 @@ function processApiData(workflowsData){
 
 function resize() {
   console.log('resize');
-  if (deliveries== null) {return false};
+  // if (deliveries == null) {return false};
 
-  var data = deliveries;
+  // var data = deliveries;
 
-  //these functions depend
-  data                = updateCurrentStationCalc(data);
-  stationCounts       = stationCountCalc(data);                                         // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  stationStackedCount = stationStackedCountCalc(stationCounts);                         // [7, 12, 17, 18, 22, 23, 24, 25]
-  stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations); // [Object(name:EnRoute, y:7,y0:0),Object...]
-  data = data.sort(compare);
+  // //these functions depend
+  // data                = updateCurrentStationCalc(data);
+  // stationCounts       = stationCountCalc(data);                                         
+  // stationStackedCount = stationStackedCountCalc(stationCounts);                         
+  // stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations); 
+  // data = data.sort(compare);
 
-  data = d3.nest() // groupByStation
-      .key(function(d) { return d.currentStation; })
-      .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
-      .entries(data);
-  data = stackDeliveriesCalc(stationStackedCount,data);
+  // data = d3.nest() // groupByStation
+  //     .key(function(d) { return d.currentStation; })
+  //     .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
+  //     .entries(data);
+  // data = stackDeliveriesCalc(stationStackedCount,data);
 
   
-  render(data);
+  render(stationData);
 }
 
 function retrieveDeliveries(){
@@ -106,8 +106,19 @@ function retrieveDeliveries(){
             apiWorkflows = apiWorkflows.map(function(workflow){
               workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery.data.id);
               workflow.attributes.station = workflow.attributes.step;
-              workflow.attributes.startTime = new Date(workflow.attributes.eta);
+              workflow.attributes.startTime = new Date(workflow.attributes['arrived-at']);
               workflow.attributes.endTime = new Date(new Date(workflow.attributes.eta).getTime() + workflow.attributes['estimated-processing-time']*1000*60);
+              if(new Date(workflow.attributes.eta) < workflow.attributes.startTime) {
+                workflow.attributes.state = 'late';
+              }else if(new Date(workflow.attributes.eta) > workflow.attributes.startTime) {
+                workflow.attributes.state = 'early';
+              }else {
+                workflow.attributes.state = 'ontime';
+              }
+              console.log('compare');
+              console.log(new Date(workflow.attributes.eta));
+              console.log(workflow.attributes.startTime);
+              console.log(workflow.attributes.state);
               return workflow.attributes;
             });
             console.log('imported workflows',apiWorkflows);
