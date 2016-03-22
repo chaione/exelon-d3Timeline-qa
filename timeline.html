@@ -67,7 +67,7 @@
                           2,//Death Star
                           3 //Great Temple
                         ]
-    var pollrate = 600000;
+    var pollrate = 55000;
     var url = 'https://exelon-api.herokuapp.com/v1/';
     var siteId = 1; //limerick
     //Calculated Variables
@@ -164,14 +164,8 @@
 
     //Functions
     function render(data){
-      if(data=== undefined || data ==[]){
-        return false;
-      }
-      // debugger;
       console.log('render-------------');
-      console.log(deliveries);
 
-      // console.log(data);
       outerWidth  = document.documentElement.clientWidth;
       outerHeight = document.documentElement.clientHeight;
       innerWidth     = outerWidth   - margin.left - margin.right;
@@ -671,7 +665,6 @@
     function generateShapes(){
       d3.xml("img/icn-vehicle-common.svg", "image/svg+xml", function(error, xml) {
         if (error) throw error;
-        // console.log(xml.documentElement);
         return xml.documentElement;
       });
     }
@@ -679,51 +672,6 @@
     function retrieveDeliveries(){
       console.log('retrieveDeliveries----------');
       var self = this;
-      console.log(self);
-      // {
-      //   [{
-      //     stationId:0,
-      //     deliveries[{
-      //           deliveryId:,
-      //           workflows:[{
-      //               workflowId:13
-      //               "step": 2,
-      //               "processing-time": null,
-      //               "started-at": "2016-03-18T13:00:51.495Z",
-      //               "ended-at": null,
-      //               "eta": "2016-03-18T15:00:51.495Z",
-      //               "estimated-processing-time": 60,
-      //               "arrived-at": null,
-      //               events: [{
-      //                   eventId:
-
-      //                 }]
-      //             }],
-      //           communication: [{
-      //             id
-
-      //           }]
-      //         },{
-
-      //         },{
-
-      //     }]
-      //   }]
-      // }
-
-      // workflows = 
-      // [{
-      //   id:
-      //   deliveryId
-      // }
-
-      // ]
-      // forms = 
-
-      // communications = 
-
-
-
 
       $.ajax({
             url:url+'deliveries',
@@ -742,40 +690,17 @@
                   return rObj;
                 });
 
-                var workflows = deliveries.included.filter(filterByWorkflows);
-                workflows = workflows.map(function(obj){
-                  obj.attributes.deliveryId = parseInt(obj.relationships.delivery.data.id);
-                  obj.attributes.station = obj.attributes.step;
-                  obj.attributes.startTime = new Date(obj.attributes.eta);
-                  obj.attributes.endTime = new Date(new Date(obj.attributes.eta).getTime() + obj.attributes['estimated-processing-time']*1000*60);
-                  // need to get delivery id
-                  // console.log(obj);
-                  // debugger;
-                  return obj.attributes;
+                var apiWorkflows = deliveries.included.filter(filterByWorkflows);
+                apiWorkflows = apiWorkflows.map(function(workflow){
+                  workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery.data.id);
+                  workflow.attributes.station = workflow.attributes.step;
+                  workflow.attributes.startTime = new Date(workflow.attributes.eta);
+                  workflow.attributes.endTime = new Date(new Date(workflow.attributes.eta).getTime() + workflow.attributes['estimated-processing-time']*1000*60);
+                  return workflow.attributes;
                 });
-                console.log('imported workflows',workflows);
-
-
-
-
-                processApiData(workflows)
-
-                  // [0, 1, 2, 3, 4].filter(function(previousValue, currentValue, currentIndex, array) {
-                  //   return previousValue + currentValue;
-                  // });
-
-
-
-      // var kvArray = [{key:1, value:10}, {key:2, value:20}, {key:3, value: 30}];
-      // var reformattedArray = kvArray.map(function(obj){ 
-      //    var rObj = {};
-      //    rObj[obj.key] = obj.value;
-      //    return rObj;
-      // });
-
-                // var workflows = 
+                console.log('imported workflows',apiWorkflows);
+                processApiData(apiWorkflows)
             }
-
           });
 
     }
@@ -783,8 +708,6 @@
       deliveries = d3.nest()  //group by delivery
             .key(function(d) { return d.deliveryId; })
             .entries(workflows);
-
-      // debugger;
 
       deliveries.forEach(function(delivery) {
         var type = Math.random();
@@ -796,15 +719,11 @@
           delivery.vehicleType = 'icn-vehicle-noncommon.png';
         }
       });
-      console.log('deliveries set!', deliveries);
-
 
       data = deliveries;
 
       //these functions depend
       data                = updateCurrentStationCalc(data);
-      console.log(data);
-
       stationCounts       = stationCountCalc(data);                                         // Gets the number of deliveries for every station
       stationStackedCount = stationStackedCountCalc(stationCounts);
       stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);
