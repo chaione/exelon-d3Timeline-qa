@@ -104,20 +104,37 @@ function retrieveDeliveries(){
 
             var apiWorkflows = deliveries.included.filter(filterByWorkflows);
             apiWorkflows = apiWorkflows.map(function(workflow){
+              // if(workflow['attrivutes']['arrived-at'] === null){  //hasnt arrived
+
+              // }
               workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery.data.id);
               workflow.attributes.station = workflow.attributes.step;
-              workflow.attributes.startTime = new Date(workflow.attributes['arrived-at']);
-              workflow.attributes.endTime = new Date(new Date(workflow.attributes.eta).getTime() + workflow.attributes['estimated-processing-time']*1000*60);
-              if(new Date(workflow.attributes.eta) < workflow.attributes.startTime) {
+              if(workflow.attributes['arrived-at']===null){
+                workflow.attributes.startTime = null;
+              } else {
+                workflow.attributes.startTime = new Date(workflow.attributes['arrived-at']);
+              }
+
+              if(workflow.attributes['ended-at'] === null){
+                workflow.attributes.endTime = null
+              } else {
+                workflow.attributes.endTime = new Date(workflow.attributes['ended-at']);
+              }
+              // workflow.attributes.endTime = new Date(new Date(workflow.attributes['ended-at']));
+              // workflow.attributes.endTime = new Date(new Date(workflow.attributes.eta).getTime() + workflow.attributes['estimated-processing-time']*1000*60);
+
+
+              //determine state
+              if(new Date(workflow.attributes.eta) < new Date(workflow.attributes['arrived-at'])) {
                 workflow.attributes.state = 'late';
-              }else if(new Date(workflow.attributes.eta) > workflow.attributes.startTime) {
+              }else if(new Date(workflow.attributes.eta) > new Date(workflow.attributes['arrived-at'])) {
                 workflow.attributes.state = 'early';
               }else {
                 workflow.attributes.state = 'ontime';
               }
               console.log('compare');
-              console.log(new Date(workflow.attributes.eta));
-              console.log(workflow.attributes.startTime);
+              console.log(workflow.attributes.eta);
+              console.log(workflow.attributes['startTime']);
               console.log(workflow.attributes.state);
               return workflow.attributes;
             });

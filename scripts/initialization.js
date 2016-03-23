@@ -63,7 +63,7 @@ var nowMonth       = now.getMonth();
 var nowDay         = now.getDate();
 var nowHours       = now.getHours();
 var nowMinutes     = now.getMinutes();
-now = new Date(nowYear, nowMonth, nowDay,10,30);// used for testing
+now = new Date(nowYear, nowMonth, nowDay,9,30);// used for testing
 
 var vehicleShapeH  = rowHeight-10;
 var svg,stationsGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask;
