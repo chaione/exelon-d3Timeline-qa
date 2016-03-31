@@ -105,6 +105,8 @@ function retrieveDeliveries(){
         },
         success: function(deliveries) {
             console.log('deliveries recieved from api', deliveries);
+            deliveries = fakeRealAPIDeliveries;
+            console.log('replaced with fake real API delivs',deliveries);
 
             var locations = deliveries.included.filter(filterByLocations);
             locations = locations.map(function(obj){
