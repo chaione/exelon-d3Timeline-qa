@@ -32,6 +32,7 @@ function processApiData(workflowsData){
         .key(function(d) { return d.deliveryId; })
         .entries(workflowsData);
 
+  //add fake truck to each
   deliveriesData.forEach(function(delivery) {
     var type = Math.random();
     if (type <.5){
@@ -43,17 +44,17 @@ function processApiData(workflowsData){
     }
   });
 
-  //these functions depend
+  //add x y data to display on chart
   deliveriesData      = updateCurrentStationCalc(deliveriesData);
   stationCounts       = stationCountCalc(deliveriesData);                                   // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
   stationStackedCount = stationStackedCountCalc(stationCounts);                             // [7, 12, 17, 18, 22, 23, 24, 25]
   stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);     // [{name:EnRoute, y:7,y0:0},Object...]
-  deliveriesData      = deliveriesData.sort(compare);
+  var deliveriesDataSorted= deliveriesData.sort(compare);//is this necesary
 
   stationData = d3.nest() // groupByStation
       .key(function(d) { return d.currentStation; })
       .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
-      .entries(deliveriesData);
+      .entries(deliveriesDataSorted);
   stationData = stackDeliveriesCalc(stationStackedCount,stationData);
 
   render(stationData);
@@ -61,23 +62,33 @@ function processApiData(workflowsData){
 
 function resize() {
   console.log('resize');
-  // if (deliveries == null) {return false};
+  // var deliveriesData = d3.nest()  //group by delivery
+  //       .key(function(d) { return d.deliveryId; })
+  //       .entries(workflowsData);
 
-  // var data = deliveries;
+  // //add fake truck to each
+  // deliveriesData.forEach(function(delivery) {
+  //   var type = Math.random();
+  //   if (type <.5){
+  //     delivery.vehicleType = 'icn-vehicle-bulk.png';
+  //   } else if(type < .75){
+  //     delivery.vehicleType = 'icn-vehicle-common.png';
+  //   } else {
+  //     delivery.vehicleType = 'icn-vehicle-noncommon.png';
+  //   }
+  // });
 
-  // //these functions depend
-  // data                = updateCurrentStationCalc(data);
-  // stationCounts       = stationCountCalc(data);                                         
-  // stationStackedCount = stationStackedCountCalc(stationCounts);                         
-  // stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations); 
-  // data = data.sort(compare);
+  // deliveriesData      = updateCurrentStationCalc(deliveriesData);
+  // stationCounts       = stationCountCalc(deliveriesData);                                   // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
+  // stationStackedCount = stationStackedCountCalc(stationCounts);                             // [7, 12, 17, 18, 22, 23, 24, 25]
+  // stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);     // [{name:EnRoute, y:7,y0:0},Object...]
+  // var deliveriesDataSorted= deliveriesData.sort(compare);//is this necesary
 
-  // data = d3.nest() // groupByStation
+  // stationData = d3.nest() // groupByStation
   //     .key(function(d) { return d.currentStation; })
   //     .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
-  //     .entries(data);
-  // data = stackDeliveriesCalc(stationStackedCount,data);
-
+  //     .entries(deliveriesDataSorted);
+  // stationData = stackDeliveriesCalc(stationStackedCount,stationData);
   
   render(stationData);
 }
@@ -109,25 +120,26 @@ function retrieveDeliveries(){
               // }
               workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery.data.id);
               workflow.attributes.station = workflow.attributes.step;
+              workflow.attributes.eta = new Date(workflow.attributes.eta);
               if(workflow.attributes['arrived-at']===null){
-                workflow.attributes.startTime = null;
+                workflow.attributes['arrived-at'] = null;
               } else {
-                workflow.attributes.startTime = new Date(workflow.attributes['arrived-at']);
+                workflow.attributes['arrived-at'] = new Date(workflow.attributes['arrived-at']);
               }
 
               if(workflow.attributes['ended-at'] === null){
-                workflow.attributes.endTime = null
+                workflow.attributes['ended-at'] = null;
               } else {
-                workflow.attributes.endTime = new Date(workflow.attributes['ended-at']);
+                workflow.attributes['ended-at'] = new Date(workflow.attributes['ended-at']);
               }
               // workflow.attributes.endTime = new Date(new Date(workflow.attributes['ended-at']));
               // workflow.attributes.endTime = new Date(new Date(workflow.attributes.eta).getTime() + workflow.attributes['estimated-processing-time']*1000*60);
 
 
               //determine state
-              if(new Date(workflow.attributes.eta) < new Date(workflow.attributes['arrived-at'])) {
+              if(workflow.attributes.eta < workflow.attributes['arrived-at']) {
                 workflow.attributes.state = 'late';
-              }else if(new Date(workflow.attributes.eta) > new Date(workflow.attributes['arrived-at'])) {
+              }else if(workflow.attributes.eta > workflow.attributes['arrived-at']) {
                 workflow.attributes.state = 'early';
               }else {
                 workflow.attributes.state = 'ontime';
@@ -229,7 +241,7 @@ function updateCurrentStationCalc(deliveriesData){//update every delivery w/ its
     if(currentStation == 1){
       var firstWorkflowOfDelivery = deliveriesData[i].values[0];
 
-      if (firstWorkflowOfDelivery.startTime > now) {
+      if (firstWorkflowOfDelivery['arrived-at'] > now) {
         currentStation = 0; // first station
       };
     }
@@ -237,7 +249,7 @@ function updateCurrentStationCalc(deliveriesData){//update every delivery w/ its
     if(currentStation == 0){
       var lastWorkflowOfDelivery = deliveriesData[i].values[deliveriesData[i].values.length-1];
 
-      if (lastWorkflowOfDelivery.endTime < now) {
+      if (lastWorkflowOfDelivery['ended-at'] < now) {
         currentStation = 6; // last station
       };
     }

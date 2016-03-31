@@ -27,7 +27,6 @@ function render(data){
   innerWidth     = outerWidth   - margin.left - margin.right;
   innerHeight    = outerHeight  - margin.top  - margin.bottom;
   
-
   stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) +
                   (stationStacked[stationStackedCount.length-1].deliveryCount * rowHeight);
   panBounds = { top:    0,
@@ -93,105 +92,9 @@ function render(data){
   var workflowSelectAll5 = workflowsSelectAll.selectAll(".workflow");
   workflowsSelectAllG
       .each(function(d){
-        var header = d3.select(this);
-
-        if(d.startTime != null && d.endTime != null ){  //completed workflow
-
-          header.append("line")
-              .attr("x1", function(d,i) { return xScale(d.startTime); })
-              .attr("y1", function(d,i) { return 0;})
-              .attr("x2", function(d,i) { return xScale(d.endTime); })
-              .attr("y2", function(d,i) { return 0;})
-              .attr("class", function(d){
-                if(d.state==='late'){
-                  return "workflow late";
-                }else if(d.state==='early'){
-                  return "workflow ahead";
-                }else {
-                  return "workflow";
-                }
-              });
-
-          header.append("svg:path")
-              .attr("d", function(d) { return customShapes['lBook'](4);})
-              .attr("class", function(d){
-                if(d.startTime < now){
-                  return "bookEnd notReached";
-                }
-              })
-              .attr("transform", function(d) {
-                return "translate(" + xScale(d.startTime) + "," + 0 + ")"
-              });;
-
-          header.append("svg:path")
-              .attr("d", function(d) { return customShapes['rBook'](4);})
-              .attr("class", function(d){
-                if(d.endTime < now){
-                  return "bookEnd notReached";
-                }
-              })
-              .attr("transform", function(d) {
-                return "translate(" + xScale(d.endTime) + "," + 0 + ")"
-              });;
-        } else if(d.startTime != null && d.endTime === null) { //current workflow
-
-          //leftside of now
-          header.append("line")
-              .attr("x1", function(d,i) { return xScale(d.startTime); })
-              .attr("y1", function(d,i) { return 0;})
-              .attr("x2", function(d,i) { return xScale(now); })
-              .attr("y2", function(d,i) { return 0;})
-              .attr("class", function(d){
-                if(d.state==='late'){
-                  return "workflow late";
-                }else if(d.state==='early'){
-                  return "workflow ahead";
-                }else {
-                  return "workflow";
-                }
-              });
-
-          header.append("svg:path")
-              .attr("d", function(d) { return customShapes['lBook'](4);})
-              .attr("class", function(d){
-                if(d.startTime < now){
-                  return "bookEnd notReached";
-                }
-              })
-              .attr("transform", function(d) {
-                return "translate(" + xScale(d.startTime) + "," + 0 + ")"
-              });;
-
-
-          //on right side of now
-          header.append("line")
-              .attr("x1", function(d,i) { return xScale(now); })
-              .attr("y1", function(d,i) { return 0;})
-              .attr("x2", function(d,i) { return xScale(new Date(new Date(d.startTime)).getTime() + d['estimated-processing-time']*1000*60)})
-              // new Date(new Date(workflow.attributes.eta).getTime() + workflow.attributes['estimated-processing-time']*1000*60);
-              .attr("y2", function(d,i) { return .001;})//IMPORTANT  if its flat its not displayed
-              .style("stroke-dasharray", ("2, 2"))
-              .style("stroke-width", 4)
-              .attr("class", function(d){
-                if(d.state==='late'){
-                  return "workflow lateGradient";
-                }else if(d.state==='early'){
-                  return "workflow aheadGradient";
-                }else {
-                  return "workflow onTimeGradient";
-                }
-              });
-
-        } else if(d.startTime === null && d.endTime === null){ //workflow hasnt started yet
-          header.append("line")
-              .attr("x1", function(d,i) { return xScale(new Date(d.eta)); })
-              .attr("y1", function(d,i) { return 0;})
-              .attr("x2", function(d,i) { return xScale(new Date(d.eta).getTime() + d['estimated-processing-time']*1000*60); })
-              .attr("y2", function(d,i) { return 0;})
-              .attr("class", "workflow notReached");
-        }
+        var workflow = d3.select(this);
+        workflow = appendWorkflow(workflow,d);
       });
-
 
   var vehicleIconsG = deliveriesSelectAllG.append("g");
   //setup Vehicle Icons
@@ -210,3 +113,105 @@ function render(data){
 
   console.log('-------------render');
 }
+
+// RENDER HELPERS
+function appendWorkflow(workflow,d){
+  if(d['arrived-at'] != null && d['ended-at'] != null ){  //completed workflow
+    workflow.append("line")
+        .attr("x1", function(d,i) { return xScale(d['arrived-at']); })
+        .attr("y1", function(d,i) { return 0;})
+        .attr("x2", function(d,i) { return xScale(d['ended-at']); })
+        .attr("y2", function(d,i) { return 0;})
+        .attr("class", function(d){
+          if(d.state==='late'){
+            return "workflow late";
+          }else if(d.state==='early'){
+            return "workflow ahead";
+          }else {
+            return "workflow";
+          }
+        });
+
+    workflow.append("svg:path")
+        .attr("d", function(d) { return customShapes['lBook'](4);})
+        .attr("class", function(d){
+          if(d['arrived-at'] < now){
+            return "bookEnd notReached";
+          }
+        })
+        .attr("transform", function(d) {
+          return "translate(" + xScale(d['arrived-at']) + "," + 0 + ")"
+        });;
+
+    workflow.append("svg:path")
+        .attr("d", function(d) { return customShapes['rBook'](4);})
+        .attr("class", function(d){
+          if(d['ended-at'] < now){
+            return "bookEnd notReached";
+          }
+        })
+        .attr("transform", function(d) {
+          return "translate(" + xScale(d['ended-at']) + "," + 0 + ")"
+        });;
+  } else if(d['arrived-at'] != null && d['ended-at'] === null) { //current workflow
+
+    //leftside of now
+    workflow.append("line")
+        .attr("x1", function(d,i) { return xScale(d['arrived-at']); })
+        .attr("y1", function(d,i) { return 0;})
+        .attr("x2", function(d,i) { return xScale(now); })
+        .attr("y2", function(d,i) { return 0;})
+        .attr("class", function(d){
+          if(d.state==='late'){
+            return "workflow late";
+          }else if(d.state==='early'){
+            return "workflow ahead";
+          }else {
+            return "workflow";
+          }
+        });
+
+    workflow.append("svg:path")
+        .attr("d", function(d) { return customShapes['lBook'](4);})
+        .attr("class", function(d){
+          if(d['arrived-at'] < now){
+            return "bookEnd notReached";
+          }
+        })
+        .attr("transform", function(d) {
+          return "translate(" + xScale(d['arrived-at']) + "," + 0 + ")"
+        });;
+
+
+    //on right side of now
+    workflow.append("line")
+        .attr("x1", function(d,i) { return xScale(now); })
+        .attr("y1", function(d,i) { return 0;})
+        .attr("x2", function(d,i) { return xScale(new Date(new Date(d['arrived-at'])).getTime() + d['estimated-processing-time']*1000*60)})
+        // new Date(new Date(workflow.attributes.eta).getTime() + workflow.attributes['estimated-processing-time']*1000*60);
+        .attr("y2", function(d,i) { return .001;})//IMPORTANT  if its flat its not displayed
+        .style("stroke-dasharray", ("2, 2"))
+        .style("stroke-width", 4)
+        .attr("class", function(d){
+          if(d.state==='late'){
+            return "workflow lateGradient";
+          }else if(d.state==='early'){
+            return "workflow aheadGradient";
+          }else {
+            return "workflow onTimeGradient";
+          }
+        });
+
+  } else if(d['arrived-at'] === null && d['ended-at'] === null){ //workflow hasnt started yet
+    workflow.append("line")
+        .attr("x1", function(d,i) { return xScale(new Date(d.eta)); })
+        .attr("y1", function(d,i) { return 0;})
+        .attr("x2", function(d,i) { return xScale(new Date(d.eta).getTime() + d['estimated-processing-time']*1000*60); })
+        .attr("y2", function(d,i) { return 0;})
+        .attr("class", "workflow notReached");
+  }
+  console.log(workflow[0][0].lastChild);
+  return workflow;
+}
+
+
