@@ -57,6 +57,7 @@ function processApiData(workflowsData){
       .entries(deliveriesDataSorted);
   stationData = stackDeliveriesCalc(stationStackedCount,stationData);
 
+  console.table(stationData);
   render(stationData);
 }
 
@@ -90,7 +91,7 @@ function resize() {
   //     .entries(deliveriesDataSorted);
   // stationData = stackDeliveriesCalc(stationStackedCount,stationData);
   
-  render(stationData);
+  // render(stationData);
 }
 
 function retrieveDeliveries(){
@@ -106,7 +107,9 @@ function retrieveDeliveries(){
         success: function(deliveries) {
             console.log('deliveries recieved from api', deliveries);
             deliveries = fakeRealAPIDeliveries;
-            console.log('replaced with fake real API delivs',deliveries);
+            console.log('replaced with fakereal deliveries');
+            console.table(deliveries);
+
 
             var locations = deliveries.included.filter(filterByLocations);
             locations = locations.map(function(obj){
@@ -221,7 +224,7 @@ function updateCurrentStationCalc(deliveriesData){//update every delivery w/ its
   var workflow;
   var currentStation = 0;
   var isCurrentUpdated = false;
-  var now = new Date(Date.now());
+  // var now = new Date(Date.now());
 
   //assums workflows are in ascending order
   for (var i = 0; i < deliveriesData.length; i++) {

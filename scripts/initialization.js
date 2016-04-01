@@ -64,7 +64,8 @@ var nowMonth       = now.getMonth();
 var nowDay         = now.getDate();
 var nowHours       = now.getHours();
 var nowMinutes     = now.getMinutes();
-now = new Date(nowYear, nowMonth, nowDay,9,30);// used for testing
+now = new Date(nowYear, 2, 31,9,30);// used for testing
+console.log('now',now);
 
 var vehicleShapeH  = rowHeight-10;
 var svg,stationsGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask;
@@ -91,16 +92,22 @@ var customShapes = {
 }
 
 //scales
+// var xScale = d3.time.scale.utc()
+//       .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                +new Date(nowYear, nowMonth, nowDay+1,12)])
+//       .range( [0,                                     xAxisWidth]);
 var xScale = d3.time.scale.utc()
-      .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                +new Date(nowYear, nowMonth, nowDay+1,12)])
+      .domain([+new Date(nowYear, 2, 31-1,12),                +new Date(nowYear, 2, 31+1,12)])
       .range( [0,                                     xAxisWidth]);
 
 var yDeliveryScale = d3.scale.linear()
       .domain([1,7])
       .range([1+rowHeight,7*rowHeight]);
 
+// var viewportScale = d3.time.scale.utc()
+//       .domain([+new Date(nowYear, nowMonth, nowDay-1,12)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay+1,12)-unixStartHours])
+//       .range( [0,                                     -1*xAxisWidth+outerWidth]);
 var viewportScale = d3.time.scale.utc()
-      .domain([+new Date(nowYear, nowMonth, nowDay-1,12)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay+1,12)-unixStartHours])
+      .domain([+new Date(nowYear, 2, 31-1,12)+unixStartHours,  +new Date(nowYear, 2, 31+1,12)-unixStartHours])
       .range( [0,                                     -1*xAxisWidth+outerWidth]);
 
 startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
