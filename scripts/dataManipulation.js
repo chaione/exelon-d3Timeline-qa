@@ -146,10 +146,10 @@ function retrieveDeliveries(){
               }else {
                 workflow.attributes.state = 'ontime';
               }
-              console.log('compare');
-              console.log(workflow.attributes.eta);
-              console.log(workflow.attributes['startTime']);
-              console.log(workflow.attributes.state);
+              // console.log('compare');
+              // console.log(workflow.attributes.eta);
+              // console.log(workflow.attributes['startTime']);
+              // console.log(workflow.attributes.state);
               return workflow.attributes;
             });
             console.log('imported workflows',apiWorkflows);

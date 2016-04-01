@@ -34,7 +34,6 @@ function render(data){
                 bottom: (-1*stationHeight) + innerHeight - xAxisHeight,
                 left:   (-1*xAxisWidth) + outerWidth};
 
-  console.log(data);
   //clear it out (for now... hope to just update some day!)
   svg.remove();
   setupSvgStructure();
@@ -210,7 +209,6 @@ function appendWorkflow(workflow,d){
         .attr("y2", function(d,i) { return 0;})
         .attr("class", "workflow notReached");
   }
-  console.log(workflow[0][0].lastChild);
   return workflow;
 }
 
