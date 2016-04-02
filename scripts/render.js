@@ -153,7 +153,7 @@ function appendWorkflow(workflow,d){
           return "translate(" + xScale(d['ended-at']) + "," + 0 + ")"
         });;
   } else if(d['arrived-at'] != null && d['ended-at'] === null) { //current workflow
-
+console.log('appendworkflow', d);
     //leftside of now
     workflow.append("line")
         .attr("x1", function(d,i) { return xScale(d['arrived-at']); })
@@ -180,6 +180,7 @@ function appendWorkflow(workflow,d){
         .attr("transform", function(d) {
           return "translate(" + xScale(d['arrived-at']) + "," + 0 + ")"
         });;
+
 
 
     //on right side of now

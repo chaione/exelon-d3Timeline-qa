@@ -47,7 +47,7 @@ var stationOrder =  [
                       2,//Death Star
                       3 //Great Temple
                     ]
-var pollrate = 245000;
+var pollrate = 2455000;
 var url = 'https://exelon-api.herokuapp.com/v1/';
 var siteId = 1; //limerick
 
