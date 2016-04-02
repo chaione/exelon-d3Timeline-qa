@@ -15,6 +15,14 @@ function filterByLocations(includedObj) {
   }
 }
 
+function filterByVehicles(includedObj) {
+  if (includedObj.type == "vehicles") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function filterByWorkflows(includedObj) {
   if (includedObj.type == "workflows") {
     return true;
@@ -35,13 +43,15 @@ function processApiData(workflowsData){
   //add fake truck to each
   deliveriesData.forEach(function(delivery) {
     var type = Math.random();
-    if (type <.5){
-      delivery.vehicleType = 'icn-vehicle-bulk.png';
-    } else if(type < .75){
-      delivery.vehicleType = 'icn-vehicle-common.png';
-    } else {
-      delivery.vehicleType = 'icn-vehicle-noncommon.png';
-    }
+    // if (type <.5){
+    //   delivery.vehicleType = 'icn-vehicle-bulk.png';
+    // } else if(type < .75){
+    //   delivery.vehicleType = 'icn-vehicle-common.png';
+    // } else {
+    //   delivery.vehicleType = 'icn-vehicle-noncommon.png';
+    // }
+    console.log(delivery);
+    debugger;
   });
 
   //add x y data to display on chart
@@ -117,6 +127,17 @@ function retrieveDeliveries(){
               rObj[obj.id] = obj.attributes.name;
               return rObj;
             });
+            
+            vehicles = {};
+            var vehiclesArray = deliveries.included.filter(filterByVehicles);
+            for (var i = 0; i < vehiclesArray.length; i++) {
+              var vehicle = vehiclesArray[i];
+              vehicles[vehicle.id] = vehicle.attributes.model;
+            };
+
+            console.log('vehicles',vehicles);
+            // debugger;
+
 
             var apiWorkflows = deliveries.included.filter(filterByWorkflows);
             apiWorkflows = apiWorkflows.map(function(workflow){
