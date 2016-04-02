@@ -77,7 +77,8 @@ var workflowsFakeData=[];
 var startingX;
 var duration, variation, variationMinutes;
 var yDeliveryScale;
-var vehicles;
+var deliveriesAPIData;
+var vehiclesAPIData;
 
 var panBounds;
 

@@ -7,6 +7,15 @@ function compare(a,b) {
     return 0;
 }
 
+
+function filterByDeliveries(includedObj) {
+  if (includedObj.type == "deliveries") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function filterByLocations(includedObj) {
   if (includedObj.type == "locations") {
     return true;
@@ -40,19 +49,13 @@ function processApiData(workflowsData){
         .key(function(d) { return d.deliveryId; })
         .entries(workflowsData);
 
+  console.log(deliveriesAPIData);
+  console.log(vehiclesAPIData);
   //add fake truck to each
   deliveriesData.forEach(function(delivery) {
-    var type = Math.random();
-    // if (type <.5){
-    //   delivery.vehicleType = 'icn-vehicle-bulk.png';
-    // } else if(type < .75){
-    //   delivery.vehicleType = 'icn-vehicle-common.png';
-    // } else {
-    //   delivery.vehicleType = 'icn-vehicle-noncommon.png';
-    // }
-    console.log(delivery);
-    debugger;
+    delivery.vehicleType = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];//yea sorry
   });
+  console.log(deliveriesData);
 
   //add x y data to display on chart
   deliveriesData      = updateCurrentStationCalc(deliveriesData);
@@ -120,6 +123,12 @@ function retrieveDeliveries(){
             console.log('replaced with fakereal deliveries');
             console.table(deliveries);
 
+            deliveriesAPIData = {};
+            var deliveriesArray = deliveries.data.filter(filterByDeliveries);
+            for (var i = 0; i < deliveriesArray.length; i++) {
+              var delivery = deliveriesArray[i];
+              deliveriesAPIData[delivery.id] = delivery;
+            };
 
             var locations = deliveries.included.filter(filterByLocations);
             locations = locations.map(function(obj){
@@ -128,23 +137,20 @@ function retrieveDeliveries(){
               return rObj;
             });
             
-            vehicles = {};
+            vehiclesAPIData = {};
             var vehiclesArray = deliveries.included.filter(filterByVehicles);
             for (var i = 0; i < vehiclesArray.length; i++) {
               var vehicle = vehiclesArray[i];
-              vehicles[vehicle.id] = vehicle.attributes.model;
+              vehiclesAPIData[vehicle.id] = vehicle.attributes.model;
             };
-
-            console.log('vehicles',vehicles);
-            // debugger;
 
 
             var apiWorkflows = deliveries.included.filter(filterByWorkflows);
             apiWorkflows = apiWorkflows.map(function(workflow){
-              // if(workflow['attrivutes']['arrived-at'] === null){  //hasnt arrived
 
-              // }
-              workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery.data.id);
+              // workflow.attributes.vehicleId = parseInt(workflow.relationships.vehicle['data']['id']);
+              workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery['data']['id']);
+
               workflow.attributes.station = workflow.attributes.step;
               workflow.attributes.eta = new Date(workflow.attributes.eta);
               if(workflow.attributes['arrived-at']===null){

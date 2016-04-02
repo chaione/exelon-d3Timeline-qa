@@ -99,7 +99,7 @@ function render(data){
   //setup Vehicle Icons
   vehicleIconsG.append("image")
       .attr("xlink:href",function(i){
-          return "img/" + i.vehicleType
+          return "img/" + i.vehicleType+'.png';
       })
       .attr("height", vehicleShapeH)
       .attr("width", vehicleShapeH)

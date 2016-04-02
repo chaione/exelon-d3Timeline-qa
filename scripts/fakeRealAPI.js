@@ -133,7 +133,7 @@ var fakeRealAPIDeliveries =
       "relationships": {
         "vehicle": {
           "data": {
-            "id": "1",
+            "id": "2",
             "type": "vehicles"
           }
         },
@@ -240,7 +240,7 @@ var fakeRealAPIDeliveries =
       "relationships": {
         "vehicle": {
           "data": {
-            "id": "1",
+            "id": "3",
             "type": "vehicles"
           }
         },
@@ -347,7 +347,7 @@ var fakeRealAPIDeliveries =
       "relationships": {
         "vehicle": {
           "data": {
-            "id": "1",
+            "id": "4",
             "type": "vehicles"
           }
         },
@@ -454,7 +454,7 @@ var fakeRealAPIDeliveries =
       "relationships": {
         "vehicle": {
           "data": {
-            "id": "1",
+            "id": "5",
             "type": "vehicles"
           }
         },
