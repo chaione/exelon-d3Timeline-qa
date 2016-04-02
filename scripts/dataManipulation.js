@@ -235,12 +235,12 @@ function updateCurrentStationCalc(deliveriesData){//update every delivery w/ its
 
       // debugger;
       if(!isCurrentUpdated){
-        if(now < workflow.endTime){
+        if(workflow['arrived-at'] !=null && workflow['ended-at'] === null){
           currentStation = workflow.station;
+          console.log('setting current station!',currentStation);
           isCurrentUpdated = true;
         }
       }
-
     }
 
     if(currentStation == 1){
