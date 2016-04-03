@@ -106,9 +106,10 @@ function render(data){
       .attr("x",-1*(vehicleShapeH/2))
       .attr("y",-1*(vehicleShapeH/2))
       .attr("class", "truckIconDiamond")
-      .attr("transform", function(d) {
-          return "translate(" + xScale(now) + "," + 0 + ")"
-        });
+      .attr("transform", function(d) {return "translate(" + xScale(now) + "," + 0 + ")"})
+      .on("click", function(a,b) {
+          console.log('CLICKED ME',   a.key);
+      });
 
   console.log('-------------render');
 }

@@ -60,6 +60,21 @@ body {
       stop-color:#C90C14;
     }
 
+/*    .delivery g image:hover line{
+      border:1px solid black;
+      stroke:white;
+      cursor: hand;
+
+    }*/
+
+    .delivery image:hover {
+        height: 55px;
+        width: 55px;
+        y: -27;
+        x: -27;
+        cursor: pointer;
+    }
+
     .maskingGradient {
       fill: url(#maskingGradient);
     }
