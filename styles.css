@@ -74,6 +74,20 @@ body {
         x: -27;
         cursor: pointer;
     }
+    #detailSvg {
+      position:absolute;
+      left:0;
+      top:0;
+
+    }
+    .detailDeliveryCloseRect {
+      opacity:.8;
+      fill: #0C0C1A;
+
+    }
+    .detailDeliveryRect {
+      fill:green;
+    }
 
     .maskingGradient {
       fill: url(#maskingGradient);
@@ -126,6 +140,6 @@ body {
       stroke:#D0D1D1;
     }
 
-    svg {
+    svg#timeline {
       background-color: #0C0C1A
     }

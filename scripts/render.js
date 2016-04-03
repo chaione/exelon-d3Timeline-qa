@@ -107,8 +107,8 @@ function render(data){
       .attr("y",-1*(vehicleShapeH/2))
       .attr("class", "truckIconDiamond")
       .attr("transform", function(d) {return "translate(" + xScale(now) + "," + 0 + ")"})
-      .on("click", function(a,b) {
-          console.log('CLICKED ME',   a.key);
+      .on("click", function(delivery) {
+          displayDetail(delivery);
       });
 
   console.log('-------------render');
@@ -212,5 +212,4 @@ function appendWorkflow(workflow,d){
   }
   return workflow;
 }
-
 

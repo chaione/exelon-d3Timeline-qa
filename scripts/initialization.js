@@ -50,6 +50,7 @@ var stationOrder =  [
 var pollrate = 2455000;
 var url = 'https://exelon-api.herokuapp.com/v1/';
 var siteId = 1; //limerick
+var isDetailDisplayed = false;
 
 //Calculated Variables
 var innerWidth     = outerWidth   - margin.left - margin.right;
@@ -125,7 +126,8 @@ function setupSvgStructure(){
   svg = d3.select("body").append("svg")
       .attr("width",  outerWidth)
       .attr("height", outerHeight)
-      .call(xAxisTranslation);;
+      .attr("id", "timeline")
+      .call(xAxisTranslation);
 
     //gradients
     var svgDefs = svg.append('defs');
