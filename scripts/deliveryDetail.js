@@ -50,8 +50,15 @@ function displayDetail(delivery) {
             var detailDeliveryInfoPOC = detailDeliveryInfoGroup.append("text")
                 .attr("x", 16)
                 .attr("y", 26)
-                .text("POC Joseph Edwards")
+                .text("POC " + "Joseph Edwards")
                 .attr("class","detailInfoPOC")
+                .attr("font-size", 16 + "px");
+
+            var detailDeliveryInfoCompanyName = detailDeliveryInfoGroup.append("text")
+                .attr("x", 16)
+                .attr("y", 46)
+                .text("ACE Asphalt Paving Co")
+                .attr("class","detailInfoCompanyName")
                 .attr("font-size", 16 + "px");
 
             // .attr("x", 10)
