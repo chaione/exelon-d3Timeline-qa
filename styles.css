@@ -89,7 +89,17 @@ body {
 
     }
     .detailDeliveryRect {
-      fill:green;
+      fill:rgba(26, 48, 71,0.25);
+    }
+
+    .detailInfoRect {
+      fill:rgba(26, 48, 71,1);
+      position:relative;
+    }
+
+    .detailInfoPOC{
+      position:relative;
+      fill:grey;
     }
 
     .maskingGradient {

@@ -36,11 +36,49 @@ function displayDetail(delivery) {
             .text(stations[delivery.currentStation])
             .attr("class","detailName")
             .attr("font-size", stationTextHeight + "px");
+
+        var detailDeliveryInfoGroup = detailSvg.append("g")
+            .attr('transform', 'translate(' + (outerWidth- 344 - 20) + "," + (((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2) - 50)+ ')');;
+
+        var detailDeliveryInfoRect = detailDeliveryInfoGroup.append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", 344)
+            .attr("height",65)
+            .attr("class","detailInfoRect")
+
+            var detailDeliveryInfoPOC = detailDeliveryInfoGroup.append("text")
+                .attr("x", 16)
+                .attr("y", 26)
+                .text("POC Joseph Edwards")
+                .attr("class","detailInfoPOC")
+                .attr("font-size", 16 + "px");
+
+            // .attr("x", 10)
+            // .attr("y", ((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2) - 10)
+            // .text(stations[delivery.currentStation])
+            // .attr("class","detailName")
+            // .attr("font-size", stationTextHeight + "px");
       
+        
+        detailDeliveryGroup = detailSvg.append("g")
+            .attr("class", "detailDelivery")
+            .attr('transform', 'translate(' + detailStartingX + "," + 0 + ')');
+
+            // detailYAxisGroup = detailDeliveryGroup.append("g")
+            //       .attr("class", "y axis");
+
+                detailDeliveryGroup.append("line")
+                    .attr("class","yAxis")
+                    .attr("x1", xScale(now))
+                    .attr("y1", ((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2) - 10)
+                    .attr("x2", xScale(now))
+                    .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
 
 }
 
 function removeDetail(){
     console.log('removeDetail');
+    isDetailDisplayed = false;
     d3.select("#detailSvg").remove();
 }

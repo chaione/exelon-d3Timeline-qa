@@ -80,6 +80,7 @@ var duration, variation, variationMinutes;
 var yDeliveryScale;
 var deliveriesAPIData;
 var vehiclesAPIData;
+var detailStartingX;
 
 var panBounds;
 
@@ -99,7 +100,7 @@ var customShapes = {
 //       .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                +new Date(nowYear, nowMonth, nowDay+1,12)])
 //       .range( [0,                                     xAxisWidth]);
 var xScale = d3.time.scale.utc()
-      .domain([+new Date(nowYear, 2, 31-1,12),                +new Date(nowYear, 2, 31+1,12)])
+      .domain([+new Date(nowYear, 2, 31-1,12),        +new Date(nowYear, 2, 31+1,12)])
       .range( [0,                                     xAxisWidth]);
 
 var yDeliveryScale = d3.scale.linear()
@@ -111,9 +112,11 @@ var yDeliveryScale = d3.scale.linear()
 //       .range( [0,                                     -1*xAxisWidth+outerWidth]);
 var viewportScale = d3.time.scale.utc()
       .domain([+new Date(nowYear, 2, 31-1,12)+unixStartHours,  +new Date(nowYear, 2, 31+1,12)-unixStartHours])
-      .range( [0,                                     -1*xAxisWidth+outerWidth]);
+      .range( [0,                                              -1*xAxisWidth+outerWidth]);
 
-startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
+// startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
+startingX = viewportScale(new Date(nowYear,2,31,9,30));
+detailStartingX = startingX;
 
 var xAxis = d3.svg.axis()
   .ticks(d3.time.hours, 1)

@@ -1,10 +1,15 @@
 function moveXAxis(a,b) {
   var eventxTranslation = d3.event.translate[0];
   var eventyTranslation = d3.event.translate[1];
-
+  detailStartingX = eventxTranslation;
+  
   deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
   stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
   xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
+
+  if(isDetailDisplayed){
+    detailDeliveryGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
+  }
 
   if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
     var maxShiftFromTop = stationHeight>outerHeight?panBounds.bottom:0;
@@ -15,6 +20,11 @@ function moveXAxis(a,b) {
     deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
     stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
     xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
+
+    if(isDetailDisplayed){
+      detailDeliveryGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
+    }
+
     xAxisTranslation.translate(translation);
   }
 }
