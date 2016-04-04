@@ -103,8 +103,8 @@ function resize() {
   //     .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
   //     .entries(deliveriesDataSorted);
   // stationData = stackDeliveriesCalc(stationStackedCount,stationData);
-  
-  // render(stationData);
+  removeDetail();
+  render(stationData);
 }
 
 function retrieveDeliveries(){

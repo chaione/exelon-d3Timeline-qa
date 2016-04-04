@@ -195,9 +195,9 @@ function setupSvgStructure(){
               .attr("x", 0)
               .attr("y", 0)
               .attr("width", outerWidth)
-              .attr("height", xAxisHeight*3)
+              .attr("height", xAxisHeight*2)
               .attr("class","maskingGradient")
-              .attr('transform', 'translate(' + 0 + "," +  (outerHeight-(xAxisHeight*3)) + ')');
+              .attr('transform', 'translate(' + 0 + "," +  (outerHeight-(xAxisHeight*2)+1) + ')');
 
         xAxisGroup = g.append("g")
               .attr("class", "x axis ")

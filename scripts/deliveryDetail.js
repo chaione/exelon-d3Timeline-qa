@@ -4,7 +4,11 @@ function displayDetail(delivery) {
     var eventHeight = 30;
     var eventCount  = 4; //how many rows of events
     var detailPadding = 30;
+    // var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
+    var detailDeliveryRectY = yDeliveryScale(delivery.yIndex+1) - detailPadding - (2*eventHeight);
     var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
+    // yDeliveryScale(d.yIndex+1)+
+
     detailSvg = d3.select("body").append("svg")
       .attr("width",  outerWidth)
       .attr("height", outerHeight-xAxisHeight)
@@ -24,7 +28,7 @@ function displayDetail(delivery) {
         
         var detailDeliveryRect = detailSvg.append("rect")
             .attr("x", 0)
-            .attr("y", ((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2))
+            .attr("y", detailDeliveryRectY)
             .attr("width", outerWidth)
             .attr("height",detailDeliveryRectHeight)
             .attr("class","detailDeliveryRect")
@@ -32,13 +36,13 @@ function displayDetail(delivery) {
 
         var detailDeliveryStationLabel = detailSvg.append("text")
             .attr("x", 10)
-            .attr("y", ((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2) - 10)
+            .attr("y", detailDeliveryRectY - 10)
             .text(stations[delivery.currentStation])
             .attr("class","detailName")
             .attr("font-size", stationTextHeight + "px");
 
         var detailDeliveryInfoGroup = detailSvg.append("g")
-            .attr('transform', 'translate(' + (outerWidth- 344 - 20) + "," + (((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2) - 50)+ ')');;
+            .attr('transform', 'translate(' + (outerWidth- 344 - 20) + "," + (detailDeliveryRectY - 50)+ ')');;
 
         var detailDeliveryInfoRect = detailDeliveryInfoGroup.append("rect")
             .attr("x", 0)
@@ -70,7 +74,16 @@ function displayDetail(delivery) {
         
         detailDeliveryGroup = detailSvg.append("g")
             .attr("class", "detailDelivery")
-            .attr('transform', 'translate(' + detailStartingX + "," + 0 + ')');
+            .attr('transform', 'translate(' + detailStartingX + "," + detailDeliveryRectY + ')');
+
+            detailDeliveryGroup.append("line")
+                .attr("x1", function(d,i) { return xScale(new Date(nowYear,2,31,5,30)); })
+                .attr("y1", function(d,i) { return 10;})
+                .attr("x2", function(d,i) { return xScale(new Date(nowYear,2,31,17,0)); })
+                .attr("y2", function(d,i) { return 10;})
+                .attr("class", function(d){
+                  return "workflow felwijf3";
+                });
 
             // detailYAxisGroup = detailDeliveryGroup.append("g")
             //       .attr("class", "y axis");
