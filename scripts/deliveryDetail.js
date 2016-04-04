@@ -1,9 +1,9 @@
 function displayDetail(delivery) {
     console.log('displayDetail', delivery);
     isDetailDisplayed = true;
-    var eventHeight = 20;
+    var eventHeight = 30;
     var eventCount  = 4; //how many rows of events
-    var detailPadding = 20;
+    var detailPadding = 30;
     var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
     detailSvg = d3.select("body").append("svg")
       .attr("width",  outerWidth)
@@ -29,6 +29,13 @@ function displayDetail(delivery) {
             .attr("height",detailDeliveryRectHeight)
             .attr("class","detailDeliveryRect")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var detailDeliveryStationLabel = detailSvg.append("text")
+            .attr("x", 10)
+            .attr("y", ((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2) - 10)
+            .text(stations[delivery.currentStation])
+            .attr("class","detailName")
+            .attr("font-size", stationTextHeight + "px");
       
 
 }

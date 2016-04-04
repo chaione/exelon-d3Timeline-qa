@@ -80,6 +80,9 @@ body {
       top:0;
 
     }
+    .detailName {
+      fill: #BFFFEA;
+    }
     .detailDeliveryCloseRect {
       opacity:.8;
       fill: #0C0C1A;
