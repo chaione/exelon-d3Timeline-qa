@@ -24,6 +24,7 @@ function displayDetail(delivery) {
       .attr("width",  outerWidth)
       .attr("height", outerHeight-xAxisHeight)
       .attr("id","detailSvg")
+      .style("opacity",.0)
       .call(xAxisTranslation);
 
         var detailDeliveryCloseRect = detailSvg.append("rect")
@@ -128,13 +129,27 @@ function displayDetail(delivery) {
                   workflow = appendWorkflow(workflow,d);
                 });
                 
-            
+            // var detailDeliveryDataVehicleGroup = detailDeliveryDataGroup.append("g")
 
+            detailDeliveryDataGroup.append("image")
+                  .attr("xlink:href",function(i){
+                      return "img/" + delivery.vehicleType+'.png';
+                  })
+                  .attr("height", vehicleShapeH)
+                  .attr("width", vehicleShapeH)
+                  .attr("x",-1*(vehicleShapeH/2))
+                  .attr("y",-1*(vehicleShapeH/2))
+                  .attr("class", "truckIconDiamond")
+                  .attr("transform", function(d) {return "translate(" + xScale(now) + "," + (detailPadding + eventHeight + eventHeight) + ")"});
+
+    detailSvg.transition().style("opacity",1.0);    
         // detailDeliveryDataGroup.selectAll(".detailLine").data(stationStacked);
 }
 
 function removeDetail(){
     console.log('removeDetail');
     isDetailDisplayed = false;
-    d3.select("#detailSvg").remove();
+    // d3.select("#detailSvg").remove();
+    d3.select("#detailSvg").style("opacity",0.0).remove();
+    
 }
