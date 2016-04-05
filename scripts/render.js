@@ -1,6 +1,10 @@
 function moveXAxis(a,b) {
   var eventxTranslation = d3.event.translate[0];
   var eventyTranslation = d3.event.translate[1];
+  if (isDetailDisplayed) {
+    eventyTranslation = previousYTranslation;
+  }
+  previousYTranslation = eventyTranslation;
   detailStartingX = eventxTranslation;
   
   deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
@@ -8,7 +12,8 @@ function moveXAxis(a,b) {
   xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
 
   if(isDetailDisplayed){
-    detailDeliveryGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
+    detailDeliveryDataGroup.attr("transform", "translate(" + [eventxTranslation,detailDeliveryRectY] + ")scale(1)");
+    console.log(eventxTranslation);
   }
 
   if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
@@ -22,7 +27,7 @@ function moveXAxis(a,b) {
     xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
 
     if(isDetailDisplayed){
-      detailDeliveryGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
+      detailDeliveryDataGroup.attr("transform", "translate(" + [translation[0],detailDeliveryRectY] + ")scale(1)");
     }
 
     xAxisTranslation.translate(translation);

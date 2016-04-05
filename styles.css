@@ -104,6 +104,11 @@ body {
     .detailInfoCompanyName {
       fill:white;
     }
+    .detailScheduledLine2 {
+      stroke: red;
+      stroke-width:    1px;
+      
+    }
 
     .maskingGradient {
       fill: url(#maskingGradient);

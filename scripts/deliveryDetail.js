@@ -5,9 +5,20 @@ function displayDetail(delivery) {
     var eventCount  = 4; //how many rows of events
     var detailPadding = 30;
     // var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
-    var detailDeliveryRectY = yDeliveryScale(delivery.yIndex+1) - detailPadding - (2*eventHeight);
+    detailDeliveryRectY = yDeliveryScale(delivery.yIndex+1) - detailPadding - (2*eventHeight);
     var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
     // yDeliveryScale(d.yIndex+1)+
+
+
+    // detailSvg
+    //     detailDeliveryCloseRect
+    //     detailDeliveryRect
+    //     detailDeliveryDataGroup
+    //     detailDeliveryStationLabel
+    //     detailDeliveryInfoGroup
+    //         detailDeliveryInfoRect
+    //         detailDeliveryInfoPOC
+    //         detailDeliveryInfoCompanyName
 
     detailSvg = d3.select("body").append("svg")
       .attr("width",  outerWidth)
@@ -44,12 +55,12 @@ function displayDetail(delivery) {
         var detailDeliveryInfoGroup = detailSvg.append("g")
             .attr('transform', 'translate(' + (outerWidth- 344 - 20) + "," + (detailDeliveryRectY - 50)+ ')');;
 
-        var detailDeliveryInfoRect = detailDeliveryInfoGroup.append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", 344)
-            .attr("height",65)
-            .attr("class","detailInfoRect")
+            var detailDeliveryInfoRect = detailDeliveryInfoGroup.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 344)
+                .attr("height",65)
+                .attr("class","detailInfoRect")
 
             var detailDeliveryInfoPOC = detailDeliveryInfoGroup.append("text")
                 .attr("x", 16)
@@ -72,11 +83,51 @@ function displayDetail(delivery) {
             // .attr("font-size", stationTextHeight + "px");
       
         
-        detailDeliveryGroup = detailSvg.append("g")
+        detailDeliveryDataGroup = detailSvg.append("g")
             .attr("class", "detailDelivery")
             .attr('transform', 'translate(' + detailStartingX + "," + detailDeliveryRectY + ')');
 
-            detailDeliveryGroup.append("line")
+            detailDeliveryDataGroup.append("line")
+                .attr("class","yAxis")
+                .attr("x1", xScale(now))
+                .attr("y1", -10)
+                .attr("x2", xScale(now))
+                .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
+
+
+            var detailDeliveryDataScheduledGroup = detailDeliveryDataGroup.append("g")
+                .attr("class", "detailScheduled")
+                .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight/2) + ')');
+
+            detailDeliveryDataScheduledGroup
+                .selectAll(".detailScheduledLine")
+                .data(delivery.values)
+                .enter()
+                .append("line")
+                .attr("x1", function(d,i) { return xScale(d['eta']); })
+                .attr("y1", function(d,i) { return eventHeight*1;})
+                .attr("x2", function(d,i) { 
+                    // var asdf = new Date(d['eta']);
+                    // var qwer = d['estimated-processing-time']*60*1000;
+                    // var poiu = asdf + qwer;
+
+                    // console.log('eta',d['eta']);
+                    // console.log('processing time', d['estimated-processing-time']*60*1000);
+                    // // console.log(d['eta'] + (d['estimated-processing-time']*60*60*1000));
+                    // console.log('end', new Date(new Date(d['eta']).getTime()+(qwer)));
+
+                    // debugger;
+                    return xScale(new Date(d['eta'].getTime()+(d['estimated-processing-time']*60*1000-60000))); 
+                })
+                .attr("y2", function(d,i) { return eventHeight*1;})
+                .attr("class", function(d){
+                  return "detailScheduledLine2";
+                });
+
+            // detailDeliveryDataGroup.selectAll(".detailLine").data(stationStacked);
+
+
+            detailDeliveryDataGroup.append("line")
                 .attr("x1", function(d,i) { return xScale(new Date(nowYear,2,31,5,30)); })
                 .attr("y1", function(d,i) { return 10;})
                 .attr("x2", function(d,i) { return xScale(new Date(nowYear,2,31,17,0)); })
@@ -88,13 +139,10 @@ function displayDetail(delivery) {
             // detailYAxisGroup = detailDeliveryGroup.append("g")
             //       .attr("class", "y axis");
 
-                detailDeliveryGroup.append("line")
-                    .attr("class","yAxis")
-                    .attr("x1", xScale(now))
-                    .attr("y1", ((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2) - 10)
-                    .attr("x2", xScale(now))
-                    .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
 
+            
+
+        detailDeliveryDataGroup.selectAll(".detailLine").data(stationStacked);
 }
 
 function removeDetail(){
