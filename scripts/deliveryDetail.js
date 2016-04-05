@@ -73,8 +73,24 @@ function displayDetail(delivery) {
             var detailDeliveryInfoCompanyName = detailDeliveryInfoGroup.append("text")
                 .attr("x", 16)
                 .attr("y", 46)
-                .text("ACE Asphalt Paving Co")
+                .text("ACE Asphalt Paving Co (S1 3/4)")
                 .attr("class","detailInfoCompanyName")
+                .attr("font-size", 16 + "px");
+
+            var detailDeliveryInfoArrivaltime = detailDeliveryInfoGroup.append("text")
+                .attr("text-anchor", "END")
+                .attr("x", 344-5)
+                .attr("y", 26)
+                .text("A " + "5:30")
+                .attr("class","detailInfoArrivaltime")
+                .attr("font-size", 16 + "px");
+
+            var detailDeliveryInfoDelay = detailDeliveryInfoGroup.append("text")
+                .attr("text-anchor", "END")
+                .attr("x", 344-5)
+                .attr("y", 46)
+                .text("Δ" + "12")
+                .attr("class","detailInfoDelay")
                 .attr("font-size", 16 + "px");
 
             // .attr("x", 10)
@@ -105,15 +121,15 @@ function displayDetail(delivery) {
                 .data(delivery.values)
                 .enter()
                 .append("line")
-                .attr("x1", function(d,i) { return xScale(d['eta']); })
-                .attr("y1", 0)
-                .attr("x2", function(d,i) { 
-                    return xScale(new Date(d['eta'].getTime()+(d['estimated-processing-time']*60*1000-60000))); 
-                })
-                .attr("y2", 0)
-                .attr("class", function(d){
-                  return "detailScheduledLine2";
-                });
+                    .attr("x1", function(d,i) { return xScale(d['eta']); })
+                    .attr("y1", 0)
+                    .attr("x2", function(d,i) { 
+                        return xScale(new Date(d['eta'].getTime()+(d['estimated-processing-time']*60*1000-60000))); 
+                    })
+                    .attr("y2", 0)
+                    .attr("class", function(d){
+                      return "detailScheduledLine2";
+                    });
 
             var detailDeliveryDataActualGroup = detailDeliveryDataGroup.append("g")
                 .attr("class", "detailScheduled")
@@ -151,5 +167,5 @@ function removeDetail(){
     isDetailDisplayed = false;
     // d3.select("#detailSvg").remove();
     d3.select("#detailSvg").style("opacity",0.0).remove();
-    
+
 }

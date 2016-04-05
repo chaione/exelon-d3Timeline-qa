@@ -105,6 +105,12 @@ body {
     .detailInfoCompanyName {
       fill:white;
     }
+    .detailInfoArrivaltime {
+      fill:rgb(77,254,220);/*Sam*/
+    }
+    .detailInfoDelay {
+      fill:rgb(212,19,32);
+    }
     .detailScheduledLine2 {
       stroke: red;
       stroke-width:    1px;
