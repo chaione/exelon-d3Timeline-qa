@@ -97,7 +97,7 @@ function displayDetail(delivery) {
 
             var detailDeliveryDataScheduledGroup = detailDeliveryDataGroup.append("g")
                 .attr("class", "detailScheduled")
-                .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight/2) + ')');
+                .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight) + ')');
 
             detailDeliveryDataScheduledGroup
                 .selectAll(".detailScheduledLine")
@@ -105,44 +105,32 @@ function displayDetail(delivery) {
                 .enter()
                 .append("line")
                 .attr("x1", function(d,i) { return xScale(d['eta']); })
-                .attr("y1", function(d,i) { return eventHeight*1;})
+                .attr("y1", 0)
                 .attr("x2", function(d,i) { 
-                    // var asdf = new Date(d['eta']);
-                    // var qwer = d['estimated-processing-time']*60*1000;
-                    // var poiu = asdf + qwer;
-
-                    // console.log('eta',d['eta']);
-                    // console.log('processing time', d['estimated-processing-time']*60*1000);
-                    // // console.log(d['eta'] + (d['estimated-processing-time']*60*60*1000));
-                    // console.log('end', new Date(new Date(d['eta']).getTime()+(qwer)));
-
-                    // debugger;
                     return xScale(new Date(d['eta'].getTime()+(d['estimated-processing-time']*60*1000-60000))); 
                 })
-                .attr("y2", function(d,i) { return eventHeight*1;})
+                .attr("y2", 0)
                 .attr("class", function(d){
                   return "detailScheduledLine2";
                 });
 
-            // detailDeliveryDataGroup.selectAll(".detailLine").data(stationStacked);
+            var detailDeliveryDataActualGroup = detailDeliveryDataGroup.append("g")
+                .attr("class", "detailScheduled")
+                .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight + eventHeight ) + ')');
 
-
-            detailDeliveryDataGroup.append("line")
-                .attr("x1", function(d,i) { return xScale(new Date(nowYear,2,31,5,30)); })
-                .attr("y1", function(d,i) { return 10;})
-                .attr("x2", function(d,i) { return xScale(new Date(nowYear,2,31,17,0)); })
-                .attr("y2", function(d,i) { return 10;})
-                .attr("class", function(d){
-                  return "workflow felwijf3";
+            detailDeliveryDataActualGroup
+                .selectAll(".detailScheduledLine")
+                .data(delivery.values)
+                .enter()
+                .append("g")
+                .each(function(d){
+                  var workflow = d3.select(this);
+                  workflow = appendWorkflow(workflow,d);
                 });
-
-            // detailYAxisGroup = detailDeliveryGroup.append("g")
-            //       .attr("class", "y axis");
-
-
+                
             
 
-        detailDeliveryDataGroup.selectAll(".detailLine").data(stationStacked);
+        // detailDeliveryDataGroup.selectAll(".detailLine").data(stationStacked);
 }
 
 function removeDetail(){

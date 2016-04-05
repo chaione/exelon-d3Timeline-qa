@@ -13,7 +13,6 @@ function moveXAxis(a,b) {
 
   if(isDetailDisplayed){
     detailDeliveryDataGroup.attr("transform", "translate(" + [eventxTranslation,detailDeliveryRectY] + ")scale(1)");
-    console.log(eventxTranslation);
   }
 
   if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {

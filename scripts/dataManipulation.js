@@ -176,6 +176,8 @@ function retrieveDeliveries(){
               }else {
                 workflow.attributes.state = 'ontime';
               }
+
+              
               // console.log('compare');
               // console.log(workflow.attributes.eta);
               // console.log(workflow.attributes['startTime']);
