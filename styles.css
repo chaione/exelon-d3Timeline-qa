@@ -3,6 +3,7 @@ body {
       margin:           0px;
       padding:          0px;
       overflow:         hidden;
+      font-family: 'Maven Pro', sans-serif;
     }
 
     .axis line {
@@ -107,7 +108,7 @@ body {
     .detailScheduledLine2 {
       stroke: red;
       stroke-width:    1px;
-      
+
     }
 
     .maskingGradient {
