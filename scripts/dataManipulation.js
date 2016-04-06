@@ -7,6 +7,57 @@ function compare(a,b) {
     return 0;
 }
 
+function getVehicleImageName(vehicleInfo,deliveryStatus) {
+  console.log('-----getVehicleImageName');
+  console.log(vehicleInfo);
+  console.log(deliveryStatus);
+  var vehicleImageName = "icn-";
+  // icn- + type + axles + status + priority
+
+  //special cases first
+  if (vehicleInfo.type === "emergency") {
+    if(deliveryStatus === "arrived"){
+      vehicleImageName += "emergency-arrived"
+    } else if(deliveryStatus ==="denied") {
+      vehicleImageName += "emergency-denied"
+    } else {
+      vehicleImageName += "emergency-enroute"
+    }
+
+  } else if (vehicleInfo.type === "construction"    ||
+             vehicleInfo.type === "passnonIMP" ||
+             vehicleInfo.type === "passIMP") {
+    vehicleImageName += vehicleInfo.type + "-";
+
+    if(deliveryStatus === "arrived"){
+      vehicleImageName += "arrived"
+    } else if(deliveryStatus ==="denied") {
+      vehicleImageName += "denied"
+    } else {
+      vehicleImageName += "enroute"
+    }
+
+    if(vehicleInfo.priority){
+      vehicleImageName += "-pri"
+    }
+
+  } else {
+    vehicleImageName += vehicleInfo.type + "-" + vehicleInfo.axles + "w-";
+
+    if(deliveryStatus === "arrived"){
+      vehicleImageName += "arrived"
+    } else if(deliveryStatus ==="denied") {
+      vehicleImageName += "denied"
+    } else {
+      vehicleImageName += "enroute"
+    }
+
+    if(vehicleInfo.priority){
+      vehicleImageName += "-pri"
+    }
+  }
+  return vehicleImageName;
+}
 
 function filterByDeliveries(includedObj) {
   if (includedObj.type == "deliveries") {
@@ -51,9 +102,10 @@ function processApiData(workflowsData){
 
   //update vehicleType
   deliveriesData.forEach(function(delivery) {
-    // console.log(delivery);
-    // debugger;
-    delivery.vehicleType = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];//yea sorry
+    var vehicleInfo = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];
+    var deliveryStatus = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
+    delivery.vehicleType = getVehicleImageName(vehicleInfo,deliveryStatus);
+    // delivery.vehicleType = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];//yea sorry
   });
   console.log(deliveriesData);
 
@@ -140,7 +192,8 @@ function retrieveDeliveries(){
             var vehiclesArray = deliveries.included.filter(filterByVehicles);
             for (var i = 0; i < vehiclesArray.length; i++) {
               var vehicle = vehiclesArray[i];
-              vehiclesAPIData[vehicle.id] = vehicle.attributes.model;
+              vehiclesAPIData[vehicle.id] = vehicle.attributes;
+              // vehiclesAPIData[]
             };
 
 

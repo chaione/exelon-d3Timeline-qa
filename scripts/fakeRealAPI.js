@@ -12,6 +12,7 @@ var fakeRealAPIDeliveries =
         "arrive-at": "2016-03-31T12:00:43.646Z",
         "escort": null,
         "priority": null,
+        "status": 'enroute',
         "processing-time": 18000,
         "current-location": {
           "id": 2,
@@ -117,6 +118,7 @@ var fakeRealAPIDeliveries =
         "cargo-quantity": 0,
         "notes": "I have a bad feeling about this",
         "arrive-at": "2016-03-31T12:00:43.646Z",
+        "status": 'arrived',
         "escort": null,
         "priority": null,
         "processing-time": 18000,
@@ -224,6 +226,7 @@ var fakeRealAPIDeliveries =
         "cargo-quantity": 0,
         "notes": "I have a bad feeling about this",
         "arrive-at": "2016-03-31T12:00:43.646Z",
+        "status": 'denied',
         "escort": null,
         "priority": null,
         "processing-time": 18000,
@@ -331,6 +334,7 @@ var fakeRealAPIDeliveries =
         "cargo-quantity": 0,
         "notes": "I have a bad feeling about this",
         "arrive-at": "2016-03-31T12:00:43.646Z",
+        "status": 'arrived',
         "escort": null,
         "priority": null,
         "processing-time": 18000,
@@ -438,6 +442,7 @@ var fakeRealAPIDeliveries =
         "cargo-quantity": 0,
         "notes": "I have a bad feeling about this",
         "arrive-at": "2016-03-31T12:00:43.646Z",
+        "status": 'arrived',
         "escort": null,
         "priority": null,
         "processing-time": 18000,
@@ -546,8 +551,10 @@ var fakeRealAPIDeliveries =
       "type": "vehicles",
       "attributes": {
         "model": "icn-bulk-2w-arrived",
+        "type": "common",
+        "axles":3,
         "escort": false,
-        "priority": false
+        "priority": true
       },
       "relationships": {
         "vendor": {
@@ -579,7 +586,9 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "model": "icn-bulk-2w-enroute",
         "escort": false,
-        "priority": false
+        "priority": true,
+        "type": "emergency",
+        "axles":2
       },
       "relationships": {
         "vendor": {
@@ -610,7 +619,9 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "model": "icn-bulk-3w-arrived",
         "escort": false,
-        "priority": false
+        "priority": true,
+        "type": "rad",
+        "axles":3
       },
       "relationships": {
         "vendor": {
@@ -641,7 +652,9 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "model": "icn-bulk-3w-arrived",
         "escort": false,
-        "priority": false
+        "priority": false,
+        "type": "passIMP",
+        "axles":2
       },
       "relationships": {
         "vendor": {
@@ -672,7 +685,9 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "model": "icn-construction-arrived",
         "escort": false,
-        "priority": false
+        "priority": true,
+        "type": "construction",
+        "axles":3
       },
       "relationships": {
         "vendor": {
