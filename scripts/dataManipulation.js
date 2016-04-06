@@ -49,10 +49,10 @@ function processApiData(workflowsData){
         .key(function(d) { return d.deliveryId; })
         .entries(workflowsData);
 
-  console.log(deliveriesAPIData);
-  console.log(vehiclesAPIData);
-  //add fake truck to each
+  //update vehicleType
   deliveriesData.forEach(function(delivery) {
+    // console.log(delivery);
+    // debugger;
     delivery.vehicleType = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];//yea sorry
   });
   console.log(deliveriesData);
@@ -70,7 +70,6 @@ function processApiData(workflowsData){
       .entries(deliveriesDataSorted);
   stationData = stackDeliveriesCalc(stationStackedCount,stationData);
 
-  console.table(stationData);
   render(stationData);
 }
 
