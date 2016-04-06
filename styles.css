@@ -19,9 +19,9 @@ body {
     }
     .axis text {
       font: 12px sans-serif;
-      shape-rendering: crispEdges;
+      /*shape-rendering: crispEdges;*/
       stroke-width:    1px;
-      stroke: white;
+      fill: white;
       font-color: #CEE5ED;
     }
 
@@ -90,7 +90,7 @@ body {
 
     }
     .detailDeliveryRect {
-      fill:rgba(26, 48, 71,0.8);
+      fill:rgba(26, 48, 71,1);
     }
 
     .detailInfoRect {
@@ -165,7 +165,19 @@ body {
     }
 
     .yAxis {
+      /*fill:#D0D1D1;*/
       stroke:#D0D1D1;
+    }
+    .yAxisDateTimeBox {
+      fill:#0D424F;
+    }
+    .axis .yAxisDateTimeText {
+      fill: #BFFFEA;
+      font-family: 'Maven Pro', sans-serif;
+    }
+    .yAxisDateTimeArrow {
+      fill: #01FEA9 !important;
+      stroke:none !important;
     }
 
     svg#timeline {

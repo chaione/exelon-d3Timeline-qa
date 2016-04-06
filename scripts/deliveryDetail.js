@@ -104,12 +104,39 @@ function displayDetail(delivery) {
             .attr("class", "detailDelivery")
             .attr('transform', 'translate(' + detailStartingX + "," + detailDeliveryRectY + ')');
 
-            detailDeliveryDataGroup.append("line")
+            var detailDeliveryYAxisGroup =detailDeliveryDataGroup.append("g") 
+                .attr("class", "y axis");;
+                // detailDeliveryYAxisGroup.append("line")
+                // .attr("class","yAxis")
+                // .attr("x1", xScale(now))
+                // .attr("y1", -10)
+                // .attr("x2", xScale(now))
+                // .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
+            detailDeliveryYAxisGroup.append("line")
                 .attr("class","yAxis")
                 .attr("x1", xScale(now))
                 .attr("y1", -10)
                 .attr("x2", xScale(now))
                 .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
+            detailDeliveryYAxisGroup.append("rect")
+                .attr("x", xScale(now)-(120/2))
+                .attr("y", -26)
+                .attr("width",120)
+                .attr("height", 16)
+                .attr("class","yAxisDateTimeBox")
+            detailDeliveryYAxisGroup.append("text")
+                .attr("x", xScale(now))
+                .attr("y", -13)
+                .attr("text-anchor", "middle")
+                .text(function(d,i){return "3.31.16 // 9:30"})
+                .attr("class","yAxisDateTimeText")
+                .attr("font-size", 14 + "px");
+            detailDeliveryYAxisGroup.append("svg:path")
+                .attr("d", function(d) { return customShapes['dBook'](4);})
+                .attr("class", "yAxisDateTimeArrow")
+                .attr("transform", function(d) {
+                  return "translate(" + xScale(now) + "," + (-10) + ")"
+                });;
 
 
             var detailDeliveryDataScheduledGroup = detailDeliveryDataGroup.append("g")

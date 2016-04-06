@@ -80,6 +80,25 @@ function render(data){
       .attr("y1", margin.top)
       .attr("x2", xScale(now))
       .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight));
+  yAxisGroup.append("rect")
+      .attr("x", xScale(now)-(120/2))
+      .attr("y", 0)
+      .attr("width",120)
+      .attr("height", 16)
+      .attr("class","yAxisDateTimeBox")
+  yAxisGroup.append("text")
+      .attr("x", xScale(now))
+      .attr("y", 13)
+      .attr("text-anchor", "middle")
+      .text(function(d,i){return "3.31.16 // 9:30"})
+      .attr("class","yAxisDateTimeText")
+      .attr("font-size", 14 + "px");
+  yAxisGroup.append("svg:path")
+      .attr("d", function(d) { return customShapes['dBook'](4);})
+      .attr("class", "yAxisDateTimeArrow")
+      .attr("transform", function(d) {
+        return "translate(" + xScale(now) + "," + 16 + ")"
+      });;
 
   // Setup Stations
   var stationsSelectAll2 = deliveriesGroup.selectAll(".station").data(data);

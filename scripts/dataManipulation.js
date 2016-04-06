@@ -8,9 +8,6 @@ function compare(a,b) {
 }
 
 function getVehicleImageName(vehicleInfo,deliveryStatus) {
-  console.log('-----getVehicleImageName');
-  console.log(vehicleInfo);
-  console.log(deliveryStatus);
   var vehicleImageName = "icn-";
   // icn- + type + axles + status + priority
 
