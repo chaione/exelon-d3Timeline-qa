@@ -169,7 +169,7 @@ function retrieveDeliveries(){
             console.log('deliveries recieved from api', deliveries);
             deliveries = fakeRealAPIDeliveries;
             console.log('replaced with fakereal deliveries');
-            console.table(deliveries);
+            // console.table(deliveries);
 
             deliveriesAPIData = {};
             var deliveriesArray = deliveries.data.filter(filterByDeliveries);

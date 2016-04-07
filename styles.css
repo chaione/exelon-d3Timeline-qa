@@ -129,7 +129,7 @@ body {
     .station:nth-child(even) {
       fill:#1B1E23;
     }
-    .station .name{
+    .name{
       fill: #BFFFEA;
     }
 
