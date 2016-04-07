@@ -1,5 +1,5 @@
 var pocContacts = ['POC', 'Delta10'];
-
+var inspectionLabels = ['Scheduled','Actual']
 function displayDetail(delivery) {
     console.log('displayDetail', delivery);
     isDetailDisplayed = true;
@@ -26,7 +26,7 @@ function displayDetail(delivery) {
       .attr("width",  outerWidth)
       .attr("height", outerHeight-xAxisHeight)
       .attr("id","detailSvg")
-      .style("opacity",.0)
+      .style("opacity",.97)
       .call(xAxisTranslation);
 
         var detailDeliveryCloseRect = detailSvg.append("rect")
@@ -187,23 +187,37 @@ function displayDetail(delivery) {
                   .attr("class", "truckIconDiamond")
                   .attr("transform", function(d) {return "translate(" + xScale(now) + "," + (detailPadding + eventHeight + eventHeight) + ")"});
 
-            // detailDeliveryDataGroup
-            //     .selectAll(".detailCommunicationLabel")
-            //     .data(pocContacts)
-            //     .enter()
-            //     .append("text")
-            //     // .each(function(d){
-            //     //   var workflow = d3.select(this);
-            //     //   workflow = appendWorkflow(workflow,d);
-            //     // });
-            //     .attr("x", function(d,i) { return stationTextPadding.left;})
-            //     .attr("y", function(d,i) { return (detailPadding + eventHeight*(i+1) + eventHeight*2 )})
-            //     .text(function(d,i){return d})
-            //     .attr("class","detailCommunicationLabel name")
-            //     .attr("font-size", 14 + "px");
+            detailSvg
+                .selectAll(".detailCommunicationDefaultLabel")
+                .data(inspectionLabels)
+                .enter()
+                .append("text")
+                // .each(function(d){
+                //   var workflow = d3.select(this);
+                //   workflow = appendWorkflow(workflow,d);
+                // });
+                .attr("x", function(d,i) { return stationTextPadding.left;})
+                .attr("y", function(d,i) { return (detailDeliveryRectY - 50) + (detailPadding + eventHeight*(i+1) + eventHeight*2 ) - 7})
+                .text(function(d,i){return d})
+                .attr("class","detailCommunicationDefaultLabel name")
+                .attr("font-size", 14 + "px");
 
-    detailSvg.transition().style("opacity",1.0);    
-        // detailDeliveryDataGroup.selectAll(".detailLine").data(stationStacked);
+            detailSvg
+                .selectAll(".detailCommunicationLabel")
+                .data(pocContacts)
+                .enter()
+                .append("text")
+                // .each(function(d){
+                //   var workflow = d3.select(this);
+                //   workflow = appendWorkflow(workflow,d);
+                // });
+                .attr("x", function(d,i) { return stationTextPadding.left;})
+                .attr("y", function(d,i) { return (detailDeliveryRectY - 50) + (detailPadding + eventHeight*(i+1) + eventHeight*5 ) - 7})
+                .text(function(d,i){return d})
+                .attr("class","detailCommunicationLabel name")
+                .attr("font-size", 14 + "px");
+
+    // detailSvg.transition().style("opacity",1.0);    
 }
 
 function removeDetail(){
