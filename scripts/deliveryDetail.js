@@ -14,18 +14,15 @@ function displayDetail(delivery) {
     var eventHeight = 30;
     var eventCount  = 4; //how many rows of events
     var detailPadding = 30;
-    // var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
+    
     detailDeliveryRectY = yDeliveryScale(delivery.yIndex+1) - detailPadding - (2*eventHeight);
     
     var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
     if(detailDeliveryRectY < 50){
         detailDeliveryRectY = 50;
     } else if(detailDeliveryRectY > innerHeight - xAxisHeight - detailDeliveryRectHeight){
-        detailDeliveryRectY = innerHeight - xAxisHeight -detailDeliveryRectHeight;
+        detailDeliveryRectY = innerHeight - xAxisHeight - detailDeliveryRectHeight;
     }
-
-    // yDeliveryScale(d.yIndex+1)+
-
 
     // detailSvg
     //     detailDeliveryCloseRect
@@ -212,7 +209,7 @@ function displayDetail(delivery) {
                 .attr('transform', 'translate(' + stationTextPadding.left + "," +  (detailDeliveryRectY - 50 + detailPadding + eventHeight*2 - 7) + ')')
                 .attr("class","detailCommunicationLabelsGroup");
 
-            var detailCommunicationDefaultLabel = detailCommunicationLabelsGroup
+            detailCommunicationLabelsGroup
                 .selectAll(".detailCommunicationDefaultLabel")
                 .data(inspectionLabels)
                 .enter()
@@ -224,7 +221,7 @@ function displayDetail(delivery) {
                 .attr("class","detailCommunicationDefaultLabel name")
                 .attr("font-size", 14 + "px");
 
-            var detailCommunicationLabel = detailCommunicationLabelsGroup
+            detailCommunicationLabelsGroup
                 .selectAll(".detailCommunicationLabel")
                 .data(pocContacts)
                 .enter()
@@ -233,26 +230,7 @@ function displayDetail(delivery) {
                 .attr("y", function(d,i) { return eventHeight*(i+1) + eventHeight*3})
                 .text(function(d,i){return d})
                 .attr("class","detailCommunicationLabel name")
-                .attr("font-size", 14 + "px");
-
-
-    // if(detailDeliveryRectY - 50<0)
-    // {
-    //     console.log('YES ITS too high',detailStartingX);
-    //     detailDeliveryRect.transition()
-    //               .attr("transform", function(d) {return "translate(" + 0 + "," + 50 + ")"});
-    //     detailDeliveryDataGroup.transition()
-    //               .attr("transform", function(d) {return "translate(" + detailStartingX + "," + (50) + ")"});
-    //     detailDeliveryStationLabel.transition()
-    //               .attr("transform", function(d) {return "translate(" + 10 + "," + 0 + ")"});
-    //     detailDeliveryInfoGroup.transition()
-    //               .attr('transform', 'translate(' + (outerWidth - 344 - 20) + "," + (0) + ')'); 
-    //     detailCommunicationLabelsGroup.transition()
-    //               .attr("transform", function(d) {return "translate(" + 10 + "," + ( detailPadding + eventHeight*2 - 7 ) + ")"});               
-    //               // .attr("y",  0);detailStartingX
-    // }
-    // detailSvg.transition().style("opacity",1.0);    
-   
+                .attr("font-size", 14 + "px"); 
 }
 
 function removeDetail(){

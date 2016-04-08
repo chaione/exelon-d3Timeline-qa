@@ -51,7 +51,6 @@ var pollrate = 2455000;
 var url = 'https://exelon-api.herokuapp.com/v1/';
 var siteId = 1; //limerick
 var isDetailDisplayed = false;
-// var detailYStart = 
 
 //Calculated Variables
 var innerWidth     = outerWidth   - margin.left - margin.right;
