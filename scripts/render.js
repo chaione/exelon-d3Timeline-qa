@@ -117,11 +117,11 @@ function render(data){
 
   // Setup Workflows
   var workflowsSelectAll = deliveriesSelectAllG.selectAll(".workflow").data(function(d){
+    console.log(d.values);
     return d.values;
   });
   var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
-  workflowsSelectAll.exit().remove();
-  var workflowSelectAll5 = workflowsSelectAll.selectAll(".workflow");
+  // workflowsSelectAll.exit().remove();
   workflowsSelectAllG
       .each(function(d){
         var workflow = d3.select(this);
@@ -143,6 +143,31 @@ function render(data){
       .on("click", function(delivery) {
           displayDetail(delivery);
       });
+
+  var communicationSelectAll = deliveriesSelectAllG.selectAll(".communicationLine").data(function(d){
+    console.log(eventsReqAndRespByDeliveryAPIData[d.key].events);
+    return eventsReqAndRespByDeliveryAPIData[d.key].events;
+  });
+  var communicationGroup = communicationSelectAll.enter().append("line")
+  communicationGroup
+    .each(function(d){
+      var eventItem = d3.select(this);
+      if(d.endTimestamp!==null){
+          eventItem
+            .attr("x1", function(d,i) {return xScale(d['timestamp']); })
+            .attr("y1", 15)
+            .attr("x2", function(d,i) { 
+                if(d['endTimestamp']===null){
+                    return xScale(now);
+                }else {
+                    return xScale(d['endTimestamp']); 
+                }
+            })
+            .attr("y2", 15)
+            .attr("class", "communicationLine")
+            .style("stroke-dasharray", ("1, 1"));
+      }
+    });
 
   console.log('-------------render');
 }

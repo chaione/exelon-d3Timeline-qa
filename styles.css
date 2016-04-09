@@ -67,7 +67,10 @@ body {
       cursor: hand;
 
     }*/
-
+    .communicationLine {
+      stroke: white;
+      stroke-width:    1px;
+    }
     .delivery image:hover {
         height: 55px;
         width: 55px;
@@ -146,7 +149,7 @@ body {
     .name{
       fill: #BFFFEA;
     }
-
+  
     .workflow {
       stroke: #017AAA;
       stroke-width:    1px;
