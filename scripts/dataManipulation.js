@@ -7,6 +7,57 @@ function compare(a,b) {
     return 0;
 }
 
+function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
+  var result={};
+  var eventsArray = deliveries.included.filter(filterByEvents);
+  //organize all events to have their id as their key
+  var eventsAPIData = eventsArray.reduce(function(result, item, currIndex) {
+    // var key = Object.keys(item)[0]; //first property: a, b, c
+    item.attributes.deliveryId = parseInt(item.relationships.delivery.data.id);
+    result[item.id] = item.attributes;
+    return result;
+  }, {});
+
+    //add the endTime
+  for(key in eventsAPIData){
+    var temp = eventsAPIData[key];
+     // do something with obj[key]
+      if(temp.isRequest){
+        if(temp.acceptedResponseId!=null){
+          temp.endTimestamp = eventsAPIData[temp.acceptedResponseId].timestamp;
+        }else {
+          temp.endTimestamp = null
+        }
+      }
+  };
+  //make final obj  
+  // 'delivery1'{
+  //   'events':[event1,event2,...]
+  //   'contacts':[contactId1,contactId2] (now we know which order)  
+  // },
+  // 'delivery2':
+  for(key in eventsAPIData) {
+    var temp = eventsAPIData[key];
+    if(temp.isRequest) {
+      if(temp.deliveryId in result) {
+        result[temp.deliveryId]['events'].push(temp);
+        if(result[temp.deliveryId]['contacts'].indexOf(temp.senderId)==-1){
+          result[temp.deliveryId]['contacts'].push(temp.senderId);
+        }
+      } else {
+        result[temp.deliveryId] ={
+          events:[],
+          contacts:[]
+        };
+        result[temp.deliveryId]['events'].push(temp);
+        result[temp.deliveryId]['contacts'].push(temp.senderId);
+      }
+    }
+  }
+
+  return result;
+}
+
 function getVehicleImageName(vehicleInfo,deliveryStatus) {
   var vehicleImageName = "icn-";
   // icn- + type + axles + status + priority
@@ -209,39 +260,12 @@ function retrieveDeliveries(){
               // vehiclesAPIData[]
             };
 
-            eventsReqAndRespByDeliveryAPIData = {}
-            var eventsArray = deliveries.included.filter(filterByEvents);
-            //organize all events to have their id as their key
-            // for (var i = 0; i < eventsArray.length; i++) {
-            //   var deliveryEvent = eventsArray[i];
-            //   eventsAPIData[vehicle.id] = deliveryEvent.attributes;
-            // };
-            var eventsAPIData = eventsArray.reduce(function(result, item, currIndex) {
-              // var key = Object.keys(item)[0]; //first property: a, b, c
-              item.attributes.deliveryId = parseInt(item.relationships.delivery.data.id);
-              result[item.id] = item.attributes;
-              return result;
-            }, {});
-            // eventsReqAndRespByDeliveryAPIData = deliveries.included.filter(filterEventByIsRequest);
-            // eventsAPIData.keys(obj).forEach(function (key) 
-            for(key in eventsAPIData){
-              var temp = eventsAPIData[key];
-               // do something with obj[key]
-                if(temp.isRequest){
-                  if(temp.acceptedResponseId!=null){
-                    temp.endTimestamp = eventsAPIData[temp.acceptedResponseId].timestamp;
-                  }else {
-                    temp.endTimestamp = null
-                  }
-                }
-            };
-
-
-
-            
-
-            console.log(eventsAPIData);
-            debugger;
+            // 'delivery1'{
+            //   'events':[event1,event2,...]
+            //   'contacts':[contactId1,contactId2] (now we know which order)  
+            // },
+            // 'delivery2':
+            eventsReqAndRespByDeliveryAPIData = calculatEeventsReqAndRespByDeliveryAPIData(deliveries);
 
             var apiWorkflows = deliveries.included.filter(filterByWorkflows);
             apiWorkflows = apiWorkflows.map(function(workflow){
