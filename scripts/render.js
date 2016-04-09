@@ -155,7 +155,7 @@ function render(data){
       if(d.endTimestamp!==null){
           eventItem
             .attr("x1", function(d,i) {return xScale(d['timestamp']); })
-            .attr("y1", 15)
+            .attr("y1", 10)
             .attr("x2", function(d,i) { 
                 if(d['endTimestamp']===null){
                     return xScale(now);
@@ -163,7 +163,7 @@ function render(data){
                     return xScale(d['endTimestamp']); 
                 }
             })
-            .attr("y2", 15)
+            .attr("y2", 10)
             .attr("class", "communicationLine")
             .style("stroke-dasharray", ("1, 1"));
       }
