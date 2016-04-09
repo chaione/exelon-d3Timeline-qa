@@ -64,6 +64,22 @@ function filterByDeliveries(includedObj) {
   }
 }
 
+function filterEventByIsRequest(includedEvent) {
+  if (includedEvent.isRequest == "events") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function filterByEvents(includedObj) {
+  if (includedObj.type == "events") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function filterByLocations(includedObj) {
   if (includedObj.type == "locations") {
     return true;
@@ -193,11 +209,43 @@ function retrieveDeliveries(){
               // vehiclesAPIData[]
             };
 
+            eventsReqAndRespByDeliveryAPIData = {}
+            var eventsArray = deliveries.included.filter(filterByEvents);
+            //organize all events to have their id as their key
+            // for (var i = 0; i < eventsArray.length; i++) {
+            //   var deliveryEvent = eventsArray[i];
+            //   eventsAPIData[vehicle.id] = deliveryEvent.attributes;
+            // };
+            var eventsAPIData = eventsArray.reduce(function(result, item, currIndex) {
+              // var key = Object.keys(item)[0]; //first property: a, b, c
+              item.attributes.deliveryId = parseInt(item.relationships.delivery.data.id);
+              result[item.id] = item.attributes;
+              return result;
+            }, {});
+            // eventsReqAndRespByDeliveryAPIData = deliveries.included.filter(filterEventByIsRequest);
+            // eventsAPIData.keys(obj).forEach(function (key) 
+            for(key in eventsAPIData){
+              var temp = eventsAPIData[key];
+               // do something with obj[key]
+                if(temp.isRequest){
+                  if(temp.acceptedResponseId!=null){
+                    temp.endTimestamp = eventsAPIData[temp.acceptedResponseId].timestamp;
+                  }else {
+                    temp.endTimestamp = null
+                  }
+                }
+            };
+
+
+
+            
+
+            console.log(eventsAPIData);
+            debugger;
 
             var apiWorkflows = deliveries.included.filter(filterByWorkflows);
             apiWorkflows = apiWorkflows.map(function(workflow){
 
-              // workflow.attributes.vehicleId = parseInt(workflow.relationships.vehicle['data']['id']);
               workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery['data']['id']);
 
               workflow.attributes.station = workflow.attributes.step;
@@ -213,9 +261,6 @@ function retrieveDeliveries(){
               } else {
                 workflow.attributes['ended-at'] = new Date(workflow.attributes['ended-at']);
               }
-              // workflow.attributes.endTime = new Date(new Date(workflow.attributes['ended-at']));
-              // workflow.attributes.endTime = new Date(new Date(workflow.attributes.eta).getTime() + workflow.attributes['estimated-processing-time']*1000*60);
-
 
               //determine state
               if(workflow.attributes.eta < workflow.attributes['arrived-at']) {
@@ -226,11 +271,6 @@ function retrieveDeliveries(){
                 workflow.attributes.state = 'ontime';
               }
 
-              
-              // console.log('compare');
-              // console.log(workflow.attributes.eta);
-              // console.log(workflow.attributes['startTime']);
-              // console.log(workflow.attributes.state);
               return workflow.attributes;
             });
             console.log('imported workflows',apiWorkflows);

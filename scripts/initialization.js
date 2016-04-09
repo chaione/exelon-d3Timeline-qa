@@ -81,6 +81,7 @@ var yDeliveryScale;
 var deliveriesAPIData;
 var previousYTranslation = 0;
 var vehiclesAPIData;
+var eventsReqAndRespByDeliveryAPIData;
 var detailStartingX;
 var detailDeliveryRectY;
 
