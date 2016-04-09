@@ -32,6 +32,7 @@ function displayDetail(delivery) {
     //         detailDeliveryDataScheduledGroup
     //         detailDeliveryDataActualGroup
     //         (vehicle diamond)
+    //         detailDeliveryDataEventsGroup
     //     detailCommunicationDefaultLabel - "Scheduled", "Actual" Label
     //     detailCommunicationLabel - other communication Labels
     //     detailDeliveryStationLabel
@@ -204,6 +205,61 @@ function displayDetail(delivery) {
                   .attr("y",-1*(vehicleShapeH/2))
                   .attr("class", "truckIconDiamond")
                   .attr("transform", function(d) {return "translate(" + xScale(now) + "," + (detailPadding + eventHeight + eventHeight) + ")"});
+
+            var deliveryEvents = eventsReqAndRespByDeliveryAPIData[delivery.key].events;
+            var deliveryContacts = eventsReqAndRespByDeliveryAPIData[delivery.key].contacts;
+            console.log(deliveryEvents);
+            console.log(deliveryContacts);
+            var detailDeliveryDataEventsGroup = detailDeliveryDataGroup.append("g")
+                .attr("class", "detailScheduled")
+                .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight*4) + ')');
+
+            detailDeliveryDataEventsGroup
+                .selectAll(".detailEventLine")
+                .data(deliveryEvents)
+                .enter()
+                .append("line")
+                    .attr("x1", function(d,i) {return xScale(d['timestamp']); })
+                    .attr("y1", function(d,i) {return eventHeight*deliveryContacts.indexOf(d.senderId);})
+                    .attr("x2", function(d,i) { 
+                        if(d['endTimestamp']===null){
+                            return xScale(now);
+                        }else {
+                            return xScale(d['endTimestamp']); 
+                        }
+                    })
+                    .attr("y2", function(d,i) {return eventHeight*deliveryContacts.indexOf(d.senderId);})
+                    .attr("class", function(d){
+                      return "detailEventLine";
+                    }).style("stroke-dasharray", ("1, 1"));
+            
+            detailDeliveryDataEventsGroup
+                .selectAll(".detailEventStart")
+                .data(deliveryEvents)
+                .enter()
+                .append("circle")
+                    .attr("cx",function(d,i) {return xScale(d['timestamp'])})
+                    .attr("cy",function(d,i) {return eventHeight*deliveryContacts.indexOf(d.senderId);})
+                    .attr("r",3)
+                    .attr("class","detailEventStart");
+
+            detailDeliveryDataEventsGroup
+                .selectAll(".detailEventEnd")
+                .data(deliveryEvents)
+                .enter()
+                .append("circle")
+                .each(function(d){
+                    var eventEnd = d3.select(this);
+                    if(d.endTimestamp!==null){
+                        eventEnd
+                            .attr("cx",function(d,i) {return xScale(d['endTimestamp'])})
+                            .attr("cy",function(d,i) {return eventHeight*deliveryContacts.indexOf(d.senderId);})
+                            .attr("r",3)
+                            .attr("class","detailEventEnd");
+                    }
+                });
+                    
+            // debugger;
 
             var detailCommunicationLabelsGroup = detailSvg.append("g")
                 .attr('transform', 'translate(' + stationTextPadding.left + "," +  (detailDeliveryRectY - 50 + detailPadding + eventHeight*2 - 7) + ')')

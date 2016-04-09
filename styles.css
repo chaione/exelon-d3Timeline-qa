@@ -112,9 +112,23 @@ body {
       fill:rgb(212,19,32);
     }
     .detailScheduledLine2 {
-      stroke: red;
+      stroke: #3B414A;
       stroke-width:    1px;
 
+    }
+    .detailEventLine {
+      stroke: white;
+      stroke-width:    1px;
+    }
+    .detailEventStart {
+      stroke: #017AAA;
+      stroke-width:    1px;
+      fill:#BFFFEA;
+    }
+    .detailEventEnd {
+      stroke: #017AAA;
+      stroke-width:    1px;
+      fill:#017AAA;
     }
 
     .maskingGradient {

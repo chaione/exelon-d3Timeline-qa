@@ -12,8 +12,8 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
   var eventsArray = deliveries.included.filter(filterByEvents);
   //organize all events to have their id as their key
   var eventsAPIData = eventsArray.reduce(function(result, item, currIndex) {
-    // var key = Object.keys(item)[0]; //first property: a, b, c
     item.attributes.deliveryId = parseInt(item.relationships.delivery.data.id);
+    item.attributes.timestamp = new Date(item.attributes.timestamp);
     result[item.id] = item.attributes;
     return result;
   }, {});
@@ -54,6 +54,7 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
       }
     }
   }
+
 
   return result;
 }
@@ -266,6 +267,7 @@ function retrieveDeliveries(){
             // },
             // 'delivery2':
             eventsReqAndRespByDeliveryAPIData = calculatEeventsReqAndRespByDeliveryAPIData(deliveries);
+            console.log(eventsReqAndRespByDeliveryAPIData);
 
             var apiWorkflows = deliveries.included.filter(filterByWorkflows);
             apiWorkflows = apiWorkflows.map(function(workflow){
