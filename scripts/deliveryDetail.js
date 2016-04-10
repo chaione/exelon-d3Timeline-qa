@@ -1,12 +1,8 @@
 var pocContacts = ['POC', 'Delta10'];
 var inspectionLabels = ['Scheduled','Actual']
-function setIsDetailDisplayedTrue(){
-    isDetailDisplayed = true;
-}
-function setIsDetailDisplayedFalse(){
-    isDetailDisplayed = false;
-}
+
 function displayDetail(delivery) {
+    delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
     console.log('displayDetail', delivery);
     isDetailDisplayed = true;
     detailYStart = 0;
@@ -58,14 +54,32 @@ function displayDetail(delivery) {
             .on("click", function() {
                 removeDetail();
             });
+
         
         var detailDeliveryRect = detailSvg.append("rect")
             .attr("x", 0)
             .attr("y", detailDeliveryRectY)
             .attr("width", outerWidth)
             .attr("height",detailDeliveryRectHeight)
-            .attr("class","detailDeliveryRect")
+            .attr("class",function(d) {
+                if (delivery.status === "denied") {
+                    return "detailDeliveryRect denied"
+                } else {
+                    return "detailDeliveryRect"       
+                }
+            })
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        if(delivery.status==="denied"){
+            var detailDeliveryStatusText = detailSvg.append("text")
+                .attr("x", outerWidth - 20)
+                .attr("y", detailDeliveryRectY + detailDeliveryRectHeight - 20)
+                .text("!! DENYING ENTRY !!")
+                .attr("class","deliveryStatuss denied")
+                .attr("text-anchor", "end")
+                .attr("font-size", stationTextHeight + "px");
+        }
+
 
         var detailDeliveryStationLabel = detailSvg.append("text")
             .attr("x", 10)

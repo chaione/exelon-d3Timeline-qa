@@ -101,6 +101,10 @@ body {
     .detailDeliveryRect {
       fill:rgba(26, 48, 71,1);
     }
+    .detailDeliveryRect.denied {
+      fill:#2F1018;
+      /*fill:rgba(26, 48, 71,1);*/
+    }
 
     .detailInfoRect {
       fill:rgba(26, 48, 71,1);
