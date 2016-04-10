@@ -69,12 +69,13 @@ now = new Date(nowYear, 2, 31,9,30);// used for testing
 console.log('now',now);
 
 var vehicleShapeH  = rowHeight-10;
-var svg,stationsGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask;
+var svg,stationsGroup,delieveryStaticGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask;
 var stationCounts =[];
 var stationStackedCount=[];
 var stationStacked=[];
 var stationHeight;
 var workflowsFakeData=[];
+var deliveryyIndexInfo=[];
 var startingX;
 var duration, variation, variationMinutes;
 var yDeliveryScale;
@@ -187,6 +188,7 @@ function setupSvgStructure(){
     stationsGroup = svg.append("g")
           .attr("class", "stations")
           .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+    
 
     g = svg.append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -209,5 +211,9 @@ function setupSvgStructure(){
         xAxisGroup = g.append("g")
               .attr("class", "x axis ")
               .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
+
+    delieveryStaticGroup = svg.append("g")
+          .attr("class", "deliveryStaticGroup")
+          .attr('transform', 'translate(' + 0 + "," + 0 + ')');
 
 }

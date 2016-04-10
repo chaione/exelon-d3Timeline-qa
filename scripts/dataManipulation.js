@@ -172,8 +172,8 @@ function processApiData(workflowsData){
     delivery.vehicleType = getVehicleImageName(vehicleInfo,deliveryStatus);
     // delivery.vehicleType = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];//yea sorry
   });
-  console.log(deliveriesData);
-
+  // console.log(deliveriesData);
+  // debugger;
   //add x y data to display on chart
   deliveriesData      = updateCurrentStationCalc(deliveriesData);
   stationCounts       = stationCountCalc(deliveriesData);                                   // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
@@ -186,8 +186,36 @@ function processApiData(workflowsData){
       .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
       .entries(deliveriesDataSorted);
   stationData = stackDeliveriesCalc(stationStackedCount,stationData);
+  console.log('stationData',stationData);
+
+
+  //create a dictionary of yindex and status / info.  Used for static information
+  for (var i = 0; i < stationData.length; i++) {
+    var tempStation = stationData[i];
+    for (var j = 0; j < tempStation.values.length; j++) {
+      var tempDelivery = tempStation.values[j];
+
+      // if(!deliveryyIndexInfo){deliveryyIndexInfo = [];}
+
+      deliveryyIndexInfo.push({
+        status:deliveriesAPIData[parseInt(tempDelivery.key)].attributes.status,
+        deliveryId:tempDelivery.key,
+        yIndex:tempDelivery.yIndex
+      })
+      // deliveryyIndexInfo[tempDelivery.yIndex]={};
+      // deliveryyIndexInfo[tempDelivery.yIndex].status = deliveriesAPIData[parseInt(tempDelivery.key)].attributes.status;
+      // deliveryyIndexInfo[tempDelivery.yIndex].deliveryId = tempDelivery.key;
+
+    };
+  };
+
+  console.log('deliveryyIndexInfo',deliveryyIndexInfo);
 
   render(stationData);
+}
+
+function getDeliveryyIndexAndData(element, index, array) {
+  console.log('a[' + index + '] = ' + element);
 }
 
 function resize() {
@@ -300,6 +328,7 @@ function retrieveDeliveries(){
               return workflow.attributes;
             });
             console.log('imported workflows',apiWorkflows);
+            // debugger;
             processApiData(apiWorkflows)
         }
       });
@@ -377,7 +406,6 @@ function updateCurrentStationCalc(deliveriesData){//update every delivery w/ its
     for (var j = 0; j < deliveriesData[i].values.length; j++) {
        workflow = deliveriesData[i].values[j];
 
-      // debugger;
       if(!isCurrentUpdated){
         if(workflow['arrived-at'] !=null && workflow['ended-at'] === null){
           currentStation = workflow.station;

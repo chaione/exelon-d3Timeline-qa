@@ -78,6 +78,12 @@ body {
         x: -27;
         cursor: pointer;
     }
+    .deliveryStatuss {
+      fill: #BFFFEA;
+    }
+    .deliveryStatuss.denied{
+      fill: #D01E40;
+    }
     #detailSvg {
       position:absolute;
       left:0;

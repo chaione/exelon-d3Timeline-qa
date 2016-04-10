@@ -8,7 +8,10 @@ function moveXAxis(a,b) {
   detailStartingX = eventxTranslation;
   
   deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
+
   stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
+  delieveryStaticGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
+
   xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
 
   if(isDetailDisplayed){
@@ -23,6 +26,8 @@ function moveXAxis(a,b) {
     ];
     deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
     stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
+    delieveryStaticGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
+    
     xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
 
     if(isDetailDisplayed){
@@ -72,6 +77,23 @@ function render(data){
       .attr("class","name")
       .attr("font-size", stationTextHeight + "px");
 
+  var delieveryStaticGroupSelectAll=delieveryStaticGroup.selectAll(".deliveryStatuss")
+    .data(deliveryyIndexInfo)
+    .enter()
+    .append("text")
+    .attr("x", function(d,i) { return outerWidth-20})
+    .attr("y", function(d,i) { return yDeliveryScale(d.yIndex+1)+6})//why is the 6 needed???
+    .text(function(d,i){
+      if(d.status==='denied'){
+        return "!! DENYING ENTRY !!";
+      }else {
+        return "";
+      }
+    })
+    .attr("class","deliveryStatuss denied")
+    .attr("text-anchor", "end")
+    .attr("font-size", stationTextHeight + "px");
+
   // Setup axii
   xAxisGroup.call(xAxis);
   yAxisGroup.append("line")
@@ -100,6 +122,7 @@ function render(data){
         return "translate(" + xScale(now) + "," + 16 + ")"
       });;
 
+
   // Setup Stations
   var stationsSelectAll2 = deliveriesGroup.selectAll(".station").data(data);
   stationsSelectAll2.enter().append("g").attr("class", "station");
@@ -117,7 +140,6 @@ function render(data){
 
   // Setup Workflows
   var workflowsSelectAll = deliveriesSelectAllG.selectAll(".workflow").data(function(d){
-    console.log(d.values);
     return d.values;
   });
   var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
@@ -145,7 +167,6 @@ function render(data){
       });
 
   var communicationSelectAll = deliveriesSelectAllG.selectAll(".communicationLine").data(function(d){
-    console.log(eventsReqAndRespByDeliveryAPIData[d.key].events);
     return eventsReqAndRespByDeliveryAPIData[d.key].events;
   });
   var communicationGroup = communicationSelectAll.enter().append("line")
