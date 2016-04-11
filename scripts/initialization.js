@@ -42,6 +42,15 @@ var stations =   {
                   5:"PA",
                   6:"Exit"
                 }
+var stationAcronyms = {
+                  0:"ER",
+                  1:"S1",
+                  2:"SG",
+                  3:"SP",
+                  4:"WH",
+                  5:"PA",
+                  6:"EX"
+}
 var stationOrder =  [
                       1,//Tatooine
                       2,//Death Star
@@ -183,7 +192,12 @@ function setupSvgStructure(){
                 .attr('class', 'color-onTime-right')
                 .attr('offset', '1');
 
-
+    svg.append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", outerWidth)
+          .attr("height",outerHeight)
+          .attr("class","onTimeGradient")
 
     stationsGroup = svg.append("g")
           .attr("class", "stations")

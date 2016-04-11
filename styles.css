@@ -121,6 +121,9 @@ body {
     .detailInfoArrivaltime {
       fill:rgb(77,254,220);/*Sam*/
     }
+    .detailActualLabels {
+      fill:#BFFFEA;
+    }
     .detailInfoDelay {
       fill:rgb(212,19,32);
     }
@@ -129,6 +132,7 @@ body {
       stroke-width:    1px;
 
     }
+
     .detailEventLine {
       stroke: white;
       stroke-width:    1px;

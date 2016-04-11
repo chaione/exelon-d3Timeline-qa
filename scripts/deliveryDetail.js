@@ -198,7 +198,7 @@ function displayDetail(delivery) {
                 .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight + eventHeight ) + ')');
 
             detailDeliveryDataActualGroup
-                .selectAll(".detailScheduledLine")
+                .selectAll(".detailActualLine")
                 .data(delivery.values)
                 .enter()
                 .append("g")
@@ -206,6 +206,23 @@ function displayDetail(delivery) {
                   var workflow = d3.select(this);
                   workflow = appendWorkflow(workflow,d);
                 });
+
+            detailDeliveryDataActualGroup
+                .selectAll(".detailActualLabels")
+                .data(delivery.values)
+                .enter()
+                .append("text")
+                .attr("x", function(d,i) { return xScale(d['arrived-at']); })
+                .attr("y", 14)
+                // .attr("y", function(d,i) { return (detailDeliveryRectY - 50) + (detailPadding + eventHeight*(i+1) + eventHeight*2 ) - 7})
+                .text(function(d,i){return stationAcronyms[d.station]})
+                .attr("class","detailActualLabels")
+                .attr("font-size", 14 + "px");
+                // .each(function(d){
+                //   var workflow = d3.select(this);
+                //   debugger;
+                //   workflow = appendWorkflow(workflow,d);
+                // });
                 
             // var detailDeliveryDataVehicleGroup = detailDeliveryDataGroup.append("g")
 
