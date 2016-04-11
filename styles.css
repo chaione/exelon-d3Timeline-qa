@@ -32,6 +32,10 @@ body {
       opacity:0;
     }
 
+    path.bookEnd.notReached.ghost{
+      opacity:.5;
+    }
+
     .color-ahead-left {
       stop-color:#0581A6;
     }
@@ -173,7 +177,11 @@ body {
     }
     .workflow.late {
       stroke:#CF0C13;
-      stroke-width:    4px;
+      stroke-width:    2px;
+    }
+    .workflow.late.ghostline {
+      stroke:#52131A;
+      stroke-width:    2px;
     }
     .workflow.notReached {
       stroke:#363667;

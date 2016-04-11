@@ -145,9 +145,12 @@ function render(data){
   var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
   // workflowsSelectAll.exit().remove();
   workflowsSelectAllG
-      .each(function(d){
+      .each(function(d,i){
         var workflow = d3.select(this);
         workflow = appendWorkflow(workflow,d);
+        if(d.step === 1 && d.eta < d['arrived-at']){
+          prependEtaLine(workflow,d);
+        }
       });
 
   var vehicleIconsG = deliveriesSelectAllG.append("g");
@@ -194,6 +197,21 @@ function render(data){
 }
 
 // RENDER HELPERS
+function prependEtaLine(firstWorkflow,d){
+  firstWorkflow.append("line")
+        .attr("x1", function(d,i) { return xScale(d['eta']); })
+        .attr("y1", function(d,i) { return 0;})
+        .attr("x2", function(d,i) { return xScale(d['arrived-at']); })
+        .attr("y2", function(d,i) { return 0;})
+        .attr("class", "workflow late ghostline");
+
+   firstWorkflow.append("svg:path")
+        .attr("d", function(d) { return customShapes['lBook'](4);})
+        .attr("class", "bookEnd notReached ghost")
+        .attr("transform", function(d) {
+          return "translate(" + xScale(d['eta']) + "," + 0 + ")"
+        });;
+}
 function appendWorkflow(workflow,d){
   if(d['arrived-at'] != null && d['ended-at'] != null ){  //completed workflow
     workflow.append("line")
