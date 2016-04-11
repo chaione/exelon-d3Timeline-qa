@@ -214,17 +214,10 @@ function displayDetail(delivery) {
                 .append("text")
                 .attr("x", function(d,i) { return xScale(d['arrived-at']); })
                 .attr("y", 14)
-                // .attr("y", function(d,i) { return (detailDeliveryRectY - 50) + (detailPadding + eventHeight*(i+1) + eventHeight*2 ) - 7})
-                .text(function(d,i){return stationAcronyms[d.station]})
+                .text(function(d,i){ if(d['arrived-at']<now){return stationAcronyms[d.station]}})
                 .attr("class","detailActualLabels")
                 .attr("font-size", 14 + "px");
-                // .each(function(d){
-                //   var workflow = d3.select(this);
-                //   debugger;
-                //   workflow = appendWorkflow(workflow,d);
-                // });
                 
-            // var detailDeliveryDataVehicleGroup = detailDeliveryDataGroup.append("g")
 
             detailDeliveryDataGroup.append("image")
                   .attr("xlink:href",function(i){
