@@ -304,17 +304,13 @@ function retrieveDeliveries(){
 
               workflow.attributes.station = workflow.attributes.step;
               workflow.attributes.eta = new Date(workflow.attributes.eta);
-              if(workflow.attributes['arrived-at']===null){
-                workflow.attributes['arrived-at'] = null;
-              } else {
-                workflow.attributes['arrived-at'] = new Date(workflow.attributes['arrived-at']);
-              }
+              
+              workflow.attributes['arrived-at'] = getNullOrDate(workflow.attributes['arrived-at']);
+              workflow.attributes['ended-at'] = getNullOrDate(workflow.attributes['ended-at']);
+              workflow.attributes['nonsearch-end'] = getNullOrDate(workflow.attributes['nonsearch-end']);
+              workflow.attributes['search-end'] = getNullOrDate(workflow.attributes['search-end']);
 
-              if(workflow.attributes['ended-at'] === null){
-                workflow.attributes['ended-at'] = null;
-              } else {
-                workflow.attributes['ended-at'] = new Date(workflow.attributes['ended-at']);
-              }
+              
 
               //determine state
               if(workflow.attributes.eta < workflow.attributes['arrived-at']) {

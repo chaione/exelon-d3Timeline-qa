@@ -59,7 +59,7 @@ var stationOrder =  [
 var pollrate = 2455000;
 var url = 'https://exelon-api.herokuapp.com/v1/';
 var siteId = 1; //limerick
-var isDetailDisplayed = false;
+var aheadOrBehindPct = .25;  // if behind .25 estimated time its longer.   if ahead by .25.. its faster
 
 //Calculated Variables
 var innerWidth     = outerWidth   - margin.left - margin.right;
@@ -75,6 +75,7 @@ var nowDay         = now.getDate();
 var nowHours       = now.getHours();
 var nowMinutes     = now.getMinutes();
 now = new Date(nowYear, 2, 31,9,30);// used for testing
+var isDetailDisplayed = false;
 console.log('now',now);
 
 var vehicleShapeH  = rowHeight-10;
