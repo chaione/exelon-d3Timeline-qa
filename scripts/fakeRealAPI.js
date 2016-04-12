@@ -1014,6 +1014,10 @@ var fakeRealAPIDeliveries =
         }
       }
     },
+
+
+
+
     {
       "id": "1",
       "type": "workflows",
@@ -1024,7 +1028,8 @@ var fakeRealAPIDeliveries =
         "ended-at": "2016-03-31T14:00:43.921Z",
         "eta": "2016-03-31T13:00:43.921Z",
         "estimated-processing-time": 120,
-        "arrived-at": "2016-03-31T13:00:43.921Z"
+        "arrived-at": "2016-03-31T13:00:43.921Z",
+        "nonsearch-end":"2016-03-31T13:20:43.921Z", "search-end":"2016-03-31T13:45:43.921Z",  "nonsearch-estimated-processing-time":30, "search-estimated-processing-time":75,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1078,7 +1083,8 @@ var fakeRealAPIDeliveries =
         "ended-at": null,
         "eta": "2016-03-31T16:00:44.092Z",
         "estimated-processing-time": 45,
-        "arrived-at": null
+        "arrived-at": null,
+        "nonsearch-end":null, "search-end":null,  "nonsearch-estimated-processing-time":15, "search-estimated-processing-time":15,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1163,6 +1169,7 @@ var fakeRealAPIDeliveries =
         "eta": "2016-03-31T14:00:43.921Z",
         "estimated-processing-time": 120,
         "step":1,
+        "nonsearch-end":"2016-03-31T14:15:43.921Z", "search-end":null,  "nonsearch-estimated-processing-time":30, "search-estimated-processing-time":75,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1206,6 +1213,7 @@ var fakeRealAPIDeliveries =
         "processing-time": null,
         
         "started-at": null,         "ended-at": null,           "arrived-at": null,         "eta": "2016-03-31T17:00:44.092Z",          "estimated-processing-time": 45,    "step":3,
+        "nonsearch-end":null, "search-end":null,  "nonsearch-estimated-processing-time":15, "search-estimated-processing-time":15,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1275,6 +1283,7 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "processing-time": null,
         "started-at": "2016-03-31T08:15:43.921Z",           "ended-at": "2016-03-31T10:18:43.921Z", "arrived-at": "2016-03-31T08:05:00.000Z",            "eta": "2016-03-31T08:00:43.921Z",          "estimated-processing-time": 120,   "step":1,
+        "nonsearch-end":"2016-03-31T08:35:00.000Z", "search-end":"2016-03-31T09:30:00.000Z",  "nonsearch-estimated-processing-time":30, "search-estimated-processing-time":75,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1317,6 +1326,7 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "processing-time": null,
         "started-at": "2016-03-31T11:15:43.921Z",           "ended-at": "2016-03-31T12:15:43.921Z",         "arrived-at": "2016-03-31T11:22:43.921Z",            "eta": "2016-03-31T11:00:44.092Z",          "estimated-processing-time": 45,    "step":3,
+        "nonsearch-end":"2016-03-31T11:50:43.921Z", "search-end":"2016-03-31T12:02:43.921Z",  "nonsearch-estimated-processing-time":15, "search-estimated-processing-time":15,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1386,6 +1396,7 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "processing-time": null,
         "started-at": "2016-03-31T10:00:43.921Z",           "ended-at": "2016-03-31T12:00:44.052Z",         "arrived-at": "2016-03-31T10:00:43.921Z",           "eta": "2016-03-31T10:00:43.921Z",          "estimated-processing-time": 120,   "step":1,
+        "nonsearch-end":"2016-03-31T10:45:43.921Z", "search-end":"2016-03-31T11:30:00.000Z",  "nonsearch-estimated-processing-time":30, "search-estimated-processing-time":75,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1428,6 +1439,7 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "processing-time": null,
         "started-at": "2016-03-31T13:00:44.092Z",           "ended-at": "2016-03-31T13:45:44.092Z",         "arrived-at": "2016-03-31T13:00:44.092Z",           "eta": "2016-03-31T13:00:44.092Z",          "estimated-processing-time": 45,    "step":3,
+        "nonsearch-end":"2016-03-31T13:15:44.092Z", "search-end":"2016-03-31T13:30:44.092Z",  "nonsearch-estimated-processing-time":15, "search-estimated-processing-time":15,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1497,6 +1509,7 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "processing-time": null,
         "started-at": "2016-03-31T13:00:43.921Z",           "ended-at": "2016-03-31T14:00:43.921Z", "arrived-at": "2016-03-31T13:00:43.921Z",           "eta": "2016-03-31T12:40:43.921Z",          "estimated-processing-time": 120,   "step":1,
+        "nonsearch-end":"2016-03-31T13:20:43.921Z", "search-end":"2016-03-31T13:40:43.921Z",  "nonsearch-estimated-processing-time":30, "search-estimated-processing-time":75,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
@@ -1539,6 +1552,7 @@ var fakeRealAPIDeliveries =
       "attributes": {
         "processing-time": null,
         "started-at": null,         "ended-at": null,           "arrived-at": null,         "eta": "2016-03-31T16:00:44.092Z",          "estimated-processing-time": 45,    "step":3,
+        "nonsearch-end":null, "search-end":null,  "nonsearch-estimated-processing-time":15, "search-estimated-processing-time":15,  "release-estimated-processing-time":15,
       },
       "relationships": {
         "location": {
