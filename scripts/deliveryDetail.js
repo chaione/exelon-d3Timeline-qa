@@ -190,16 +190,101 @@ function displayDetail(delivery) {
                 .selectAll(".detailScheduledLine")
                 .data(delivery.values)
                 .enter()
-                .append("line")
-                    .attr("x1", function(d,i) { return xScale(d['eta']); })
-                    .attr("y1", 0)
-                    .attr("x2", function(d,i) { 
-                        return xScale(new Date(d['eta'].getTime()+(d['estimated-processing-time']*60*1000-60000))); 
-                    })
-                    .attr("y2", 0)
-                    .attr("class", function(d){
-                      return "detailScheduledLine2";
-                    });
+                .append("g")
+                .each(function(d){
+                    var workflow = d3.select(this);
+                    if(d['station'] === 1 || d['station'] === 3){
+                        console.log('yep!',d);
+                        workflow.append("line")
+                            .attr("x1", function(d,i) { return xScale(d['eta']); })
+                            .attr("y1", 0)
+                            .attr("x2", function(d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000 - 60000) })
+                            .attr("y2", 0)
+                            .attr("class", function(d){
+                              return "detailScheduledLine2";
+                            });
+
+                        workflow.append("line")
+                            .attr("x1", function(d,i) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000) })
+                            .attr("y1", 0)
+                            .attr("x2", function(d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000 + d['search-estimated-processing-time']*60000 - 60000) })
+                            .attr("y2", 0)
+                            .attr("class", function(d){
+                              return "detailScheduledLine2";
+                            });
+
+                        workflow.append("line")
+                            .attr("x1", function(d,i) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000 + d['search-estimated-processing-time']*60000) })
+                            .attr("y1", 0)
+                            .attr("x2", function(d) { return xScale(d['eta'].getTime() + d['estimated-processing-time']*60000 - 60000) })
+                            .attr("y2", 0)
+                            .attr("class", function(d){
+                              return "detailScheduledLine2";
+                            });
+
+                    } else {
+                        workflow.append("line")
+                            .attr("x1", function(d,i) { return xScale(d['eta']); })
+                            .attr("y1", 0)
+                            .attr("x2", function(d,i) { 
+                                return xScale(new Date(d['eta'].getTime()+(d['estimated-processing-time']*60*1000-60000))); 
+                            })
+                            .attr("y2", 0)
+                            .attr("class", function(d){
+                              return "detailScheduledLine2";
+                            });
+                    }
+                });
+                
+
+            detailDeliveryDataScheduledGroup
+                .selectAll(".detailActualLabels")
+                .data(delivery.values)
+                .enter()
+                .append("g")
+                .each(function(d){
+                  var workflow = d3.select(this);
+                  if(d['station'] === 1 || d['station'] === 3){
+
+                    workflow.append("text")
+                      .attr("x", function(d) { return xScale(d['eta']);})
+                      .attr("y", -3)
+                      .text(function(d,i){ if(d['eta']>now){
+                        return stationAcronyms[d.station] + "." + 1;
+                      }})
+                      .attr("class","detailActualLabels")
+                      .attr("font-size", 14 + "px");
+
+                      workflow.append("text")
+                      .attr("x", function(d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000) })
+                      .attr("y", -3)
+                      .text(function(d,i){ if(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000>now){
+                        return 2;
+                      }})
+                      .attr("class","detailActualLabels")
+                      .attr("font-size", 14 + "px");
+
+                      workflow.append("text")
+                      .attr("x", function(d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000 + d['search-estimated-processing-time']*60000); })
+                      .attr("y", -3)
+                      .text(function(d,i){ if(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000 + d['search-estimated-processing-time']*60000>now){
+                        return 3;
+                      }})
+                      .attr("class","detailActualLabels")
+                      .attr("font-size", 14 + "px");
+                  }else {
+                    workflow.append("text")
+                      .attr("x", function(d) { return xScale(d['eta']); })
+                      .attr("y", -3)
+                      .text(function(d,i){ if(d['eta']>now){return stationAcronyms[d.station];}})
+                      .attr("class","detailActualLabels")
+                      .attr("font-size", 14 + "px");
+                  }
+                  
+
+
+                });
+
 
             var detailDeliveryDataActualGroup = detailDeliveryDataGroup.append("g")
                 .attr("class", "detailScheduled")
@@ -240,8 +325,6 @@ function displayDetail(delivery) {
 
             var deliveryEvents = eventsReqAndRespByDeliveryAPIData[delivery.key].events;
             var deliveryContacts = eventsReqAndRespByDeliveryAPIData[delivery.key].contacts;
-            console.log(deliveryEvents);
-            console.log(deliveryContacts);
             var detailDeliveryDataEventsGroup = detailDeliveryDataGroup.append("g")
                 .attr("class", "detailScheduled")
                 .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight*4) + ')');
@@ -337,7 +420,14 @@ function detailCalculateDelay(delivery){
     var currentDuration;
     var estimatedDuration;
     var currentStationOverTime;
-    
+
+    if(delivery.currentStation === 0){
+        currentWF = delivery.values[0];//get last wf
+        if(currentWF.eta < now){
+            return Math.round((now.getTime()-currentWF.eta.getTime())/60000);
+        }
+        return 0;
+    }
     if(delivery.currentStation === 6){
         currentWF = delivery.values[4];//get last wf
         var a = currentWF.eta.getTime() + currentWF["estimated-processing-time"]*60*1000; 
