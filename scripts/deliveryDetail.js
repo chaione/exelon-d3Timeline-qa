@@ -129,7 +129,7 @@ function displayDetail(delivery) {
                 .attr("y", 46)
                 .text(function(){
                     if(delivery.delay>15){return "Δ" + delivery.delay}
-                    else{return delivery.delay}})
+                    else{return "+"+delivery.delay}})
                 .attr("class",function(){
                     if(delivery.delay>15){return "detailInfoDelay late"}
                     else if(delivery.delay<-15){return"detailInfoDelay early"}
@@ -332,22 +332,25 @@ function removeDetail(){
 function detailCalculateDelay(delivery){
     var delay = 0 ;
     var wfDelay = 0;
-    var wf;
-
+    var currentWF;
+    var minutesStartingLate;
+    var currentDuration;
+    var estimatedDuration;
+    var currentStationOverTime;
+    
     if(delivery.currentStation === 6){
-        return 0;
+        currentWF = delivery.values[4];//get last wf
+        var a = currentWF.eta.getTime() + currentWF["estimated-processing-time"]*60*1000; 
+        var b = currentWF['ended-at'] - a ;
+        return Math.round(b / 1000 / 60);
     }
 
-    var currentWF = delivery.values[delivery.currentStation-1];
-    //how many minutes late
-    var minutesStartingLate = currentWF['arrived-at'] - currentWF['eta'];
-    //arrive at 9am    and eta is 830    30
+    currentWF = delivery.values[delivery.currentStation-1];
 
-    var currentDuration = (now-currentWF['arrived-at']);
-    var estimatedDuration = currentWF["estimated-processing-time"]*60*1000;
-    
-    //if arrival to now is greater than ept, then its running longer than estimated.
-    var currentStationOverTime = currentDuration - estimatedDuration;
+    minutesStartingLate    = currentWF['arrived-at'] - currentWF['eta'];
+    currentDuration        = (now-currentWF['arrived-at']);
+    estimatedDuration      = currentWF["estimated-processing-time"]*60*1000;
+    currentStationOverTime = currentDuration - estimatedDuration;
     if(currentStationOverTime > 0){
         minutesStartingLate +=currentStationOverTime;
     }
