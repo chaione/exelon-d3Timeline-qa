@@ -432,26 +432,19 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
   var oneMinute    = 1000*60;
   //leftside of now
   var currentSubStep;
-  if("nonsearch-end" === null) {
+  if(nonsearchEnd === null) {
     currentSubStep = 1;
-  } else if("search-end" === null){
+  } else if(searchEnd === null){
     currentSubStep = 2;
   } else {
     currentSubStep = 3;
   }
 
-   currentWorkflow.append("svg:path")
-        .attr("d", function(d) { return customShapes['lBook'](4);})
-        .attr("class", function(d){
-          if(arrivedAt < now){
-            return "bookEnd notReached";
-          }
-        })
-        .attr("transform", function(d) {
-          return "translate(" + xScale(arrivedAt) + "," + 0 + ")"
-        });
+   
 
   if (currentSubStep === 1) {
+    // console.log(currentWorkflow.key);
+    // debugger
     // var substep1State = substepState(arrivedAt,nonsearchEnd,nonsearchEPT) 
     // var substep2State = substepState(nonsearchEnd,searchEnd,searchEPT) 
     // var substep3State = substepState(searchEnd,endedAt,releaseEPT) 
@@ -603,17 +596,26 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
 
   }
 
-
+  currentWorkflow.append("svg:path")// LEFT BOOKEND IS AT BOTTOM SO IT DISPLAYS ON TOP
+        .attr("d", function(d) { return customShapes['lBook'](4);})
+        .attr("class", function(d){
+          if(arrivedAt < now){
+            return "bookEnd notReached";
+          }
+        })
+        .attr("transform", function(d) {
+          return "translate(" + xScale(arrivedAt) + "," + 0 + ")"
+        });
 
 
   return currentWorkflow;
 }
 
 function substepState(stepStartTime,stepEndtime,estimatedTimeInMinutes){//if its late 1, on time 0, early -1
-  // console.log(stepEndtime - stepStartTime);
+  console.log(stepEndtime - stepStartTime);
   var difference = (stepEndtime - stepStartTime);
   var estimatedTimeInMS = estimatedTimeInMinutes * 60*1000;
-  // console.log(estimatedTimeInMS);
+  console.log(estimatedTimeInMS);
 
   if(difference > estimatedTimeInMS * (1+aheadOrBehindPct) ){return 1;} 
   else if(difference < estimatedTimeInMS * (1-aheadOrBehindPct) ){return -1;} 
