@@ -90,6 +90,7 @@ var startingX;
 var duration, variation, variationMinutes;
 var yDeliveryScale;
 var deliveriesAPIData;
+var pocsAPIData;
 var previousYTranslation = 0;
 var vehiclesAPIData;
 var eventsReqAndRespByDeliveryAPIData;

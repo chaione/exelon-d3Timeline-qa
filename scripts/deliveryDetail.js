@@ -3,7 +3,12 @@ var inspectionLabels = ['Scheduled','Actual']
 
 function displayDetail(delivery) {
     delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
-    console.log(deliveriesAPIData[parseInt(delivery.key)]);
+    console.log('deliveriesAPIData',deliveriesAPIData[parseInt(delivery.key)]);
+    var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)];
+    var pocId = currentDeliveryData['relationships']['primary-poc']['data']['id'];
+    console.log(pocsAPIData);
+    console.log(pocId);;
+    delivery.primaryPocName = "POC " + pocsAPIData[pocId]['first-name'] + " " + pocsAPIData[pocId]['last-name'];
     delivery.delay = detailCalculateDelay(delivery);
     
     console.log('displayDetail', delivery);
@@ -104,7 +109,7 @@ function displayDetail(delivery) {
             var detailDeliveryInfoPOC = detailDeliveryInfoGroup.append("text")
                 .attr("x", 16)
                 .attr("y", 26)
-                .text("POC " + "Joseph Edwards")
+                .text(delivery.primaryPocName)
                 .attr("class","detailInfoPOC")
                 .attr("font-size", 16 + "px");
 

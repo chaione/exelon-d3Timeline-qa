@@ -155,6 +155,13 @@ function filterByWorkflows(includedObj) {
     return false;
   }
 }
+function filterByPocs(includedObj) {
+  if (includedObj.type == "pocs") {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 function isTimeBetweenTime(time, start,end){
   return start <= time && time <= end;
@@ -165,11 +172,12 @@ function processApiData(workflowsData){
         .key(function(d) { return d.deliveryId; })
         .entries(workflowsData);
 
-  //update vehicleType
+  //update deliveries w/ data
   deliveriesData.forEach(function(delivery) {
     var vehicleInfo = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];
     var deliveryStatus = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
     delivery.vehicleType = getVehicleImageName(vehicleInfo,deliveryStatus);
+    // delivery.pocName = pocsAPIData[parseInt(delivery.)]
     // delivery.vehicleType = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];//yea sorry
   });
   // console.log(deliveriesData);
@@ -288,6 +296,15 @@ function retrieveDeliveries(){
               vehiclesAPIData[vehicle.id] = vehicle.attributes;
               // vehiclesAPIData[]
             };
+
+            pocsAPIData = {};
+            var pocsArray = deliveries.included.filter(filterByPocs);
+            for (var i = 0; i < pocsArray.length; i++) {
+              var poc = pocsArray[i];
+              pocsAPIData[poc.id] = poc.attributes;
+              // vehiclesAPIData[]
+            };
+            
 
             // 'delivery1'{
             //   'events':[event1,event2,...]
