@@ -142,12 +142,6 @@ body {
       stroke-width:    1px;
 
     }
-    .detailScheduledLine2.pink{
-      stroke:red;
-    }
-    .detailScheduledLine2.green{
-      stroke:green;
-    }
 
     .detailEventLine {
       stroke: white;
