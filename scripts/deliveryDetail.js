@@ -129,7 +129,7 @@ function displayDetail(delivery) {
                 .attr("y", 46)
                 .text(function(){
                     if(delivery.delay>15){return "Δ" + delivery.delay}
-                    else{return "+"+delivery.delay}})
+                    else{return "+"+Math.abs(delivery.delay)}})
                 .attr("class",function(){
                     if(delivery.delay>15){return "detailInfoDelay late"}
                     else if(delivery.delay<-15){return"detailInfoDelay early"}
