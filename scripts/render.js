@@ -612,10 +612,8 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
 }
 
 function substepState(stepStartTime,stepEndtime,estimatedTimeInMinutes){//if its late 1, on time 0, early -1
-  console.log(stepEndtime - stepStartTime);
   var difference = (stepEndtime - stepStartTime);
   var estimatedTimeInMS = estimatedTimeInMinutes * 60*1000;
-  console.log(estimatedTimeInMS);
 
   if(difference > estimatedTimeInMS * (1+aheadOrBehindPct) ){return 1;} 
   else if(difference < estimatedTimeInMS * (1-aheadOrBehindPct) ){return -1;} 

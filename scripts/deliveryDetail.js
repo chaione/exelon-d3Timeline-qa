@@ -3,6 +3,9 @@ var inspectionLabels = ['Scheduled','Actual']
 
 function displayDetail(delivery) {
     delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
+    console.log(deliveriesAPIData[parseInt(delivery.key)]);
+    delivery.delay = detailCalculateDelay(delivery);
+    
     console.log('displayDetail', delivery);
     isDetailDisplayed = true;
     detailYStart = 0;
@@ -124,8 +127,13 @@ function displayDetail(delivery) {
                 .attr("text-anchor", "END")
                 .attr("x", 344-5)
                 .attr("y", 46)
-                .text("Δ" + "12")
-                .attr("class","detailInfoDelay")
+                .text(function(){
+                    if(delivery.delay>15){return "Δ" + delivery.delay}
+                    else{return delivery.delay}})
+                .attr("class",function(){
+                    if(delivery.delay>15){return "detailInfoDelay late"}
+                    else if(delivery.delay<-15){return"detailInfoDelay early"}
+                    else {return "detailInfoDelay"}})
                 .attr("font-size", 16 + "px");
 
             // .attr("x", 10)
@@ -319,4 +327,29 @@ function removeDetail(){
     // d3.select("#detailSvg").remove();
     d3.select("#detailSvg").style("opacity",0.0).remove();
 
+}
+
+function detailCalculateDelay(delivery){
+    var delay = 0 ;
+    var wfDelay = 0;
+    var wf;
+
+    if(delivery.currentStation === 6){
+        return 0;
+    }
+
+    var currentWF = delivery.values[delivery.currentStation-1];
+    //how many minutes late
+    var minutesStartingLate = currentWF['arrived-at'] - currentWF['eta'];
+    //arrive at 9am    and eta is 830    30
+
+    var currentDuration = (now-currentWF['arrived-at']);
+    var estimatedDuration = currentWF["estimated-processing-time"]*60*1000;
+    
+    //if arrival to now is greater than ept, then its running longer than estimated.
+    var currentStationOverTime = currentDuration - estimatedDuration;
+    if(currentStationOverTime > 0){
+        minutesStartingLate +=currentStationOverTime;
+    }
+    return Math.round(minutesStartingLate / 1000/60);
 }

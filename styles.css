@@ -129,7 +129,13 @@ body {
       fill:#BFFFEA;
     }
     .detailInfoDelay {
+      fill:#0A5D7F;
+    }
+    .detailInfoDelay.late {
       fill:rgb(212,19,32);
+    }
+    .detailInfoDelay.early {
+      fill:rgb(1,254,169);
     }
     .detailScheduledLine2 {
       stroke: #3B414A;
