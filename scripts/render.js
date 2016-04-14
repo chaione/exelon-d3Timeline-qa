@@ -420,6 +420,7 @@ function appendWorkflow(workflow,d){
 }
 
 
+
 function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
   var arrivedAt    = d['arrived-at'];
   var nonsearchEnd = d['nonsearch-end'];

@@ -1,15 +1,27 @@
 var pocContacts = ['POC', 'Delta10'];
 var inspectionLabels = ['Scheduled','Actual']
-
+function calculateInfoboxCurrStation(delivery){
+    var currentWF = delivery.values[delivery.currentStation-1];
+    
+    //leftside of now
+    if(delivery.currentStation === 1 || delivery.currentStation === 3){
+        var currentSubStep = calcCurrentSubStep(currentWF);
+        return "(" + stationAcronyms[currentWF.station] + " " + currentSubStep + "/3)";
+    }else if(delivery.currentStation === 0 || delivery.currentStation === 6){
+        return "";
+    } else {
+        return "(" + stationAcronyms[currentWF.station] + ")";
+    }
+}
 function displayDetail(delivery) {
     delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
     console.log('deliveriesAPIData',deliveriesAPIData[parseInt(delivery.key)]);
     var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)];
     var pocId = currentDeliveryData['relationships']['primary-poc']['data']['id'];
-    console.log(pocsAPIData);
-    console.log(pocId);;
     delivery.primaryPocName = "POC " + pocsAPIData[pocId]['first-name'] + " " + pocsAPIData[pocId]['last-name'];
     delivery.delay = detailCalculateDelay(delivery);
+    delivery.companyName = deliveriesAPIData[parseInt(delivery.key)].attributes['company-name'];
+    delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery);
     
     console.log('displayDetail', delivery);
     isDetailDisplayed = true;
@@ -116,7 +128,7 @@ function displayDetail(delivery) {
             var detailDeliveryInfoCompanyName = detailDeliveryInfoGroup.append("text")
                 .attr("x", 16)
                 .attr("y", 46)
-                .text("ACE Asphalt Paving Co (S1 3/4)")
+                .text(delivery.companyName + delivery.infoBoxCurrStation)
                 .attr("class","detailInfoCompanyName")
                 .attr("font-size", 16 + "px");
 
