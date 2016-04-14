@@ -1,18 +1,6 @@
 var pocContacts = ['POC', 'Delta10'];
 var inspectionLabels = ['Scheduled','Actual']
-function calculateInfoboxCurrStation(delivery){
-    var currentWF = delivery.values[delivery.currentStation-1];
-    
-    //leftside of now
-    if(delivery.currentStation === 1 || delivery.currentStation === 3){
-        var currentSubStep = calcCurrentSubStep(currentWF);
-        return "(" + stationAcronyms[currentWF.station] + " " + currentSubStep + "/3)";
-    }else if(delivery.currentStation === 0 || delivery.currentStation === 6){
-        return "";
-    } else {
-        return "(" + stationAcronyms[currentWF.station] + ")";
-    }
-}
+
 function displayDetail(delivery) {
     delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
     delivery.arrivedAt = new Date(deliveriesAPIData[parseInt(delivery.key)].attributes['arrive-at']);
@@ -44,6 +32,7 @@ function displayDetail(delivery) {
     // detailSvg
     //     detailDeliveryCloseRect
     //     detailDeliveryRect
+            //here goes the gradient
     //     detailDeliveryDataGroup
     //         detailDeliveryYAxisGroup
     //         detailDeliveryDataScheduledGroup
@@ -90,6 +79,20 @@ function displayDetail(delivery) {
                 }
             })
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            detailSvg.append("image")
+              .attr("xlink:href",function(i){
+                  return "img/purpleSquare.png";
+              })
+              .attr("height", detailDeliveryRectHeight)
+              .attr("width", detailDeliveryRectHeight)
+              .attr("x",0)
+              .attr("y",0)
+              .attr("class", "truckIconDiamond")
+              .attr("transform", function(d) {return "translate(" + (outerHeight/2-(detailDeliveryRectHeight/2)) + "," + detailDeliveryRectY + ")"});
+
+
+
 
         if(delivery.status==="denied"){
             var detailDeliveryStatusText = detailSvg.append("text")
@@ -462,4 +465,17 @@ function detailCalculateDelay(delivery){
         minutesStartingLate +=currentStationOverTime;
     }
     return Math.round(minutesStartingLate / 1000/60);
+}
+function calculateInfoboxCurrStation(delivery){
+    var currentWF = delivery.values[delivery.currentStation-1];
+    
+    //leftside of now
+    if(delivery.currentStation === 1 || delivery.currentStation === 3){
+        var currentSubStep = calcCurrentSubStep(currentWF);
+        return "(" + stationAcronyms[currentWF.station] + " " + currentSubStep + "/3)";
+    }else if(delivery.currentStation === 0 || delivery.currentStation === 6){
+        return "";
+    } else {
+        return "(" + stationAcronyms[currentWF.station] + ")";
+    }
 }
