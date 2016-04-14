@@ -77,7 +77,21 @@ function render(data){
       .attr("class","name")
       .attr("font-size", stationTextHeight + "px");
 
-  var delieveryStaticGroupSelectAll=delieveryStaticGroup.selectAll(".deliveryStatuss")
+  stationsLabelSelectAll.selectAll(".deliveryBGStatuss")  //denying entry bg
+    .data(deliveryyIndexInfo.filter(filterWorkflowsByHasStatus))
+    .enter()
+    .append("image")
+    .attr("xlink:href",function(i){
+        return "img/icn-timeline-denied-small.png";
+    })
+    .attr("height", rowHeight)
+    .attr("width", outerWidth)
+    .attr("preserveAspectRatio","none")
+    .attr("x",0)
+    .attr("y",0)
+    .attr("transform", function(d) {return "translate(" + 0 + "," + (yDeliveryScale(d.yIndex+1)-rowHeight/2) + ")"});
+
+  var delieveryStaticGroupSelectAll=delieveryStaticGroup.selectAll(".deliveryStatuss")  //denying entry text
     .data(deliveryyIndexInfo)
     .enter()
     .append("text")
@@ -619,5 +633,13 @@ function substepState(stepStartTime,stepEndtime,estimatedTimeInMinutes){//if its
   if(difference > estimatedTimeInMS * (1+aheadOrBehindPct) ){return 1;} 
   else if(difference < estimatedTimeInMS * (1-aheadOrBehindPct) ){return -1;} 
   else {return 0;}
+}
+
+function filterWorkflowsByHasStatus(includedObj) {
+  if (includedObj.status == "denied") {
+    return true;
+  } else {
+    return false;
+  }
 }
 

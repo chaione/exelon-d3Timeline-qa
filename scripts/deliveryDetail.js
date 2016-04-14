@@ -71,27 +71,16 @@ function displayDetail(delivery) {
             .attr("y", detailDeliveryRectY)
             .attr("width", outerWidth)
             .attr("height",detailDeliveryRectHeight)
+            .attr("opacity",.7)
             .attr("class",function(d) {
-                if (delivery.status === "denied") {
-                    return "detailDeliveryRect denied"
-                } else {
                     return "detailDeliveryRect"       
-                }
+                // if (delivery.status === "denied") {
+                //     return "detailDeliveryRect denied"
+                // } else {
+                //     return "detailDeliveryRect"       
+                // }
             })
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-            detailSvg.append("image")
-              .attr("xlink:href",function(i){
-                  return "img/purpleSquare.png";
-              })
-              .attr("height", detailDeliveryRectHeight)
-              .attr("width", detailDeliveryRectHeight)
-              .attr("x",0)
-              .attr("y",0)
-              .attr("class", "truckIconDiamond")
-              .attr("transform", function(d) {return "translate(" + (outerHeight/2-(detailDeliveryRectHeight/2)) + "," + detailDeliveryRectY + ")"});
-
-
 
 
         if(delivery.status==="denied"){
@@ -102,6 +91,19 @@ function displayDetail(delivery) {
                 .attr("class","deliveryStatuss denied")
                 .attr("text-anchor", "end")
                 .attr("font-size", stationTextHeight + "px");
+
+            detailSvg.append("image")
+              .attr("xlink:href",function(i){
+                  return "img/icn-timeline-denied-panel.png";
+              })
+              .attr("height", detailDeliveryRectHeight)
+              .attr("width", outerWidth)
+              .attr("x",0)
+              .attr("y",0)
+              // .attr("class", "truckIconDiamond")
+              .attr("preserveAspectRatio","xMinYMin slice")
+              // .attr("viewBox","0 0 " + 1236 + " " + 522)
+              .attr("transform", function(d) {return "translate(" + 0 + "," + detailDeliveryRectY + ")"});
         }
 
 
