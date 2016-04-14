@@ -15,6 +15,7 @@ function calculateInfoboxCurrStation(delivery){
 }
 function displayDetail(delivery) {
     delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
+    delivery.arrivedAt = new Date(deliveriesAPIData[parseInt(delivery.key)].attributes['arrive-at']);
     console.log('deliveriesAPIData',deliveriesAPIData[parseInt(delivery.key)]);
     var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)];
     var pocId = currentDeliveryData['relationships']['primary-poc']['data']['id'];
@@ -136,7 +137,7 @@ function displayDetail(delivery) {
                 .attr("text-anchor", "END")
                 .attr("x", 344-5)
                 .attr("y", 26)
-                .text("A " + "5:30")
+                .text("A " + delivery.arrivedAt.getHours() + ":" + ("0" + delivery.arrivedAt.getMinutes()).slice(-2))
                 .attr("class","detailInfoArrivaltime")
                 .attr("font-size", 16 + "px");
 
@@ -211,7 +212,6 @@ function displayDetail(delivery) {
                 .each(function(d){
                     var workflow = d3.select(this);
                     if(d['station'] === 1 || d['station'] === 3){
-                        console.log('yep!',d);
                         workflow.append("line")
                             .attr("x1", function(d,i) { return xScale(d['eta']); })
                             .attr("y1", 0)
