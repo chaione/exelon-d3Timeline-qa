@@ -54,7 +54,7 @@ body {
       stop-color:rgba(212,19,32,0);
     }
     .color-deniedEntry-right {
-      stop-color:rgba(212,19,32,.2);
+      stop-color:rgba(212,19,32,.05);
     }
 
     .color-fullBG-left {

@@ -205,7 +205,10 @@ function setupSvgStructure(){
                 .attr('offset', '0');
             deniedEntryGradient.append('stop')
                 .attr('class', 'color-deniedEntry-right')
-                .attr('offset', '.5');
+                .attr('offset', '.3');
+                deniedEntryGradient.append('stop')
+                .attr('class', 'color-deniedEntry-right')
+                .attr('offset', '.7');
             deniedEntryGradient.append('stop')
                 .attr('class', 'color-deniedEntry-left')
                 .attr('offset', '1');
