@@ -101,7 +101,7 @@ function displayDetail(delivery) {
               .attr("x",0)
               .attr("y",0)
               // .attr("class", "truckIconDiamond")
-              .attr("preserveAspectRatio","xMinYMin slice")
+              .attr("preserveAspectRatio","xMidYMid slice")
               // .attr("viewBox","0 0 " + 1236 + " " + 522)
               .attr("transform", function(d) {return "translate(" + 0 + "," + detailDeliveryRectY + ")"});
         }
@@ -260,7 +260,7 @@ function displayDetail(delivery) {
                 
 
             detailDeliveryDataScheduledGroup
-                .selectAll(".detailActualLabels")
+                .selectAll(".detailScheduledLabels")
                 .data(delivery.values)
                 .enter()
                 .append("g")
@@ -274,7 +274,7 @@ function displayDetail(delivery) {
                       .text(function(d,i){ if(d['eta']>now){
                         return stationAcronyms[d.station] + "." + 1;
                       }})
-                      .attr("class","detailActualLabels")
+                      .attr("class","detailScheduledLabels")
                       .attr("font-size", 14 + "px");
 
                       workflow.append("text")
@@ -283,7 +283,7 @@ function displayDetail(delivery) {
                       .text(function(d,i){ if(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000>now){
                         return 2;
                       }})
-                      .attr("class","detailActualLabels")
+                      .attr("class","detailScheduledLabels")
                       .attr("font-size", 14 + "px");
 
                       workflow.append("text")
@@ -292,19 +292,16 @@ function displayDetail(delivery) {
                       .text(function(d,i){ if(d['eta'].getTime() + d['nonsearch-estimated-processing-time']*60000 + d['search-estimated-processing-time']*60000>now){
                         return 3;
                       }})
-                      .attr("class","detailActualLabels")
+                      .attr("class","detailScheduledLabels")
                       .attr("font-size", 14 + "px");
                   }else {
                     workflow.append("text")
                       .attr("x", function(d) { return xScale(d['eta']); })
                       .attr("y", -3)
                       .text(function(d,i){ if(d['eta']>now){return stationAcronyms[d.station];}})
-                      .attr("class","detailActualLabels")
+                      .attr("class","detailScheduledLabels")
                       .attr("font-size", 14 + "px");
                   }
-                  
-
-
                 });
 
 
@@ -322,28 +319,109 @@ function displayDetail(delivery) {
                   workflow = appendWorkflow(workflow,d);
                 });
 
+            // detailDeliveryDataActualGroup
+            //     .selectAll(".detailActualLabels")
+            //     .data(delivery.values)
+            //     .enter()
+            //     .append("text")
+            //     .attr("x", function(d,i) { return xScale(d['arrived-at']); })
+            //     .attr("y", 14)
+            //     .text(function(d,i){ if(d['arrived-at']<now){return stationAcronyms[d.station]}})
+            //     .attr("class","detailActualLabels")
+            //     .attr("font-size", 14 + "px");
+
             detailDeliveryDataActualGroup
                 .selectAll(".detailActualLabels")
                 .data(delivery.values)
                 .enter()
-                .append("text")
-                .attr("x", function(d,i) { return xScale(d['arrived-at']); })
-                .attr("y", 14)
-                .text(function(d,i){ if(d['arrived-at']<now){return stationAcronyms[d.station]}})
-                .attr("class","detailActualLabels")
-                .attr("font-size", 14 + "px");
+                .append("g")
+                .each(function(d){
+                  console.log('-------------each',d);
+                  // var arrivedAt    = d['arrived-at'];
+                  // var nonsearchEnd = d['nonsearch-end'];
+                  // var searchEnd    = d['search-end'];
+                  // var endedAt      = d['ended-at'];
+                  // var nonsearchEPT = d['nonsearch-estimated-processing-time'];
+                  // var searchEPT    = d['search-estimated-processing-time'];
+                  // var releaseEPT   = d['release-estimated-processing-time'];
+                  // var EPT          = d['estimated-processing-time']
+                  // var oneMinute    = 1000*60;
+                  var workflow = d3.select(this);
+
+
+                  if(d['arrived-at'] < now) {
+                    if(d['station'] === 1 || d['station'] === 3){
+                      var substep1State = substepState(d['arrived-at'],d['nonsearch-end'],d['nonsearch-estimated-processing-time']) 
+                      var substep2State = substepState(d['nonsearch-end'],d['search-end'], d['search-estimated-processing-time']) 
+                      var substep3State = substepState(d['search-end'], d['ended-at'],d['release-estimated-processing-time']) 
+                      workflow.append("text")
+                        .attr("x", function(d) { return xScale(d['arrived-at']);})
+                        .attr("y", 14)
+                        .text(function(d,i){ 
+                          return stationAcronyms[d.station] + "." + 1;
+                        })
+                        .attr("class",function(d){
+                            if(substep1State === 1) {return "detailActualLabels late";} 
+                            else if(substep1State === -1) {return "detailActualLabels ahead";} 
+                            else {return "detailActualLabels";}
+                          })
+                        .attr("font-size", 14 + "px");
+
+                      if(d['nonsearch-end']<now) {
+                          workflow.append("text")
+                          .attr("x", function(d) { return xScale(d['nonsearch-end'])})
+                          .attr("y", 14)
+                          .text(2)
+                            .attr("class",function(d){
+                            if(substep2State === 1) {return "detailActualLabels late";} 
+                            else if(substep2State === -1) {return "detailActualLabels ahead";} 
+                            else {return "detailActualLabels";}
+                          })
+                          .attr("font-size", 14 + "px");
+                        }
+
+                      if(d['search-end']<now) {
+                          workflow.append("text")
+                          .attr("x", function(d) { return xScale(d['search-end']) })
+                          .attr("y", 14)
+                          .text(3)
+                          .attr("class",function(d){
+                            if(substep3State === 1) {return "detailActualLabels late";} 
+                            else if(substep3State === -1) {return "detailActualLabels ahead";} 
+                            else {return "detailActualLabels";}
+                          })
+                          .attr("font-size", 14 + "px");
+                      }
+                    } else {
+                      workflow.append("text")
+                        .attr("x", function(d) { return xScale(d['arrived-at']); })
+                        .attr("y", 14)
+                        .text(function(d,i){ return stationAcronyms[d.station];})
+                        .attr("class",function(d){
+                            if(d.state==='late'){
+                              return "detailActualLabels late";
+                            }else if(d.state==='early'){
+                              return "detailActualLabels ahead";
+                            }else {
+                              return "detailActualLabels";
+                            }
+                          })
+                        .attr("font-size", 14 + "px");
+                    }
+                  }
+                });
                 
 
-            detailDeliveryDataGroup.append("image")
-                  .attr("xlink:href",function(i){
-                      return "img/" + delivery.vehicleType+'.png';
-                  })
-                  .attr("height", vehicleShapeH)
-                  .attr("width", vehicleShapeH)
-                  .attr("x",-1*(vehicleShapeH/2))
-                  .attr("y",-1*(vehicleShapeH/2))
-                  .attr("class", "truckIconDiamond")
-                  .attr("transform", function(d) {return "translate(" + xScale(now) + "," + (detailPadding + eventHeight + eventHeight) + ")"});
+            // detailDeliveryDataGroup.append("image")
+            //       .attr("xlink:href",function(i){
+            //           return "img/" + delivery.vehicleType+'.png';
+            //       })
+            //       .attr("height", vehicleShapeH)
+            //       .attr("width", vehicleShapeH)
+            //       .attr("x",-1*(vehicleShapeH/2))
+            //       .attr("y",-1*(vehicleShapeH/2))
+            //       .attr("class", "truckIconDiamond")
+            //       .attr("transform", function(d) {return "translate(" + xScale(now) + "," + (detailPadding + eventHeight + eventHeight) + ")"});
 
             var deliveryEvents = eventsReqAndRespByDeliveryAPIData[delivery.key].events;
             var deliveryContacts = eventsReqAndRespByDeliveryAPIData[delivery.key].contacts;

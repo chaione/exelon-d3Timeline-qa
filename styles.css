@@ -148,9 +148,19 @@ body {
     .detailInfoArrivaltime {
       fill:rgb(77,254,220);/*Sam*/
     }
+    .detailScheduledLabels {
+      fill:#BFFFEA;
+    }
     .detailActualLabels {
       fill:#BFFFEA;
     }
+    .detailActualLabels.ahead {
+      fill:#00B4C2;
+    }
+    .detailActualLabels.late {
+      fill:#CF0C13;
+    }
+  
     .detailInfoDelay {
       fill:#0A5D7F;
     }
