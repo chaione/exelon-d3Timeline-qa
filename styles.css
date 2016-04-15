@@ -43,6 +43,29 @@ body {
       stop-color:#05A9B8;
     }
 
+    .color-ahead-left {
+      stop-color:#0581A6;
+    }
+    .color-ahead-right {
+      stop-color:#05A9B8;
+    }
+
+    .color-deniedEntry-left {
+      stop-color:rgba(212,19,32,0);
+    }
+    .color-deniedEntry-right {
+      stop-color:rgba(212,19,32,.2);
+    }
+
+    .color-fullBG-left {
+      stop-color:rgba(0,0,0,1);
+      /*stop-color:red;*/
+    }
+    .color-fullBG-right {
+      stop-color:rgba(20,24,36,1);
+      /*stop-color:green;*/
+    }
+
     .color-late-left {
       stop-color:#C90C14;
     }
@@ -165,10 +188,14 @@ body {
     .stations {
     }
     .station{
-      fill:#181F2B;
+      /*fill:#181F2B;*/
+      fill:rgba(24,31,43,.7);
+      /*fill:rgba(9,12,17,.5)*/
     }
     .station:nth-child(even) {
-      fill:#1B1E23;
+      /*fill:#1B1E23;*/
+      fill:rgba(27,30,35,.7);
+      /*fill:rgba(11,12,14,.5);*/
     }
     .name{
       fill: #BFFFEA;

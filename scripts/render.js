@@ -80,13 +80,14 @@ function render(data){
   stationsLabelSelectAll.selectAll(".deliveryBGStatuss")  //denying entry bg
     .data(deliveryyIndexInfo.filter(filterWorkflowsByHasStatus))
     .enter()
-    .append("image")
-    .attr("xlink:href",function(i){
-        return "img/icn-timeline-denied-small.png";
-    })
+    .append("rect")
+    // .attr("xlink:href",function(i){
+    //     return "img/icn-timeline-denied-small.png";
+    // })
     .attr("height", rowHeight)
     .attr("width", outerWidth)
-    .attr("preserveAspectRatio","none")
+    // .attr("preserveAspectRatio","none")
+    .attr("fill","url(#deniedEntryGradient)")
     .attr("x",0)
     .attr("y",0)
     .attr("transform", function(d) {return "translate(" + 0 + "," + (yDeliveryScale(d.yIndex+1)-rowHeight/2) + ")"});

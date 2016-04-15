@@ -193,13 +193,40 @@ function setupSvgStructure(){
             onTimeGradient.append('stop')
                 .attr('class', 'color-onTime-right')
                 .attr('offset', '1');
+        var deniedEntryGradient = svgDefs.append('linearGradient')
+                .attr('id','deniedEntryGradient')
+                .attr('x1',"0%")
+                .attr('y1',"0%")
+                .attr('x2',"100%")
+                .attr('y2',"0%");
+            deniedEntryGradient.append('stop')
+                .attr('class', 'color-deniedEntry-left')
+                .attr('offset', '0');
+            deniedEntryGradient.append('stop')
+                .attr('class', 'color-deniedEntry-right')
+                .attr('offset', '.5');
+            deniedEntryGradient.append('stop')
+                .attr('class', 'color-deniedEntry-left')
+                .attr('offset', '1');
+        var fullBGGradient = svgDefs.append('radialGradient')
+                .attr('id', 'fullBGGradient')
+                .attr('x1',"0%")
+                .attr('y1',"0%")
+                .attr('x2',"100%")
+                .attr('y2',"100%");
+            fullBGGradient.append('stop')
+                .attr('class', 'color-fullBG-left')
+                .attr('offset', '0');
+            fullBGGradient.append('stop')
+                .attr('class', 'color-fullBG-right')
+                .attr('offset', '1');
 
     svg.append("rect")
           .attr("x", 0)
-          .attr("y", 0)
-          .attr("width", outerWidth)
-          .attr("height",outerHeight)
-          .attr("class","onTimeGradient")
+          .attr("y", -100)
+          .attr("width", outerWidth*1.5)
+          .attr("height",outerHeight*1.5)
+          .attr("fill","url(#fullBGGradient)")
 
     stationsGroup = svg.append("g")
           .attr("class", "stations")
