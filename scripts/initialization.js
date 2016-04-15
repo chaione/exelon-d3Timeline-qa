@@ -89,7 +89,8 @@ var deliveryyIndexInfo=[];
 var startingX;
 var duration, variation, variationMinutes;
 var yDeliveryScale;
-var deliveriesAPIData;
+var deliveriesAPIData;  //big one.  has all the details for every delivery by id
+var currentDeliveryDelayById=12;
 var pocsAPIData;
 var previousYTranslation = 0;
 var vehiclesAPIData;

@@ -1604,7 +1604,7 @@ var fakeRealAPIDeliveries =
       "type": "workflows",
       "attributes": {
         "processing-time": null,
-        "started-at": null,         "ended-at": null,           "arrived-at": null,         "eta": "2016-03-31T17:30:44.092Z",          "estimated-processing-time": 60,    "step":5,
+        "started-at": null,         "ended-at": null,           "arrived-at": null,         "eta": "2016-03-31T17:45:44.092Z",          "estimated-processing-time": 60,    "step":5,
       },
       "relationships": {
         "location": {

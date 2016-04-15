@@ -187,7 +187,9 @@ function processApiData(workflowsData){
   stationCounts       = stationCountCalc(deliveriesData);                                   // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
   stationStackedCount = stationStackedCountCalc(stationCounts);                             // [7, 12, 17, 18, 22, 23, 24, 25]
   stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);     // [{name:EnRoute, y:7,y0:0},Object...]
-  var deliveriesDataSorted= deliveriesData.sort(compare);//is this necesary
+  var deliveriesDataSorted = deliveriesData.sort(compare);//is this necesary
+
+  currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData);
 
   stationData = d3.nest() // groupByStation
       .key(function(d) { return d.currentStation; })
@@ -446,4 +448,18 @@ function updateCurrentStationCalc(deliveriesData){//update every delivery w/ its
     deliveriesData[i].currentStation = currentStation;
   };
   return deliveriesData;
+}
+
+function generateCurrentDeliveryDelayById(deliveriesData) {
+  var delayData = {}
+  console.log('deliveriesdata',deliveriesData);
+  // debugger;
+  // detailCalculateDelay
+  for (var i = 0; i < deliveriesData.length; i++) {
+    var delivery = deliveriesData[i];
+    // var deliveryData = deliveriesAPIData[parseInt(delivery.key)];
+    delayData[delivery.key] = detailCalculateDelay(delivery);
+  };
+  console.log(delayData);
+  return delayData;
 }
