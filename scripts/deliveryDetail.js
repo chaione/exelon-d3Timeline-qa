@@ -521,14 +521,14 @@ function detailCalculateDelay(delivery){
     var estimatedDuration;
     var currentStationOverTime;
 
-    if(delivery.currentStation === 0){
+    if(delivery.currentStation === 0){ //enroute
         currentWF = delivery.values[0];//get last wf
         if(currentWF.eta < now){
             return Math.round((now.getTime()-currentWF.eta.getTime())/60000);
         }
         return 0;
     }
-    if(delivery.currentStation === 6){
+    if(delivery.currentStation === 6){ //exited
         currentWF = delivery.values[4];//get last wf
         var a = currentWF.eta.getTime() + currentWF["estimated-processing-time"]*60*1000; 
         var b = currentWF['ended-at'] - a ;
