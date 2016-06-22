@@ -1623,7 +1623,7 @@ var fakeRealAPIDeliveries =
         "senderId": 1
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "1",
             "type": "deliveries"
@@ -1639,7 +1639,7 @@ var fakeRealAPIDeliveries =
         "uuid": "2"
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "1",
             "type": "deliveries"
@@ -1659,7 +1659,7 @@ var fakeRealAPIDeliveries =
         "senderId": 2
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "2",
             "type": "deliveries"
@@ -1675,7 +1675,7 @@ var fakeRealAPIDeliveries =
         "isRequest": false
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "2",
             "type": "deliveries"
@@ -1692,7 +1692,7 @@ var fakeRealAPIDeliveries =
         "senderId": 17
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "2",
             "type": "deliveries"
@@ -1712,7 +1712,7 @@ var fakeRealAPIDeliveries =
         "senderId": 4
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "3",
             "type": "deliveries"
@@ -1728,7 +1728,7 @@ var fakeRealAPIDeliveries =
                 "uuid": "6"
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "3",
             "type": "deliveries"
@@ -1745,7 +1745,7 @@ var fakeRealAPIDeliveries =
         "senderId": 5
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "3",
             "type": "deliveries"
@@ -1761,7 +1761,7 @@ var fakeRealAPIDeliveries =
         "uuid": "8"
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "3",
             "type": "deliveries"
@@ -1778,7 +1778,7 @@ var fakeRealAPIDeliveries =
         "senderId": 5
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "3",
             "type": "deliveries"
@@ -1794,7 +1794,7 @@ var fakeRealAPIDeliveries =
         "uuid": "10"
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "3",
             "type": "deliveries"
@@ -1815,7 +1815,7 @@ var fakeRealAPIDeliveries =
         "senderId": 6
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "4",
             "type": "deliveries"
@@ -1831,7 +1831,7 @@ var fakeRealAPIDeliveries =
         "uuid": "12"
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "4",
             "type": "deliveries"
@@ -1848,7 +1848,7 @@ var fakeRealAPIDeliveries =
         "senderId": 6
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "4",
             "type": "deliveries"
@@ -1864,7 +1864,7 @@ var fakeRealAPIDeliveries =
                 "uuid": "14"
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "4",
             "type": "deliveries"
@@ -1886,7 +1886,7 @@ var fakeRealAPIDeliveries =
         "senderId": 7
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "5",
             "type": "deliveries"
@@ -1903,7 +1903,7 @@ var fakeRealAPIDeliveries =
         "acceptedResponseId": null
       },
       "relationships": {
-        "delivery": {
+        "eventable": {
           "data": {
             "id": "5",
             "type": "deliveries"
