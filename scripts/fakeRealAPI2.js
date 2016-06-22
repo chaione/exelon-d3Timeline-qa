@@ -1658,7 +1658,7 @@ var fakeRealAPIDeliveries =
         "isRequest": true,
         "uuid": "4",
         // "senderId": 2
-        "role":"POC"
+        "role":"D10"
       },
       "relationships": {
         "eventable": {
@@ -1713,7 +1713,7 @@ var fakeRealAPIDeliveries =
         "isRequest": true,
         "uuid": "6",
         // "senderId": 4
-        "role":"POC"
+        "role":"D10"
       },
       "relationships": {
         "eventable": {
@@ -1783,7 +1783,7 @@ var fakeRealAPIDeliveries =
         "isRequest": true,
         "uuid": "10",
         // "senderId": 5
-        "role":"POC"
+        "role":"D10"
       },
       "relationships": {
         "eventable": {
@@ -1821,7 +1821,7 @@ var fakeRealAPIDeliveries =
         "isRequest": true,
         "uuid": "12",
         // "senderId": 6
-        "role":"POC"
+        "role":"Officer"
       },
       "relationships": {
         "eventable": {
@@ -1855,7 +1855,7 @@ var fakeRealAPIDeliveries =
         "isRequest": true,
         "uuid": "14",
         // "senderId": 6
-        "role":"POC"
+        "role":"D10"
       },
       "relationships": {
         "eventable": {
