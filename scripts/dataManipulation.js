@@ -24,7 +24,7 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
     if(temp.isRequest){
       temp.endTimestamp = null;
       for(key in eventsAPIData){
-        let temp2 = eventsAPIData[key];
+        var temp2 = eventsAPIData[key];
         if(temp.uuid == temp2.uuid && temp2.isRequest===false)
         {
           temp.endTimestamp = new Date(temp2['created-at']);
