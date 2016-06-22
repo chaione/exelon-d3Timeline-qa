@@ -69,12 +69,15 @@ var unixMinute     = 1000*60;
 var vpStartHours   = (outerWidth/2)/(xAxisWidth/24);  //startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
 var unixStartHours = unixHour * vpStartHours;
 var now            = new Date(Date.now());
+now                = new Date(2016, 5, 20,13,30);// used for testing - june 20 2016 at 13:30 (some timezone..)
 var nowYear        = now.getFullYear();
 var nowMonth       = now.getMonth();
 var nowDay         = now.getDate();
 var nowHours       = now.getHours();
 var nowMinutes     = now.getMinutes();
-now = new Date(nowYear, 2, 31,9,30);// used for testing
+var yesterday      = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
+var tomorrow       = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
+
 var isDetailDisplayed = false;
 console.log('now',now);
 
@@ -97,6 +100,7 @@ var vehiclesAPIData;
 var eventsReqAndRespByDeliveryAPIData;
 var detailStartingX;
 var detailDeliveryRectY;
+var deliveries = {}
 
 var panBounds;
 
@@ -114,13 +118,12 @@ var customShapes = {
     return d3.svg.line()(points);
   }
 }
-
 //scales
 // var xScale = d3.time.scale.utc()
 //       .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                +new Date(nowYear, nowMonth, nowDay+1,12)])
 //       .range( [0,                                     xAxisWidth]);
 var xScale = d3.time.scale.utc()
-      .domain([+new Date(nowYear, 2, 31-1,12),        +new Date(nowYear, 2, 31+1,12)])
+      .domain([+new Date(nowYear, nowMonth, yesterday.getDate(),12),        +new Date(nowYear, nowMonth, tomorrow.getDate(),12)])
       .range( [0,                                     xAxisWidth]);
 
 var yDeliveryScale = d3.scale.linear()
@@ -131,11 +134,11 @@ var yDeliveryScale = d3.scale.linear()
 //       .domain([+new Date(nowYear, nowMonth, nowDay-1,12)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay+1,12)-unixStartHours])
 //       .range( [0,                                     -1*xAxisWidth+outerWidth]);
 var viewportScale = d3.time.scale.utc()
-      .domain([+new Date(nowYear, 2, 31-1,12)+unixStartHours,  +new Date(nowYear, 2, 31+1,12)-unixStartHours])
+      .domain([+new Date(nowYear, nowMonth, yesterday.getDate(),12)+unixStartHours,  +new Date(nowYear, nowMonth, tomorrow.getDate(),12)-unixStartHours])
       .range( [0,                                              -1*xAxisWidth+outerWidth]);
 
 // startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes));
-startingX = viewportScale(new Date(nowYear,2,31,9,30));
+startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,9,30));
 detailStartingX = startingX;
 
 var xAxis = d3.svg.axis()

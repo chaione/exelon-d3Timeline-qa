@@ -12,7 +12,7 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
   var eventsArray = deliveries.included.filter(filterByEvents);
   //organize all events to have their id as their key
   var eventsAPIData = eventsArray.reduce(function(result, item, currIndex) {
-    item.attributes.deliveryId = parseInt(item.relationships.delivery.data.id);
+    item.attributes.deliveryId = parseInt(item.relationships.eventable.data.id);
     item.attributes.timestamp = new Date(item.attributes.timestamp);
     result[item.id] = item.attributes;
     return result;
@@ -172,6 +172,8 @@ function processApiData(workflowsData){
         .key(function(d) { return d.deliveryId; })
         .entries(workflowsData);
 
+  console.log(deliveriesData);
+  debugger;
   //update deliveries w/ data
   deliveriesData.forEach(function(delivery) {
     var vehicleInfo = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];
@@ -183,7 +185,9 @@ function processApiData(workflowsData){
   // console.log(deliveriesData);
   // debugger;
   //add x y data to display on chart
+  
   deliveriesData      = updateCurrentStationCalc(deliveriesData);
+
   stationCounts       = stationCountCalc(deliveriesData);                                   // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
   stationStackedCount = stationStackedCountCalc(stationCounts);                             // [7, 12, 17, 18, 22, 23, 24, 25]
   stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);     // [{name:EnRoute, y:7,y0:0},Object...]
@@ -220,7 +224,8 @@ function processApiData(workflowsData){
   };
 
   console.log('deliveryyIndexInfo',deliveryyIndexInfo);
-
+  console.log(stationData);
+  debugger;
   render(stationData);
 }
 
@@ -266,15 +271,16 @@ function retrieveDeliveries(){
   var self = this;
 
   $.ajax({
-        url:url+'deliveries',
+        url:url+'deliveries?filter=all',
         headers: { 
           'X-SITE-ID': siteId,
           'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ1NTAzNDQ3Mn0.p8lguJGQHf3aMjQfgLScyEz6_H_1o5IFg0zBV3SnFZM'
         },
-        success: function(deliveries) {
-            console.log('deliveries recieved from api', deliveries);
+        success: function(deliveriesAPI) {
+            console.log('deliveries recieved from api', deliveriesAPI);
+            // deliveries = deliveriesAPI;
             deliveries = fakeRealAPIDeliveries;
-            console.log('replaced with fakereal deliveries');
+            // console.log('replaced with fakereal deliveries');
             // console.table(deliveries);
 
             deliveriesAPIData = {};
