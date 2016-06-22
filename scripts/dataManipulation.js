@@ -13,23 +13,35 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
   //organize all events to have their id as their key
   var eventsAPIData = eventsArray.reduce(function(result, item, currIndex) {
     item.attributes.deliveryId = parseInt(item.relationships.eventable.data.id);
-    item.attributes.timestamp = new Date(item.attributes.timestamp);
+    item.attributes.timestamp = new Date(item.attributes['created-at']);
     result[item.id] = item.attributes;
     return result;
   }, {});
-
+  console.log(eventsAPIData);
     //add the endTime
   for(key in eventsAPIData){
     var temp = eventsAPIData[key];
-     // do something with obj[key]
-      if(temp.isRequest){
-        if(temp.acceptedResponseId!=null){
-          temp.endTimestamp = eventsAPIData[temp.acceptedResponseId].timestamp;
-        }else {
-          temp.endTimestamp = null
+    if(temp.isRequest){
+      temp.endTimestamp = null;
+      for(key in eventsAPIData){
+        let temp2 = eventsAPIData[key];
+        if(temp.uuid == temp2.uuid && temp2.isRequest===false)
+        {
+          temp.endTimestamp = new Date(temp2['created-at']);
+          console.log(temp.uuid);
+          console.log(temp.timestamp );
+          console.log(temp.endTimestamp);
         }
       }
+      // OLD WAY
+      // if(temp.acceptedResponseId!=null){
+      //   temp.endTimestamp = eventsAPIData[temp.acceptedResponseId].timestamp;
+      // }else {
+      //   temp.endTimestamp = null
+      // }
+    }
   };
+  debugger;
   //make final obj  
   // 'delivery1'{
   //   'events':[event1,event2,...]
@@ -172,8 +184,6 @@ function processApiData(workflowsData){
         .key(function(d) { return d.deliveryId; })
         .entries(workflowsData);
 
-  console.log(deliveriesData);
-  debugger;
   //update deliveries w/ data
   deliveriesData.forEach(function(delivery) {
     var vehicleInfo = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];
