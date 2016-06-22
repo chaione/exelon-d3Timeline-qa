@@ -127,7 +127,7 @@ function render(data){
       .attr("x", xScale(now))
       .attr("y", 13)
       .attr("text-anchor", "middle")
-      .text(function(d,i){return "3.31.16 // 9:30"})
+      .text(function(d,i){return (nowMonth+1) + "." + nowDay + "." + nowYear + " // " + nowHours + "." + nowMinutes})
       .attr("class","yAxisDateTimeText")
       .attr("font-size", 14 + "px");
   yAxisGroup.append("svg:path")
