@@ -41,7 +41,7 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
       // }
     }
   };
-  debugger;
+
   //make final obj  
   // 'delivery1'{
   //   'events':[event1,event2,...]
@@ -50,11 +50,13 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
   // 'delivery2':
   for(key in eventsAPIData) {
     var temp = eventsAPIData[key];
+    // i have all events for all the deliveries.  Im only storing the requests
     if(temp.isRequest) {
       if(temp.deliveryId in result) {
         result[temp.deliveryId]['events'].push(temp);
-        if(result[temp.deliveryId]['contacts'].indexOf(temp.senderId)==-1){
-          result[temp.deliveryId]['contacts'].push(temp.senderId);
+        // why -1?
+        if(result[temp.deliveryId]['contacts'].indexOf(temp.role)==-1){
+          result[temp.deliveryId]['contacts'].push(temp.role);
         }
       } else {
         result[temp.deliveryId] ={
@@ -62,11 +64,10 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
           contacts:[]
         };
         result[temp.deliveryId]['events'].push(temp);
-        result[temp.deliveryId]['contacts'].push(temp.senderId);
+        result[temp.deliveryId]['contacts'].push(temp.role);
       }
     }
   }
-
 
   return result;
 }
@@ -233,9 +234,6 @@ function processApiData(workflowsData){
     };
   };
 
-  console.log('deliveryyIndexInfo',deliveryyIndexInfo);
-  console.log(stationData);
-  debugger;
   render(stationData);
 }
 

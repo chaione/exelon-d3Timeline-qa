@@ -428,14 +428,15 @@ function displayDetail(delivery) {
             var detailDeliveryDataEventsGroup = detailDeliveryDataGroup.append("g")
                 .attr("class", "detailScheduled")
                 .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight*4) + ')');
-
+            
+            console.log(deliveryContacts);
             detailDeliveryDataEventsGroup
                 .selectAll(".detailEventLine")
                 .data(deliveryEvents)
                 .enter()
                 .append("line")
                     .attr("x1", function(d,i) {return xScale(d['timestamp']); })
-                    .attr("y1", function(d,i) {return eventHeight*deliveryContacts.indexOf(d.senderId);})
+                    .attr("y1", function(d,i) {return eventHeight*deliveryContacts.indexOf(d.role);})
                     .attr("x2", function(d,i) { 
                         if(d['endTimestamp']===null){
                             return xScale(now);
@@ -443,7 +444,7 @@ function displayDetail(delivery) {
                             return xScale(d['endTimestamp']); 
                         }
                     })
-                    .attr("y2", function(d,i) {return eventHeight*deliveryContacts.indexOf(d.senderId);})
+                    .attr("y2", function(d,i) {return eventHeight*deliveryContacts.indexOf(d.role);})
                     .attr("class", function(d){
                       return "detailEventLine";
                     }).style("stroke-dasharray", ("1, 1"));
@@ -454,7 +455,7 @@ function displayDetail(delivery) {
                 .enter()
                 .append("circle")
                     .attr("cx",function(d,i) {return xScale(d['timestamp'])})
-                    .attr("cy",function(d,i) {return eventHeight*deliveryContacts.indexOf(d.senderId);})
+                    .attr("cy",function(d,i) {return eventHeight*deliveryContacts.indexOf(d.role);})
                     .attr("r",3)
                     .attr("class","detailEventStart");
 
@@ -468,7 +469,7 @@ function displayDetail(delivery) {
                     if(d.endTimestamp!==null){
                         eventEnd
                             .attr("cx",function(d,i) {return xScale(d['endTimestamp'])})
-                            .attr("cy",function(d,i) {return eventHeight*deliveryContacts.indexOf(d.senderId);})
+                            .attr("cy",function(d,i) {return eventHeight*deliveryContacts.indexOf(d.role);})
                             .attr("r",3)
                             .attr("class","detailEventEnd");
                     }
@@ -494,7 +495,7 @@ function displayDetail(delivery) {
 
             detailCommunicationLabelsGroup
                 .selectAll(".detailCommunicationLabel")
-                .data(pocContacts)
+                .data(deliveryContacts)
                 .enter()
                 .append("text")
                 .attr("x", function(d,i) { return stationTextPadding.left;})
