@@ -173,6 +173,25 @@ function setupSvgStructure(){
                 .attr('class', 'color-maskingGradient-bottom')
                 .attr('offset', '1')
                 .attr('stop-opacity', '0');
+
+        var maskingGradientHorizontal = svgDefs.append('linearGradient')
+                .attr('id', 'maskingGradientHorizontal')
+                .attr("x1", "0%")
+                .attr("y1", "0%")
+                .attr("x2", "100%")
+                .attr("y2", "0%");
+            maskingGradientHorizontal.append('stop')
+                .attr('class', 'color-maskingGradientHorizontal-left')
+                .attr('offset', '.5')
+                .attr('stop-opacity', '.9');
+            // maskingGradientHorizontal.append('stop')
+            //     .attr('class', 'color-maskingGradientHorizontal-left')
+            //     .attr('offset', '.3');
+            maskingGradientHorizontal.append('stop')
+                .attr('class', 'color-maskingGradientHorizontal-right')
+                .attr('offset', '1')
+                .attr('stop-opacity', '0');
+
         var aheadGradient = svgDefs.append('linearGradient')
                 .attr('id', 'aheadGradient');
             aheadGradient.append('stop')
@@ -235,10 +254,7 @@ function setupSvgStructure(){
           .attr("height",outerHeight*1.5)
           .attr("fill","url(#fullBGGradient)")
 
-    delieveryStaticGroup = svg.append("g")
-          .attr("class", "deliveryStaticGroup")
-          .attr('transform', 'translate(' + 0 + "," + 0 + ')');
-    
+  
 
     g = svg.append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -262,10 +278,20 @@ function setupSvgStructure(){
               .attr("class", "x axis ")
               .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
-
+    yStationMask = svg.append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", 120)
+          .attr("height", outerHeight - xAxisHeight)
+          .attr("class","maskingGradientHorizontal")
+          .attr('transform', 'translate(' + 0 + "," +  0 + ')');
 
     stationsGroup = svg.append("g")
           .attr("class", "stations")
           .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+
+    delieveryStaticGroup = svg.append("g")
+          .attr("class", "deliveryStaticGroup")
+          .attr('transform', 'translate(' + 0 + "," + 0 + ')');
 
 }

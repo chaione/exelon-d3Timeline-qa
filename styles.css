@@ -88,6 +88,13 @@ body {
       stop-color:#1B1E23
     }
 
+    .color-maskingGradientHorizontal-left {
+      stop-color:#1B1E23
+    }
+    .color-maskingGradientHorizontal-right {
+      stop-color:#1B1E23
+    }
+
     .color-onTime-left {
       stop-color:#0581A6;
     }
@@ -200,6 +207,10 @@ body {
 
     .maskingGradient {
       fill: url(#maskingGradient);
+    }
+
+    .maskingGradientHorizontal {
+      fill: url(#maskingGradientHorizontal);
     }
 
     .stations {
