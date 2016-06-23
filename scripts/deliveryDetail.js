@@ -412,16 +412,16 @@ function displayDetail(delivery) {
                 });
                 
 
-            // detailDeliveryDataGroup.append("image")
-            //       .attr("xlink:href",function(i){
-            //           return "img/" + delivery.vehicleType+'.png';
-            //       })
-            //       .attr("height", vehicleShapeH)
-            //       .attr("width", vehicleShapeH)
-            //       .attr("x",-1*(vehicleShapeH/2))
-            //       .attr("y",-1*(vehicleShapeH/2))
-            //       .attr("class", "truckIconDiamond")
-            //       .attr("transform", function(d) {return "translate(" + xScale(now) + "," + (detailPadding + eventHeight + eventHeight) + ")"});
+            detailDeliveryDataGroup.append("image")
+                  .attr("xlink:href",function(i){
+                      return "img/" + delivery.vehicleType+'.png';
+                  })
+                  .attr("height", vehicleShapeH)
+                  .attr("width", vehicleShapeH)
+                  .attr("x",-1*(vehicleShapeH/2))
+                  .attr("y",-1*(vehicleShapeH/2))
+                  .attr("class", "truckIconDiamond")
+                  .attr("transform", function(d) {return "translate(" + xScale(now) + "," + (detailPadding + eventHeight + eventHeight) + ")"});
 
             var deliveryEvents = eventsReqAndRespByDeliveryAPIData[delivery.key].events;
             var deliveryContacts = eventsReqAndRespByDeliveryAPIData[delivery.key].contacts;

@@ -51,10 +51,17 @@ body {
     }
 
     .color-deniedEntry-left {
-      stop-color:rgba(212,19,32,0);
+      stop-color:rgb(212,19,32);
+      stop-opacity:.1;
     }
     .color-deniedEntry-right {
-      stop-color:rgba(212,19,32,.05);
+      stop-color:rgb(212,19,32);
+      stop-opacity:.8;
+    }
+
+    .deniedEntry{
+      fill: red;
+      fill-opacity: .02;
     }
 
     .color-fullBG-left {
@@ -196,15 +203,16 @@ body {
     }
 
     .stations {
+      pointer-events: none;
     }
     .station{
       /*fill:#181F2B;*/
-      fill:rgba(24,31,43,.7);
+      fill:rgba(24,31,43,0);
       /*fill:rgba(9,12,17,.5)*/
     }
     .station:nth-child(even) {
       /*fill:#1B1E23;*/
-      fill:rgba(27,30,35,.7);
+      fill:rgba(27,30,35,.3);
       /*fill:rgba(11,12,14,.5);*/
     }
     .name{

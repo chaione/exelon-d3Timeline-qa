@@ -235,9 +235,9 @@ function setupSvgStructure(){
           .attr("height",outerHeight*1.5)
           .attr("fill","url(#fullBGGradient)")
 
-    stationsGroup = svg.append("g")
-          .attr("class", "stations")
-          .attr('transform', 'translate(' + 0 + "," + 0 + ')')
+    delieveryStaticGroup = svg.append("g")
+          .attr("class", "deliveryStaticGroup")
+          .attr('transform', 'translate(' + 0 + "," + 0 + ')');
     
 
     g = svg.append("g")
@@ -262,8 +262,10 @@ function setupSvgStructure(){
               .attr("class", "x axis ")
               .attr('transform', 'translate(' + startingX + "," +  innerHeight + ')');
 
-    delieveryStaticGroup = svg.append("g")
-          .attr("class", "deliveryStaticGroup")
-          .attr('transform', 'translate(' + 0 + "," + 0 + ')');
+
+
+    stationsGroup = svg.append("g")
+          .attr("class", "stations")
+          .attr('transform', 'translate(' + 0 + "," + 0 + ')')
 
 }

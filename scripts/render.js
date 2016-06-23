@@ -86,8 +86,9 @@ function render(data){
     // })
     .attr("height", rowHeight)
     .attr("width", outerWidth)
+    .attr("class","deniedEntry")
     // .attr("preserveAspectRatio","none")
-    .attr("fill","url(#deniedEntryGradient)")
+    // .attr("fill","url(#deniedEntryGradient)")
     .attr("x",0)
     .attr("y",0)
     .attr("transform", function(d) {return "translate(" + 0 + "," + (yDeliveryScale(d.yIndex+1)-rowHeight/2) + ")"});
