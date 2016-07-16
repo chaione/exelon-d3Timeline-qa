@@ -71,7 +71,7 @@ function displayDetail(delivery) {
             .attr("y", detailDeliveryRectY)
             .attr("width", outerWidth)
             .attr("height",detailDeliveryRectHeight)
-            .attr("opacity",.7)
+            .attr("opacity",1)
             .attr("class",function(d) {
                     return "detailDeliveryRect"       
                 // if (delivery.status === "denied") {
