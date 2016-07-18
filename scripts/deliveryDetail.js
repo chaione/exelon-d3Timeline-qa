@@ -4,7 +4,7 @@ var inspectionLabels = ['Scheduled','Actual']
 function displayDetail(delivery) {
     delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
     delivery.arrivedAt = new Date(deliveriesAPIData[parseInt(delivery.key)].attributes['arrive-at']);
-    console.log('deliveriesAPIData',deliveriesAPIData[parseInt(delivery.key)]);
+    // console.log('deliveriesAPIData',deliveriesAPIData[parseInt(delivery.key)]);
     var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)];
     var pocId = currentDeliveryData['relationships']['primary-poc']['data']['id'];
     delivery.primaryPocName = "POC " + pocsAPIData[pocId]['first-name'] + " " + pocsAPIData[pocId]['last-name'];
@@ -12,23 +12,24 @@ function displayDetail(delivery) {
     delivery.companyName = deliveriesAPIData[parseInt(delivery.key)].attributes['company-name'];
     delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery);
     
-    console.log('displayDetail', delivery);
+    // console.log('displayDetail', delivery);
     isDetailDisplayed = true;
     detailYStart = 0;
 
     var eventHeight = 30;
     var eventCount  = 4; //how many rows of events
     var detailPadding = 30;
-    
     detailDeliveryRectY = yDeliveryScale(delivery.yIndex+1) - detailPadding - (2*eventHeight);
-    
+    // debugger;
     var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
     if(detailDeliveryRectY < 50){
-        detailDeliveryRectY = 50;
+        detailDeliveryRectY = 0;
     } else if(detailDeliveryRectY > innerHeight - xAxisHeight - detailDeliveryRectHeight){
         detailDeliveryRectY = innerHeight - xAxisHeight - detailDeliveryRectHeight;
+        console.log('FJIOWEJFIEOWJFWLIEFJ3234');
     }
-
+    // detailDeliveryRectY = detailDeliveryRectY+100;
+    console.log('FJIOWEJFIEOWJFWLIEFJ3234 detailDeliveryRectY', detailDeliveryRectY);
     // detailSvg
     //     detailDeliveryCloseRect
     //     detailDeliveryRect
@@ -336,7 +337,7 @@ function displayDetail(delivery) {
                 .enter()
                 .append("g")
                 .each(function(d){
-                  console.log('-------------each',d);
+                  // console.log('-------------each',d);
                   // var arrivedAt    = d['arrived-at'];
                   // var nonsearchEnd = d['nonsearch-end'];
                   // var searchEnd    = d['search-end'];
@@ -429,7 +430,7 @@ function displayDetail(delivery) {
                 .attr("class", "detailScheduled")
                 .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight*4) + ')');
             
-            console.log(deliveryContacts);
+            // console.log(deliveryContacts);
             detailDeliveryDataEventsGroup
                 .selectAll(".detailEventLine")
                 .data(deliveryEvents)

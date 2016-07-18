@@ -6,6 +6,17 @@ body {
       font-family: 'Maven Pro', sans-serif;
     }
 
+    .title{
+        margin: auto;
+        margin-top:25px;
+        margin-bottom:35px;
+        width:230px;
+        color:#BFFFEA;
+        font-size: 20px;
+        white-space: nowrap;
+    }
+
+
     .axis line {
       fill:         none;
       stroke:       #CEE5ED;
@@ -128,7 +139,7 @@ body {
     #detailSvg {
       position:absolute;
       left:0;
-      top:0;
+      top:83;
 
     }
     .detailName {

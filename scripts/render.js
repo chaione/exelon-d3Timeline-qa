@@ -17,9 +17,10 @@ function moveXAxis(a,b) {
   if(isDetailDisplayed){
     detailDeliveryDataGroup.attr("transform", "translate(" + [eventxTranslation,detailDeliveryRectY] + ")scale(1)");
   }
+    console.log('stationHeight: ' + stationHeight + ' outerHeight: ' + outerHeight + ' panBounds.bottom: '+ panBounds.bottom + ' eventyTranslation: ' + eventyTranslation);
 
   if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
-    var maxShiftFromTop = stationHeight>outerHeight?panBounds.bottom:0;
+    var maxShiftFromTop = stationHeight > outerHeight?panBounds.bottom:0;
     var translation = [
       Math.max(Math.min(eventxTranslation, panBounds.right),  panBounds.left),
       Math.max(Math.min(eventyTranslation, panBounds.top),    maxShiftFromTop)
@@ -41,10 +42,10 @@ function moveXAxis(a,b) {
 function render(data){
   console.log('render-------------');
 
-  outerWidth  = document.documentElement.clientWidth;
-  outerHeight = document.documentElement.clientHeight;
-  innerWidth     = outerWidth   - margin.left - margin.right;
-  innerHeight    = outerHeight  - margin.top  - margin.bottom;
+  // outerWidth  = document.documentElement.clientWidth;
+  // outerHeight = document.documentElement.clientHeight - 83;
+  // innerWidth     = outerWidth   - margin.left - margin.right;
+  // innerHeight    = outerHeight  - margin.top  - margin.bottom;
   
   stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) +
                   (stationStacked[stationStackedCount.length-1].deliveryCount * rowHeight);

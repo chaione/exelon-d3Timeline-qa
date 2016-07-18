@@ -29,7 +29,7 @@ var stationTextPadding = {top: 10, right: 0, bottom: 0, left: 10};
 
 var margin      = {top: 0, right: 0, bottom: 30, left: 0};
 var outerWidth  = document.documentElement.clientWidth;
-var outerHeight = document.documentElement.clientHeight;
+var outerHeight = document.documentElement.clientHeight - 83;
 console.log(outerWidth);
 console.log(outerHeight);
 var startOfDayHour = 6; //used for fake data
@@ -60,7 +60,7 @@ var pollrate = 2455000;
 var url = 'https://exelon-api.herokuapp.com/v1/';
 var siteId = 1; //limerick
 var aheadOrBehindPct = .25;  // if behind .25 estimated time its longer.   if ahead by .25.. its faster
-
+var titleHeight = 83;
 //Calculated Variables
 var innerWidth     = outerWidth   - margin.left - margin.right;
 var innerHeight    = outerHeight  - margin.top  - margin.bottom;
