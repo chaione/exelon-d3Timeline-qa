@@ -162,6 +162,12 @@ body {
       fill:rgba(26, 48, 71,1);
       position:relative;
     }
+    .detailInfoRectDenied {
+      fill:rgb(212,19,32);
+      fill-opacity:.3;
+      position:relative;
+
+    }
 
     .detailInfoPOC{
       position:relative;

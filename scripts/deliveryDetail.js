@@ -116,12 +116,21 @@ function displayDetail(delivery) {
         var detailDeliveryInfoGroup = detailSvg.append("g")
             .attr('transform', 'translate(' + (outerWidth- 344 - 20) + "," + (detailDeliveryRectY - 50)+ ')');;
 
-            var detailDeliveryInfoRect = detailDeliveryInfoGroup.append("rect")
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("width", 344)
-                .attr("height",65)
-                .attr("class","detailInfoRect")
+            if(delivery.status==="denied"){
+                var detailDeliveryInfoRect = detailDeliveryInfoGroup.append("rect")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", 344)
+                    .attr("height",65)
+                    .attr("class","detailInfoRectDenied")
+            } else {
+                var detailDeliveryInfoRect = detailDeliveryInfoGroup.append("rect")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", 344)
+                    .attr("height",65)
+                    .attr("class","detailInfoRect")
+            }
 
             var detailDeliveryInfoPOC = detailDeliveryInfoGroup.append("text")
                 .attr("x", 16)
