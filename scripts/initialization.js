@@ -66,7 +66,8 @@ var innerWidth     = outerWidth   - margin.left - margin.right;
 var innerHeight    = outerHeight  - margin.top  - margin.bottom;
 var unixHour       = 1000*60*60;
 var unixMinute     = 1000*60;
-var vpStartHours   = (outerWidth/2)/(xAxisWidth/24);  //startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
+var vpStartHours   = (outerWidth/2)/(xAxisWidth/48);  //startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
+console.log('vpStartHours',vpStartHours);
 var unixStartHours = unixHour * vpStartHours;
 var now            = new Date(Date.now());
 now                = new Date(2016, 5, 20,9,30);// used for testing - june 20 2016 at 13:30 (some timezone..)
