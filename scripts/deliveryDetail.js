@@ -23,13 +23,11 @@ function displayDetail(delivery) {
     // debugger;
     var detailDeliveryRectHeight = ((eventCount+1)*eventHeight) + (detailPadding*2);
     if(detailDeliveryRectY < 50){
-        detailDeliveryRectY = 0;
+        detailDeliveryRectY = 50;
     } else if(detailDeliveryRectY > innerHeight - xAxisHeight - detailDeliveryRectHeight){
         detailDeliveryRectY = innerHeight - xAxisHeight - detailDeliveryRectHeight;
-        console.log('FJIOWEJFIEOWJFWLIEFJ3234');
     }
     // detailDeliveryRectY = detailDeliveryRectY+100;
-    console.log('FJIOWEJFIEOWJFWLIEFJ3234 detailDeliveryRectY', detailDeliveryRectY);
     // detailSvg
     //     detailDeliveryCloseRect
     //     detailDeliveryRect
