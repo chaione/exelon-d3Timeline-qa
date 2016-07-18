@@ -12,12 +12,14 @@ function moveXAxis(a,b) {
   stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
   delieveryStaticGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
 
-  xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight] + ")scale(1)");
-
+  xAxisGroup.attr("transform", "translate(" + [eventxTranslation,innerHeight-200] + ")scale(1)");
+  console.log('here');
+console.log(innerHeight);
+console.log(outerHeight  + ' '+margin.top  +' '+ margin.bottom);
   if(isDetailDisplayed){
     detailDeliveryDataGroup.attr("transform", "translate(" + [eventxTranslation,detailDeliveryRectY] + ")scale(1)");
   }
-    console.log('stationHeight: ' + stationHeight + ' outerHeight: ' + outerHeight + ' panBounds.bottom: '+ panBounds.bottom + ' eventyTranslation: ' + eventyTranslation);
+    // console.log('stationHeight: ' + stationHeight + ' outerHeight: ' + outerHeight + ' panBounds.bottom: '+ panBounds.bottom + ' eventyTranslation: ' + eventyTranslation);
 
   if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
     var maxShiftFromTop = stationHeight > outerHeight?panBounds.bottom:0;
@@ -42,10 +44,11 @@ function moveXAxis(a,b) {
 function render(data){
   console.log('render-------------');
 
-  // outerWidth  = document.documentElement.clientWidth;
-  // outerHeight = document.documentElement.clientHeight - 83;
-  // innerWidth     = outerWidth   - margin.left - margin.right;
-  // innerHeight    = outerHeight  - margin.top  - margin.bottom;
+  outerWidth  = document.documentElement.clientWidth;
+  outerHeight = document.documentElement.clientHeight - 83;
+  
+  innerWidth     = outerWidth   - margin.left - margin.right;
+  innerHeight    = outerHeight  - margin.top  - margin.bottom;
   
   stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) +
                   (stationStacked[stationStackedCount.length-1].deliveryCount * rowHeight);
@@ -157,7 +160,7 @@ function render(data){
 
   // Setup Workflows
   var workflowsSelectAll = deliveriesSelectAllG.selectAll(".workflow").data(function(d){
-    console.log(d);
+    // console.log(d);
     return d.values;
   });
   var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
@@ -421,7 +424,7 @@ function appendWorkflow(workflow,d){
 
     } else if(arrivedAt === null && endedAt === null){ //workflow hasnt started yet
       workflow.append("line")
-          .attr("x1", function(d,i) { console.log(currentDeliveryDelayById);return xScale(new Date(d.eta.getTime() + currentDeliveryDelayById[d.deliveryId]*60000)); })
+          .attr("x1", function(d,i) { return xScale(new Date(d.eta.getTime() + currentDeliveryDelayById[d.deliveryId]*60000)); })
           .attr("y1", function(d,i) { return 0;})
           .attr("x2", function(d,i) { return xScale(new Date(d.eta).getTime() + EPT *oneMinute-60000 + currentDeliveryDelayById[d.deliveryId]*60000); })//remove a minute so a gap appears
           .attr("y2", function(d,i) { return 0;})
