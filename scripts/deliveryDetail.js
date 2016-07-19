@@ -2,6 +2,7 @@ var pocContacts = ['POC', 'Delta10'];
 var inspectionLabels = ['Scheduled','Actual']
 
 function displayDetail(delivery) {
+    console.log(delivery);
     delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
     delivery.arrivedAt = new Date(deliveriesAPIData[parseInt(delivery.key)].attributes['arrive-at']);
     // console.log('deliveriesAPIData',deliveriesAPIData[parseInt(delivery.key)]);

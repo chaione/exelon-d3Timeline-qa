@@ -184,15 +184,49 @@ function render(data){
     // console.log(d);
     return d.values;
   });
+  var prevData = {};
   var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
   // workflowsSelectAll.exit().remove();
   workflowsSelectAllG
       .each(function(d,i){
+
         var workflow = d3.select(this);
         workflow = appendWorkflow(workflow,d);
         if(d.step === 1 && d.eta < d['arrived-at']){
           prependEtaLine(workflow,d);
         }
+if(d.deliveryId==1){
+console.log('d',d);
+console.log('prevData',prevData);
+console.log('------------------');
+}
+        // console.log(prev.data());
+
+        if(i>0 )
+        {
+          // var prevData = workflowsSelectAllG.data()[i-1];
+          // console.log(workflowsSelectAllG.data());
+          // console.log(i);
+          // console.log('',d.deliveryId);
+          // conssole.log('  ',prevData.deliveryId);
+          // if (d.deliveryId==1) {
+          //   console.log(d);
+          //   console.log(prevData);
+          //   console.log('arrived at                         ended-at');
+          //   console.log("wf   " + d['arrived-at'] + " " + d['ended-at']);
+          //   console.log("prev " + prevData['arrived-at'] + " " + prevData['ended-at']);
+          //   console.log('----------------------');  
+          // };
+          
+          if(d['arrived-at']!=null && prevData['ended-at']!=null) {
+            // console.log('this workflow',d);
+            // console.log('prev workflow',prevData);
+            console.log('betweenPorts');
+            appendLineBetweenPorts(workflow,d,prevData);  
+          }
+        }
+
+        prevData = d;
       });
 
   var vehicleIconsG = deliveriesSelectAllG.append("g");
@@ -253,6 +287,17 @@ function prependEtaLine(firstWorkflow,d){
         .attr("transform", function(d) {
           return "translate(" + xScale(d['eta']) + "," + 0 + ")"
         });;
+}
+function appendLineBetweenPorts(workflow,WFData,prevWFData) {
+  // console.log(WFData);
+  // console.log(prevWFData);
+
+  workflow.append("line")
+        .attr("x1", function(d,i) { return xScale(WFData['arrived-at']); })
+        .attr("y1", function(d,i) { return 0;})
+        .attr("x2", function(d,i) { return xScale(prevWFData['ended-at']); })
+        .attr("y2", function(d,i) { return 0;})
+        .attr("class", "workflow betweenPorts");
 }
 function appendWorkflow(workflow,d){
   var arrivedAt    = d['arrived-at'];
