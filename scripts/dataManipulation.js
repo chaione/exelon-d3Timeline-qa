@@ -104,7 +104,11 @@ function getVehicleImageName(vehicleInfo,deliveryStatus) {
     }
 
   } else {
-    vehicleImageName += vehicleInfo.type + "-" + vehicleInfo.axles + "w-";
+    if(vehicleInfo.axles != null){
+      vehicleImageName += vehicleInfo.type + "-" + vehicleInfo.axles + "w-";
+    } else {
+      vehicleImageName += vehicleInfo.type + "-" + 2 + "w-";
+    }
 
     if(deliveryStatus === "arrived"){
       vehicleImageName += "arrived"
