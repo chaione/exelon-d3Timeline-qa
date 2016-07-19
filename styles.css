@@ -251,6 +251,10 @@ body {
       stroke: #017AAA;
       stroke-width:    1px;
     }
+    .workflow.betweenPorts {
+      stroke: #535353;
+      stroke-width:    2px;
+    }
     .workflow.ahead {
       stroke:#00B4C2;
     }

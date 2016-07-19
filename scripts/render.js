@@ -184,6 +184,7 @@ function render(data){
     // console.log(d);
     return d.values;
   });
+  var prevData = {};
   var workflowsSelectAllG = workflowsSelectAll.enter().append("g");
   // workflowsSelectAll.exit().remove();
   workflowsSelectAllG
@@ -193,6 +194,12 @@ function render(data){
         if(d.step === 1 && d.eta < d['arrived-at']){
           prependEtaLine(workflow,d);
         }
+
+        if(i>0 && d['arrived-at']!=null && prevData['ended-at']!=null) {
+            appendLineBetweenPorts(workflow,d,prevData);  
+        }
+        
+        prevData = d;
       });
 
   var vehicleIconsG = deliveriesSelectAllG.append("g");
@@ -253,6 +260,14 @@ function prependEtaLine(firstWorkflow,d){
         .attr("transform", function(d) {
           return "translate(" + xScale(d['eta']) + "," + 0 + ")"
         });;
+}
+function appendLineBetweenPorts(workflow,WFData,prevWFData) {
+  workflow.append("line")
+        .attr("x1", function(d,i) { return xScale(WFData['arrived-at']); })
+        .attr("y1", function(d,i) { return 0;})
+        .attr("x2", function(d,i) { return xScale(prevWFData['ended-at']); })
+        .attr("y2", function(d,i) { return 0;})
+        .attr("class", "workflow betweenPorts");
 }
 function appendWorkflow(workflow,d){
   var arrivedAt    = d['arrived-at'];
