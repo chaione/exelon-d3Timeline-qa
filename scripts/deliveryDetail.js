@@ -317,15 +317,24 @@ function displayDetail(delivery) {
             var detailDeliveryDataActualGroup = detailDeliveryDataGroup.append("g")
                 .attr("class", "detailScheduled")
                 .attr('transform', 'translate(' + 0 + "," + (detailPadding + eventHeight + eventHeight ) + ')');
-
+            
+            var prevData = {};
             detailDeliveryDataActualGroup
                 .selectAll(".detailActualLine")
                 .data(delivery.values)
                 .enter()
                 .append("g")
-                .each(function(d){
+                .each(function(d,i){
                   var workflow = d3.select(this);
                   workflow = appendWorkflow(workflow,d);
+                  if(d.step === 1 && d.eta < d['arrived-at']){
+                    prependEtaLine(workflow,d);
+                  }
+                  if(i>0 && d['arrived-at']!=null && prevData['ended-at']!=null) {
+                      appendLineBetweenPorts(workflow,d,prevData);  
+                  }
+                  
+                  prevData = d;
                 });
 
             // detailDeliveryDataActualGroup
