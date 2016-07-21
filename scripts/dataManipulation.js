@@ -77,7 +77,7 @@ function getVehicleImageName(vehicleInfo,deliveryStatus) {
   // icn- + type + axles + status + priority
 
   //special cases first
-  if (vehicleInfo.type === "emergency") {
+  if (VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === "emergency") {
     if(deliveryStatus === "arrived"){
       vehicleImageName += "emergency-arrived"
     } else if(deliveryStatus ==="denied") {
@@ -86,10 +86,10 @@ function getVehicleImageName(vehicleInfo,deliveryStatus) {
       vehicleImageName += "emergency-enroute"
     }
 
-  } else if (vehicleInfo.type === "construction"    ||
-             vehicleInfo.type === "passnonIMP" ||
-             vehicleInfo.type === "passIMP") {
-    vehicleImageName += vehicleInfo.type + "-";
+  } else if (VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === "construction"    ||
+             VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === "passnonIMP" ||
+             VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === "passIMP") {
+    vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + "-";
 
     if(deliveryStatus === "arrived"){
       vehicleImageName += "arrived"
@@ -104,10 +104,11 @@ function getVehicleImageName(vehicleInfo,deliveryStatus) {
     }
 
   } else {
+
     if(vehicleInfo.axles != null){
-      vehicleImageName += vehicleInfo.type + "-" + vehicleInfo.axles + "w-";
+      vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + "-" + vehicleInfo.axles + "w-";
     } else {
-      vehicleImageName += vehicleInfo.type + "-" + 2 + "w-";
+      vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + "-" + 2 + "w-";
     }
 
     if(deliveryStatus === "arrived"){
@@ -290,8 +291,8 @@ function retrieveDeliveries(){
         },
         success: function(deliveriesAPI) {
             console.log('deliveries recieved from api', deliveriesAPI);
-            // deliveries = deliveriesAPI;
-            deliveries = fakeRealAPIDeliveries;
+            deliveries = deliveriesAPI;
+            // deliveries = fakeRealAPIDeliveries;
             // console.log('replaced with fakereal deliveries');
             // console.table(deliveries);
 
@@ -308,7 +309,7 @@ function retrieveDeliveries(){
               rObj[obj.id] = obj.attributes.name;
               return rObj;
             });
-            
+            // debugger;
             vehiclesAPIData = {};
             var vehiclesArray = deliveries.included.filter(filterByVehicles);
             for (var i = 0; i < vehiclesArray.length; i++) {
@@ -316,6 +317,11 @@ function retrieveDeliveries(){
               vehiclesAPIData[vehicle.id] = vehicle.attributes;
               // vehiclesAPIData[]
             };
+            console.log(vehiclesArray);
+            for (var i = 0; i < vehiclesArray.length; i++) {
+              console.log(vehiclesArray[i].attributes['vehicle-type']);;
+            };
+            debugger
 
             pocsAPIData = {};
             var pocsArray = deliveries.included.filter(filterByPocs);
