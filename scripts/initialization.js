@@ -56,11 +56,13 @@ var VEHICLE_TYPE_TO_IMG = {
                     "common_carrier": "common",
                     "bulk_materials": "bulk",
                     "radioactive":"rad",
-                    null:"null"
-                     // ?:"construction", 
-                     // ?:"emergency",
-                     // ?:"passIMP",
-                     // ?:"passnonIMP",
+                    "emergency":"emergency",
+                    "construction":"construction",
+                    "passenger_imp":"passIMP",
+                    "passenger_non_imp":"passnonIMP",
+                    "radioactivehic":"radioactivehic",/need
+                    "hazmat":"hazmat",//need
+                    "null":"null",
                     };
 
 var pollrate = 2455000;
