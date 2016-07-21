@@ -51,13 +51,25 @@ var stationAcronyms = {
                   5:"PA",
                   6:"EX"
 }
-var stationOrder =  [
-                      1,//Tatooine
-                      2,//Death Star
-                      3 //Great Temple
-                    ]
+var VEHICLE_TYPE_TO_IMG = {
+                    "non_common_carrier": "noncommon",
+                    "common_carrier": "common",
+                    "bulk_materials": "bulk",
+                    "radioactive":"rad",
+                    "emergency":"emergency",
+                    "construction":"construction",
+                    "passenger_imp":"passIMP",
+                    "passenger_non_imp":"passnonIMP",
+                    "radioactivehic":"radioactivehic",//need
+                    "hazmat":"hazmat",//need
+                    "null":"null",
+                    };
+
 var pollrate = 2455000;
-var url = 'https://exelon-api.herokuapp.com/v1/';
+// var url = 'https://exelon-api.herokuapp.com/v1/';
+var url = 'https://exelon-api-staging.herokuapp.com/v1/';
+// var url = 'https://exelon-api-qa.herokuapp.com/v1/';
+// var url = 'https://exelon-api-production.herokuapp.com/v1/';
 var siteId = 1; //limerick
 var aheadOrBehindPct = .25;  // if behind .25 estimated time its longer.   if ahead by .25.. its faster
 var titleHeight = 83;
@@ -70,7 +82,7 @@ var vpStartHours   = (outerWidth/2)/(xAxisWidth/48);  //startHours is the time w
 console.log('vpStartHours',vpStartHours);
 var unixStartHours = unixHour * vpStartHours;
 var now            = new Date(Date.now());
-now                = new Date(2016, 5, 20,9,30);// used for testing - june 20 2016 at 13:30 (some timezone..)
+// now                = new Date(2016, 5, 20,9,30);// used for testing - june 20 2016 at 13:30 (some timezone..)
 var nowYear        = now.getFullYear();
 var nowMonth       = now.getMonth();
 var nowDay         = now.getDate();

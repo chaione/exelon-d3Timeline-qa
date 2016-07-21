@@ -10,6 +10,7 @@ function compare(a,b) {
 function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
   var result={};
   var eventsArray = deliveries.included.filter(filterByEvents);
+
   //organize all events to have their id as their key
   var eventsAPIData = eventsArray.reduce(function(result, item, currIndex) {
     item.attributes.deliveryId = parseInt(item.relationships.eventable.data.id);
@@ -17,17 +18,18 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
     result[item.id] = item.attributes;
     return result;
   }, {});
-  console.log(eventsAPIData);
-    //add the endTime
+
+  //add the endTime
   for(key in eventsAPIData){
     var temp = eventsAPIData[key];
-    if(temp.isRequest){
+    if(temp['is-request']){
       temp.endTimestamp = null;
       for(key in eventsAPIData){
         var temp2 = eventsAPIData[key];
-        if(temp.uuid == temp2.uuid && temp2.isRequest===false)
+        if(temp.uuid == temp2.uuid && temp2['is-request']===false)
         {
           temp.endTimestamp = new Date(temp2['created-at']);
+          console.log('FOUNDONE');
           console.log(temp.uuid);
           console.log(temp.timestamp );
           console.log(temp.endTimestamp);
@@ -51,7 +53,7 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
   for(key in eventsAPIData) {
     var temp = eventsAPIData[key];
     // i have all events for all the deliveries.  Im only storing the requests
-    if(temp.isRequest) {
+    if(temp['is-request']) {
       if(temp.deliveryId in result) {
         result[temp.deliveryId]['events'].push(temp);
         // why -1?
@@ -77,7 +79,7 @@ function getVehicleImageName(vehicleInfo,deliveryStatus) {
   // icn- + type + axles + status + priority
 
   //special cases first
-  if (vehicleInfo.type === "emergency") {
+  if (VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === "emergency") {
     if(deliveryStatus === "arrived"){
       vehicleImageName += "emergency-arrived"
     } else if(deliveryStatus ==="denied") {
@@ -86,10 +88,10 @@ function getVehicleImageName(vehicleInfo,deliveryStatus) {
       vehicleImageName += "emergency-enroute"
     }
 
-  } else if (vehicleInfo.type === "construction"    ||
-             vehicleInfo.type === "passnonIMP" ||
-             vehicleInfo.type === "passIMP") {
-    vehicleImageName += vehicleInfo.type + "-";
+  } else if (VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === "construction"    ||
+             VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === "passnonIMP" ||
+             VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === "passIMP") {
+    vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + "-";
 
     if(deliveryStatus === "arrived"){
       vehicleImageName += "arrived"
@@ -104,10 +106,11 @@ function getVehicleImageName(vehicleInfo,deliveryStatus) {
     }
 
   } else {
+
     if(vehicleInfo.axles != null){
-      vehicleImageName += vehicleInfo.type + "-" + vehicleInfo.axles + "w-";
+      vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + "-" + vehicleInfo.axles + "w-";
     } else {
-      vehicleImageName += vehicleInfo.type + "-" + 2 + "w-";
+      vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + "-" + 2 + "w-";
     }
 
     if(deliveryStatus === "arrived"){
@@ -134,7 +137,7 @@ function filterByDeliveries(includedObj) {
 }
 
 function filterEventByIsRequest(includedEvent) {
-  if (includedEvent.isRequest == "events") {
+  if (includedEvent['is-request'] == "events") {
     return true;
   } else {
     return false;
@@ -194,12 +197,7 @@ function processApiData(workflowsData){
     var vehicleInfo = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];
     var deliveryStatus = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
     delivery.vehicleType = getVehicleImageName(vehicleInfo,deliveryStatus);
-    // delivery.pocName = pocsAPIData[parseInt(delivery.)]
-    // delivery.vehicleType = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id];//yea sorry
   });
-  // console.log(deliveriesData);
-  // debugger;
-  //add x y data to display on chart
   
   deliveriesData      = updateCurrentStationCalc(deliveriesData);
 
@@ -224,16 +222,11 @@ function processApiData(workflowsData){
     for (var j = 0; j < tempStation.values.length; j++) {
       var tempDelivery = tempStation.values[j];
 
-      // if(!deliveryyIndexInfo){deliveryyIndexInfo = [];}
-
       deliveryyIndexInfo.push({
         status:deliveriesAPIData[parseInt(tempDelivery.key)].attributes.status,
         deliveryId:tempDelivery.key,
         yIndex:tempDelivery.yIndex
       })
-      // deliveryyIndexInfo[tempDelivery.yIndex]={};
-      // deliveryyIndexInfo[tempDelivery.yIndex].status = deliveriesAPIData[parseInt(tempDelivery.key)].attributes.status;
-      // deliveryyIndexInfo[tempDelivery.yIndex].deliveryId = tempDelivery.key;
 
     };
   };
@@ -247,33 +240,7 @@ function getDeliveryyIndexAndData(element, index, array) {
 
 function resize() {
   console.log('resize');
-  // var deliveriesData = d3.nest()  //group by delivery
-  //       .key(function(d) { return d.deliveryId; })
-  //       .entries(workflowsData);
 
-  // //add fake truck to each
-  // deliveriesData.forEach(function(delivery) {
-  //   var type = Math.random();
-  //   if (type <.5){
-  //     delivery.vehicleType = 'icn-vehicle-bulk.png';
-  //   } else if(type < .75){
-  //     delivery.vehicleType = 'icn-vehicle-common.png';
-  //   } else {
-  //     delivery.vehicleType = 'icn-vehicle-noncommon.png';
-  //   }
-  // });
-
-  // deliveriesData      = updateCurrentStationCalc(deliveriesData);
-  // stationCounts       = stationCountCalc(deliveriesData);                                   // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  // stationStackedCount = stationStackedCountCalc(stationCounts);                             // [7, 12, 17, 18, 22, 23, 24, 25]
-  // stationStacked      = stationStackedCalc(stationCounts,stationStackedCount,stations);     // [{name:EnRoute, y:7,y0:0},Object...]
-  // var deliveriesDataSorted= deliveriesData.sort(compare);//is this necesary
-
-  // stationData = d3.nest() // groupByStation
-  //     .key(function(d) { return d.currentStation; })
-  //     .sortValues(function(a,b) { return b.values[0].endTime - a.values[0].endTime; })
-  //     .entries(deliveriesDataSorted);
-  // stationData = stackDeliveriesCalc(stationStackedCount,stationData);
   removeDetail();
   render(stationData);
 }
@@ -290,10 +257,7 @@ function retrieveDeliveries(){
         },
         success: function(deliveriesAPI) {
             console.log('deliveries recieved from api', deliveriesAPI);
-            // deliveries = deliveriesAPI;
-            deliveries = fakeRealAPIDeliveries;
-            // console.log('replaced with fakereal deliveries');
-            // console.table(deliveries);
+            deliveries = deliveriesAPI;
 
             deliveriesAPIData = {};
             var deliveriesArray = deliveries.data.filter(filterByDeliveries);
@@ -308,13 +272,12 @@ function retrieveDeliveries(){
               rObj[obj.id] = obj.attributes.name;
               return rObj;
             });
-            
+
             vehiclesAPIData = {};
             var vehiclesArray = deliveries.included.filter(filterByVehicles);
             for (var i = 0; i < vehiclesArray.length; i++) {
               var vehicle = vehiclesArray[i];
               vehiclesAPIData[vehicle.id] = vehicle.attributes;
-              // vehiclesAPIData[]
             };
 
             pocsAPIData = {};
@@ -322,7 +285,6 @@ function retrieveDeliveries(){
             for (var i = 0; i < pocsArray.length; i++) {
               var poc = pocsArray[i];
               pocsAPIData[poc.id] = poc.attributes;
-              // vehiclesAPIData[]
             };
             
 
@@ -332,7 +294,6 @@ function retrieveDeliveries(){
             // },
             // 'delivery2':
             eventsReqAndRespByDeliveryAPIData = calculatEeventsReqAndRespByDeliveryAPIData(deliveries);
-            console.log(eventsReqAndRespByDeliveryAPIData);
 
             var apiWorkflows = deliveries.included.filter(filterByWorkflows);
             apiWorkflows = apiWorkflows.map(function(workflow){
@@ -347,8 +308,6 @@ function retrieveDeliveries(){
               workflow.attributes['nonsearch-end'] = getNullOrDate(workflow.attributes['nonsearch-end']);
               workflow.attributes['search-end'] = getNullOrDate(workflow.attributes['search-end']);
 
-              
-
               //determine state
               if(workflow.attributes.eta < workflow.attributes['arrived-at']) {
                 workflow.attributes.state = 'late';
@@ -361,7 +320,7 @@ function retrieveDeliveries(){
               return workflow.attributes;
             });
             console.log('imported workflows',apiWorkflows);
-            // debugger;
+
             processApiData(apiWorkflows)
         }
       });

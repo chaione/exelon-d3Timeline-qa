@@ -548,7 +548,13 @@ function detailCalculateDelay(delivery){
         return 0;
     }
     if(delivery.currentStation === 6){ //exited
-        currentWF = delivery.values[4];//get last wf
+        // currentWF = delivery.values[4];//get last wf
+        currentWF = delivery.values[delivery.values.length-1];//get last wf
+        // debugger
+        if(currentWF == null){
+            debugger;
+        }
+
         var a = currentWF.eta.getTime() + currentWF["estimated-processing-time"]*60*1000; 
         var b = currentWF['ended-at'] - a ;
         return Math.round(b / 1000 / 60);

@@ -1618,7 +1618,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T13:03:40.921Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": "2",
         // "senderId": 1,
         "role":"POC"
@@ -1636,7 +1636,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T13:44:56.921Z",
-        "isRequest": false,
+        "is-request": false,
         "uuid": "2"
       },
       "relationships": {
@@ -1655,7 +1655,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T13:46:00.000Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": "4",
         // "senderId": 2
         "role":"D10"
@@ -1674,7 +1674,7 @@ var fakeRealAPIDeliveries =
       "attributes": {
                 "uuid": "4",
         "created-at": "2016-06-20T13:48:40.921Z",
-        "isRequest": false
+        "is-request": false
       },
       "relationships": {
         "eventable": {
@@ -1689,7 +1689,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T14:23:40.921Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": null,
         // "senderId": 17
         "role":"POC"
@@ -1710,7 +1710,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T08:05:02.000Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": "6",
         // "senderId": 4
         "role":"D10"
@@ -1728,7 +1728,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T09:05:02.000Z",
-        "isRequest": false,
+        "is-request": false,
         "uuid": "6",
         "role":"D10"
       },
@@ -1745,7 +1745,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T11:22:43.921Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": "8",
         // "senderId": 5
         "role":"POC"
@@ -1763,7 +1763,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T11:26:43.921Z",
-        "isRequest": false,
+        "is-request": false,
         "uuid": "8",
         "role":"D10"
       },
@@ -1780,7 +1780,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T12:19:43.921Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": "10",
         // "senderId": 5
         "role":"D10"
@@ -1798,7 +1798,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T12:21:43.921Z",
-        "isRequest": false,
+        "is-request": false,
         "uuid": "10"
       },
       "relationships": {
@@ -1818,7 +1818,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T10:22:43.921Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": "12",
         // "senderId": 6
         "role":"Officer"
@@ -1836,7 +1836,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T10:29:43.921Z",
-        "isRequest": false,
+        "is-request": false,
         "uuid": "12"
       },
       "relationships": {
@@ -1852,7 +1852,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T10:30:13.921Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": "14",
         // "senderId": 6
         "role":"D10"
@@ -1870,7 +1870,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T10:33:43.921Z",
-        "isRequest": false,
+        "is-request": false,
                 "uuid": "14"
       },
       "relationships": {
@@ -1891,7 +1891,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T12:58:43.921Z",
-        "isRequest": true,
+        "is-request": true,
         "uuid": "16",
         // "senderId": 7
         "role":"POC"
@@ -1909,7 +1909,7 @@ var fakeRealAPIDeliveries =
       "type": "events",
       "attributes": {
         "created-at": "2016-06-20T13:22:43.921Z",
-        "isRequest": false,
+        "is-request": false,
                 "uuid": "16",
         "acceptedResponseId": null,
         "role":"POC"
