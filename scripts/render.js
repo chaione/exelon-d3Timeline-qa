@@ -217,10 +217,18 @@ function render(data){
       .on("click", function(delivery) {
           displayDetail(delivery);
       });
+  
 
+  // console.log(eventsReqAndRespByDeliveryAPIData);
+  // debugger;
   var communicationSelectAll = deliveriesSelectAllG.selectAll(".communicationLine").data(function(d){
-    return eventsReqAndRespByDeliveryAPIData[d.key].events;
+    if(d.key in eventsReqAndRespByDeliveryAPIData){  //no events for a delivery
+      return eventsReqAndRespByDeliveryAPIData[d.key].events;
+    } else {
+      return [];
+    }
   });
+
   var communicationGroup = communicationSelectAll.enter().append("line")
   communicationGroup
     .each(function(d){

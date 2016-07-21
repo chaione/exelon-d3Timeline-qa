@@ -60,7 +60,7 @@ var VEHICLE_TYPE_TO_IMG = {
                     "construction":"construction",
                     "passenger_imp":"passIMP",
                     "passenger_non_imp":"passnonIMP",
-                    "radioactivehic":"radioactivehic",/need
+                    "radioactivehic":"radioactivehic",//need
                     "hazmat":"hazmat",//need
                     "null":"null",
                     };
@@ -68,6 +68,8 @@ var VEHICLE_TYPE_TO_IMG = {
 var pollrate = 2455000;
 // var url = 'https://exelon-api.herokuapp.com/v1/';
 var url = 'https://exelon-api-staging.herokuapp.com/v1/';
+// var url = 'https://exelon-api-qa.herokuapp.com/v1/';
+// var url = 'https://exelon-api-production.herokuapp.com/v1/';
 var siteId = 1; //limerick
 var aheadOrBehindPct = .25;  // if behind .25 estimated time its longer.   if ahead by .25.. its faster
 var titleHeight = 83;
