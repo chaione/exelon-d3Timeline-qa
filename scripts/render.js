@@ -37,29 +37,7 @@ function moveXAxis(a,b) {
   if(isDetailDisplayed){
     detailDeliveryDataGroup.attr("transform", "translate(" + [eventxTranslation,detailDeliveryRectY] + ")scale(1)");
   }
-    // console.log('stationHeight: ' + stationHeight + ' outerHeight: ' + outerHeight + ' panBounds.bottom: '+ panBounds.bottom + ' eventyTranslation: ' + eventyTranslation);
 
-  // if (panBounds.left > eventxTranslation || eventxTranslation > panBounds.right || eventyTranslation > panBounds.top || eventyTranslation < panBounds.bottom ) {
-  //   var maxShiftFromTop = stationHeight > outerHeight?panBounds.bottom:0;
-  //   var translation = [
-  //     Math.max(Math.min(eventxTranslation, panBounds.right),  panBounds.left),
-  //     Math.max(Math.min(eventyTranslation, panBounds.top),    maxShiftFromTop)
-  //   ];
-  //   console.log('eventyTranslation',eventyTranslation);
-  //   console.log('panBounds.top',panBounds.top);
-  //   console.log('maxShiftFromTop',maxShiftFromTop);
-  //   deliveriesGroup.attr("transform", "translate(" + [translation[0],translation[1]] + ")scale(1)");
-  //   stationsGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
-  //   delieveryStaticGroup.attr("transform", "translate(" + [0,translation[1]] + ")scale(1)");
-    
-  //   xAxisGroup.attr("transform", "translate(" + [translation[0],innerHeight] + ")scale(1)");
-
-  //   if(isDetailDisplayed){
-  //     detailDeliveryDataGroup.attr("transform", "translate(" + [translation[0],detailDeliveryRectY] + ")scale(1)");
-  //   }
-
-  //   xAxisTranslation.translate(translation);
-  // }
 }
 
 function render(data){
@@ -181,7 +159,6 @@ function render(data){
 
   // Setup Workflows
   var workflowsSelectAll = deliveriesSelectAllG.selectAll(".workflow").data(function(d){
-    // console.log(d);
     return d.values;
   });
   var prevData = {};
@@ -218,9 +195,6 @@ function render(data){
           displayDetail(delivery);
       });
   
-
-  // console.log(eventsReqAndRespByDeliveryAPIData);
-  // debugger;
   var communicationSelectAll = deliveriesSelectAllG.selectAll(".communicationLine").data(function(d){
     if(d.key in eventsReqAndRespByDeliveryAPIData){  //no events for a delivery
       return eventsReqAndRespByDeliveryAPIData[d.key].events;
