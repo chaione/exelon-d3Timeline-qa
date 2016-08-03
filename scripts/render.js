@@ -27,7 +27,7 @@ function moveXAxis(a,b) {
   }
   previousYTranslation = eventyTranslation;
   detailStartingX = eventxTranslation;
-  
+
   deliveriesGroup.attr("transform", "translate(" + [eventxTranslation,eventyTranslation] + ")scale(1)");
 
   stationsGroup.attr("transform", "translate(" + [0,eventyTranslation] + ")scale(1)");
@@ -45,10 +45,10 @@ function render(data){
 
   outerWidth  = document.documentElement.clientWidth;
   outerHeight = document.documentElement.clientHeight - 83;
-  
+
   innerWidth     = outerWidth   - margin.left - margin.right;
   innerHeight    = outerHeight  - margin.top  - margin.bottom;
-  
+
   stationHeight = (stationStacked[stationStackedCount.length-1].y0*rowHeight) +
                   (stationStacked[stationStackedCount.length-1].deliveryCount * rowHeight);
   panBounds = { top:    0,
@@ -173,9 +173,9 @@ function render(data){
         }
 
         if(i>0 && d['arrived-at']!=null && prevData['ended-at']!=null) {
-            appendLineBetweenPorts(workflow,d,prevData);  
+            appendLineBetweenPorts(workflow,d,prevData);
         }
-        
+
         prevData = d;
       });
 
@@ -194,7 +194,7 @@ function render(data){
       .on("click", function(delivery) {
           displayDetail(delivery);
       });
-  
+
   var communicationSelectAll = deliveriesSelectAllG.selectAll(".communicationLine").data(function(d){
     if(d.key in eventsReqAndRespByDeliveryAPIData){  //no events for a delivery
       return eventsReqAndRespByDeliveryAPIData[d.key].events;
@@ -211,11 +211,11 @@ function render(data){
           eventItem
             .attr("x1", function(d,i) {return xScale(d['timestamp']); })
             .attr("y1", 10)
-            .attr("x2", function(d,i) { 
+            .attr("x2", function(d,i) {
                 if(d['endTimestamp']===null){
                     return xScale(now);
                 }else {
-                    return xScale(d['endTimestamp']); 
+                    return xScale(d['endTimestamp']);
                 }
             })
             .attr("y2", 10)
@@ -262,7 +262,7 @@ function appendWorkflow(workflow,d){
   var EPT          = d['estimated-processing-time']
   var oneMinute    = 1000*60;
 
-  if (d.step === 1 || d.step === 3) { //Has Substeps--------------------------------------------------------------
+  if (d.step === 1 || d.step === 3) { // Has Substeps--------------------------------------------------------------
     if(arrivedAt === null && endedAt === null) { //workflow hasnt started yet
       workflow.append("line")//nonsearch notreached
           .attr("x1", function(d,i) { return xScale(new Date(d.eta.getTime() + currentDeliveryDelayById[d.deliveryId]*60000));})
@@ -286,11 +286,11 @@ function appendWorkflow(workflow,d){
 
     } else if(arrivedAt != null && endedAt === null) { //current workflow
       workflow = appendCurrentWorkflowWithSubsteps(workflow,d);
-     
+
     } else if(arrivedAt != null && endedAt != null) {// completed workflow
-      var substep1State = substepState(arrivedAt,nonsearchEnd,nonsearchEPT) 
-      var substep2State = substepState(nonsearchEnd,searchEnd,searchEPT) 
-      var substep3State = substepState(searchEnd,endedAt,releaseEPT) 
+      var substep1State = substepState(arrivedAt,nonsearchEnd,nonsearchEPT)
+      var substep2State = substepState(nonsearchEnd,searchEnd,searchEPT)
+      var substep3State = substepState(searchEnd,endedAt,releaseEPT)
 
       workflow.append("line")//substep 1
           .attr("x1", function(d,i) { return xScale(arrivedAt); })
@@ -298,8 +298,8 @@ function appendWorkflow(workflow,d){
           .attr("x2", function(d,i) { return xScale(nonsearchEnd-60000); })
           .attr("y2", function(d,i) { return 0;})
           .attr("class", function(d){
-            if(substep1State === 1) {return "workflow late";} 
-            else if(substep1State === -1) {return "workflow ahead";} 
+            if(substep1State === 1) {return "workflow late";}
+            else if(substep1State === -1) {return "workflow ahead";}
             else {return "workflow";}
           });
 
@@ -309,8 +309,8 @@ function appendWorkflow(workflow,d){
           .attr("x2", function(d,i) { return xScale(searchEnd-60000); })
           .attr("y2", function(d,i) { return 0;})
           .attr("class", function(d){
-             if(substep2State === 1) {return "workflow late";} 
-             else if(substep2State === -1) {return "workflow ahead";} 
+             if(substep2State === 1) {return "workflow late";}
+             else if(substep2State === -1) {return "workflow ahead";}
              else {return "workflow";}
           });
 
@@ -320,8 +320,8 @@ function appendWorkflow(workflow,d){
           .attr("x2", function(d,i) { return xScale(endedAt); })
           .attr("y2", function(d,i) { return 0;})
           .attr("class", function(d){
-            if(substep3State === 1) {return "workflow late";} 
-            else if(substep3State === -1) {return "workflow ahead";} 
+            if(substep3State === 1) {return "workflow late";}
+            else if(substep3State === -1) {return "workflow ahead";}
             else {return "workflow";
             }
           });
@@ -513,7 +513,7 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
     currentWorkflow.append("line")//search notreached
         .attr("x1", function(d,i) { return xScale(new Date(d.eta).getTime() + nonsearchEPT*oneMinute-60000); })
         .attr("y1", function(d,i) { return 0;})
-        .attr("x2", function(d,i) { return xScale(new Date(d.eta).getTime() + 
+        .attr("x2", function(d,i) { return xScale(new Date(d.eta).getTime() +
                                           nonsearchEPT *oneMinute +
                                           searchEPT*oneMinute -
                                           60000); })
@@ -521,7 +521,7 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
         .attr("class", "workflow notReached");
 
     currentWorkflow.append("line")//release notreached
-        .attr("x1", function(d,i) { return xScale(new Date(d.eta).getTime() + 
+        .attr("x1", function(d,i) { return xScale(new Date(d.eta).getTime() +
                                           nonsearchEPT *oneMinute +
                                           searchEPT*oneMinute -
                                           60000); })
@@ -529,15 +529,15 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
         .attr("y2", function(d,i) { return 0;})
         .attr("class", "workflow notReached");
   } else if (currentSubStep === 2) {
-    var substep1State = substepState(arrivedAt,nonsearchEnd,nonsearchEPT) 
+    var substep1State = substepState(arrivedAt,nonsearchEnd,nonsearchEPT)
     currentWorkflow.append("line")//substep 1 complted
         .attr("x1", function(d,i) { return xScale(arrivedAt); })
         .attr("y1", function(d,i) { return 0;})
         .attr("x2", function(d,i) { return xScale(nonsearchEnd-60000); })
         .attr("y2", function(d,i) { return 0;})
         .attr("class", function(d){
-          if(substep1State === 1) {return "workflow late";} 
-          else if(substep1State === -1) {return "workflow ahead";} 
+          if(substep1State === 1) {return "workflow late";}
+          else if(substep1State === -1) {return "workflow ahead";}
           else {return "workflow";}
         });
 
@@ -569,7 +569,7 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
         });
 
     currentWorkflow.append("line")//release notreached
-        .attr("x1", function(d,i) { return xScale(new Date(d.eta).getTime() + 
+        .attr("x1", function(d,i) { return xScale(new Date(d.eta).getTime() +
                                           nonsearchEPT *oneMinute +
                                           searchEPT*oneMinute -
                                           60000); })
@@ -577,16 +577,16 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
         .attr("y2", function(d,i) { return 0;})
         .attr("class", "workflow notReached");
   } else if (currentSubStep === 3) {
-    var substep1State = substepState(arrivedAt,nonsearchEnd,nonsearchEPT) 
-    var substep2State = substepState(nonsearchEnd,searchEnd,searchEPT) 
+    var substep1State = substepState(arrivedAt,nonsearchEnd,nonsearchEPT)
+    var substep2State = substepState(nonsearchEnd,searchEnd,searchEPT)
     currentWorkflow.append("line")//substep 1
         .attr("x1", function(d,i) { return xScale(arrivedAt); })
         .attr("y1", function(d,i) { return 0;})
         .attr("x2", function(d,i) { return xScale(nonsearchEnd-60000); })
         .attr("y2", function(d,i) { return 0;})
         .attr("class", function(d){
-          if(substep1State === 1) {return "workflow late";} 
-          else if(substep1State === -1) {return "workflow ahead";} 
+          if(substep1State === 1) {return "workflow late";}
+          else if(substep1State === -1) {return "workflow ahead";}
           else {return "workflow";}
         });
 
@@ -596,8 +596,8 @@ function appendCurrentWorkflowWithSubsteps(currentWorkflow,d){
         .attr("x2", function(d,i) { return xScale(searchEnd-60000); })
         .attr("y2", function(d,i) { return 0;})
         .attr("class", function(d){
-           if(substep2State === 1) {return "workflow late";} 
-           else if(substep2State === -1) {return "workflow ahead";} 
+           if(substep2State === 1) {return "workflow late";}
+           else if(substep2State === -1) {return "workflow ahead";}
            else {return "workflow";}
         });
 
@@ -649,8 +649,8 @@ function substepState(stepStartTime,stepEndtime,estimatedTimeInMinutes){//if its
   var difference = (stepEndtime - stepStartTime);
   var estimatedTimeInMS = estimatedTimeInMinutes * 60*1000;
 
-  if(difference > estimatedTimeInMS * (1+aheadOrBehindPct) ){return 1;} 
-  else if(difference < estimatedTimeInMS * (1-aheadOrBehindPct) ){return -1;} 
+  if(difference > estimatedTimeInMS * (1+aheadOrBehindPct) ){return 1;}
+  else if(difference < estimatedTimeInMS * (1-aheadOrBehindPct) ){return -1;}
   else {return 0;}
 }
 

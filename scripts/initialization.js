@@ -32,38 +32,40 @@ var outerWidth  = document.documentElement.clientWidth;
 var outerHeight = document.documentElement.clientHeight - 83;
 console.log(outerWidth);
 console.log(outerHeight);
-var startOfDayHour = 6; //used for fake data
-var stations =   {
-                  0:"En Route",
-                  1:"Sierra One",
-                  2:"Stinger Gate",
-                  3:"Sally Port",
-                  4:"Warehouse",
-                  5:"PA",
-                  6:"Exit"
-                }
-var stationAcronyms = {
-                  0:"ER",
-                  1:"S1",
-                  2:"SG",
-                  3:"SP",
-                  4:"WH",
-                  5:"PA",
-                  6:"EX"
+var startOfDayHour = 6; // used for fake data
+var stations = {
+  0: "En Route",
+  1: "Sierra One",
+  2: "Stinger Gate",
+  3: "Sally Port",
+  4: "Warehouse",
+  5: "PA",
+  6: "Exit"
 }
+var stationAcronyms = {
+  0: "ER",
+  1: "S1",
+  2: "SG",
+  3: "SP",
+  4: "WH",
+  5: "PA",
+  6: "EX"
+}
+
 var VEHICLE_TYPE_TO_IMG = {
-                    "non_common_carrier": "noncommon",
-                    "common_carrier": "common",
-                    "bulk_materials": "bulk",
-                    "radioactive":"rad",
-                    "emergency":"emergency",
-                    "construction":"construction",
-                    "passenger_imp":"passIMP",
-                    "passenger_non_imp":"passnonIMP",
-                    "radioactivehic":"radioactivehic",//need
-                    "hazmat":"hazmat",//need
-                    "null":"null",
-                    };
+  "non_common_carrier": "noncommon",
+  "common_carrier": "common",
+  "bulk_materials": "bulk",
+  "radioactive": "rad",
+  "emergency": "emergency",
+  "construction": "construction",
+  "passenger_imp": "passIMP",
+  "passenger_non_imp": "passnonIMP",
+  "radioactivehic": "rad",
+  "radioactive_hic": "rad",
+  "hazmat": "rad",
+  "null": "null",
+};
 
 var pollrate = 2455000;
 // var url = 'https://exelon-api.herokuapp.com/v1/';
@@ -117,7 +119,7 @@ var deliveries = {}
 
 var panBounds;
 
-var customShapes = { 
+var customShapes = {
   lBook: function(r) {
     var points = [ [0,r], [0,-r], [r,0], [0,r]];
     return d3.svg.line()(points);
@@ -267,7 +269,7 @@ function setupSvgStructure(){
           .attr("height",outerHeight*1.5)
           .attr("fill","url(#fullBGGradient)")
 
-  
+
 
     g = svg.append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
