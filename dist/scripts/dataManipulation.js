@@ -44,10 +44,10 @@ function calculatEeventsReqAndRespByDeliveryAPIData(deliveries){
     }
   };
 
-  //make final obj  
+  //make final obj
   // 'delivery1'{
   //   'events':[event1,event2,...]
-  //   'contacts':[contactId1,contactId2] (now we know which order)  
+  //   'contacts':[contactId1,contactId2] (now we know which order)
   // },
   // 'delivery2':
   for(key in eventsAPIData) {
@@ -198,7 +198,7 @@ function processApiData(workflowsData){
     var deliveryStatus = deliveriesAPIData[parseInt(delivery.key)].attributes.status;
     delivery.vehicleType = getVehicleImageName(vehicleInfo,deliveryStatus);
   });
-  
+
   deliveriesData      = updateCurrentStationCalc(deliveriesData);
 
   stationCounts       = stationCountCalc(deliveriesData);                                   // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
@@ -251,7 +251,7 @@ function retrieveDeliveries(){
 
   $.ajax({
         url:url+'deliveries?filter=all',
-        headers: { 
+        headers: {
           'X-SITE-ID': siteId,
           'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ1NTAzNDQ3Mn0.p8lguJGQHf3aMjQfgLScyEz6_H_1o5IFg0zBV3SnFZM'
         },
@@ -286,11 +286,11 @@ function retrieveDeliveries(){
               var poc = pocsArray[i];
               pocsAPIData[poc.id] = poc.attributes;
             };
-            
+
 
             // 'delivery1'{
             //   'events':[event1,event2,...]
-            //   'contacts':[contactId1,contactId2] (now we know which order)  
+            //   'contacts':[contactId1,contactId2] (now we know which order)
             // },
             // 'delivery2':
             eventsReqAndRespByDeliveryAPIData = calculatEeventsReqAndRespByDeliveryAPIData(deliveries);
@@ -302,7 +302,7 @@ function retrieveDeliveries(){
 
               workflow.attributes.station = workflow.attributes.step;
               workflow.attributes.eta = new Date(workflow.attributes.eta);
-              
+
               workflow.attributes['arrived-at'] = getNullOrDate(workflow.attributes['arrived-at']);
               workflow.attributes['ended-at'] = getNullOrDate(workflow.attributes['ended-at']);
               workflow.attributes['nonsearch-end'] = getNullOrDate(workflow.attributes['nonsearch-end']);
