@@ -69,9 +69,12 @@ var VEHICLE_TYPE_TO_IMG = {
 
 var pollrate = 2455000;
 // var url = 'https://exelon-api.herokuapp.com/v1/';
-var url = 'https://exelon-api-staging.herokuapp.com/v1/';
+// var url = 'https://exelon-api-staging.herokuapp.com/v1/';
 // var url = 'https://exelon-api-qa.herokuapp.com/v1/';
 // var url = 'https://exelon-api-production.herokuapp.com/v1/';
+
+var url = 'https://vsap-ccc-01v.exelonds.com/v1/';
+
 var siteId = 1; //limerick
 var aheadOrBehindPct = .25;  // if behind .25 estimated time its longer.   if ahead by .25.. its faster
 var titleHeight = 83;
