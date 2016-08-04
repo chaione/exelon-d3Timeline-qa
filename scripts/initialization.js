@@ -69,10 +69,14 @@ var VEHICLE_TYPE_TO_IMG = {
 
 var pollrate = 2455000;
 // var url = 'https://exelon-api.herokuapp.com/v1/';
-var url = 'https://exelon-api-staging.herokuapp.com/v1/';
 // var url = 'https://exelon-api-qa.herokuapp.com/v1/';
 // var url = 'https://exelon-api-production.herokuapp.com/v1/';
+
+var url = 'https://exelon-api-staging.herokuapp.com/v1/';
 var siteId = 1; //limerick
+// QA Token
+var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMyMDU5Nn0.CEuKdJVBDvoDOGksBmQWMxsnc7CtV5zp59H7IrxNGhc'
+
 var aheadOrBehindPct = .25;  // if behind .25 estimated time its longer.   if ahead by .25.. its faster
 var titleHeight = 83;
 //Calculated Variables

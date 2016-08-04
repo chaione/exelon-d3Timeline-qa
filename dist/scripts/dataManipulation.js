@@ -253,7 +253,7 @@ function retrieveDeliveries(){
         url:url+'deliveries?filter=all',
         headers: {
           'X-SITE-ID': siteId,
-          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ1NTAzNDQ3Mn0.p8lguJGQHf3aMjQfgLScyEz6_H_1o5IFg0zBV3SnFZM'
+          'Authorization': 'Bearer ' + bearerToken
         },
         success: function(deliveriesAPI) {
             console.log('deliveries recieved from api', deliveriesAPI);

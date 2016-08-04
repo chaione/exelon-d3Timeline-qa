@@ -74,8 +74,9 @@ var pollrate = 2455000;
 // var url = 'https://exelon-api-production.herokuapp.com/v1/';
 
 var url = 'https://vsap-ccc-01v.exelonds.com/v1/';
+var siteId = 10000; //limerick
+var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMxNzQ2MX0.86TwRbaqlfu7pv14NZ6ZF-RZKfUDLXtm9-5_2TGf4Mg'
 
-var siteId = 1; //limerick
 var aheadOrBehindPct = .25;  // if behind .25 estimated time its longer.   if ahead by .25.. its faster
 var titleHeight = 83;
 //Calculated Variables
