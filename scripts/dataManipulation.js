@@ -9,7 +9,7 @@ function compare (a, b) {
 
 function calculatEeventsReqAndRespByDeliveryAPIData (deliveries) {
   var result = {}
-  var eventsArray = deliveries.included.filter(filterByEvents)
+  var eventsArray = _.filter(deliveries.included, {type: 'events'})
 
   // organize all events to have their id as their key
   var eventsAPIData = eventsArray.reduce(function (result, item, currIndex) {
@@ -125,55 +125,8 @@ function getVehicleImageName (vehicleInfo, deliveryStatus) {
   return vehicleImageName
 }
 
-function filterByDeliveries (includedObj) {
-  if (includedObj.type == 'deliveries') {
-    return true
-  } else {
-    return false
-  }
-}
-
 function filterEventByIsRequest (includedEvent) {
   if (includedEvent['is-request'] == 'events') {
-    return true
-  } else {
-    return false
-  }
-}
-
-function filterByEvents (includedObj) {
-  if (includedObj.type == 'events') {
-    return true
-  } else {
-    return false
-  }
-}
-
-function filterByLocations (includedObj) {
-  if (includedObj.type == 'locations') {
-    return true
-  } else {
-    return false
-  }
-}
-
-function filterByVehicles (includedObj) {
-  if (includedObj.type == 'vehicles') {
-    return true
-  } else {
-    return false
-  }
-}
-
-function filterByWorkflows (includedObj) {
-  if (includedObj.type == 'workflows') {
-    return true
-  } else {
-    return false
-  }
-}
-function filterByPocs (includedObj) {
-  if (includedObj.type == 'pocs') {
     return true
   } else {
     return false
@@ -242,7 +195,6 @@ function resize () {
 
 function retrieveDeliveries () {
   console.log('retrieveDeliveries----------')
-  var self = this
 
   $.ajax({
     url: url + 'deliveries?filter=all',
@@ -255,13 +207,13 @@ function retrieveDeliveries () {
       deliveries = deliveriesAPI
 
       deliveriesAPIData = {}
-      var deliveriesArray = deliveries.data.filter(filterByDeliveries)
+      var deliveriesArray = _.filter(deliveries.data, {type: 'deliveries'})
       for (var i = 0; i < deliveriesArray.length; i++) {
         var delivery = deliveriesArray[i]
         deliveriesAPIData[delivery.id] = delivery
       }
 
-      var locations = deliveries.included.filter(filterByLocations)
+      var locations = _.filter(deliveries.included, {type: 'locations'})
       locations = locations.map(function (obj) {
         var rObj = {}
         rObj[obj.id] = obj.attributes.name
@@ -269,14 +221,14 @@ function retrieveDeliveries () {
       })
 
       vehiclesAPIData = {}
-      var vehiclesArray = deliveries.included.filter(filterByVehicles)
+      var vehiclesArray = _.filter(deliveries.included, {type: 'vehicles'})
       for (var i = 0; i < vehiclesArray.length; i++) {
         var vehicle = vehiclesArray[i]
         vehiclesAPIData[vehicle.id] = vehicle.attributes
       }
 
       pocsAPIData = {}
-      var pocsArray = deliveries.included.filter(filterByPocs)
+      var pocsArray = _.filter(deliveries.included, {type: 'pocs'})
       for (var i = 0; i < pocsArray.length; i++) {
         var poc = pocsArray[i]
         pocsAPIData[poc.id] = poc.attributes
@@ -289,7 +241,7 @@ function retrieveDeliveries () {
       // 'delivery2':
       eventsReqAndRespByDeliveryAPIData = calculatEeventsReqAndRespByDeliveryAPIData(deliveries)
 
-      var apiWorkflows = deliveries.included.filter(filterByWorkflows)
+      var apiWorkflows = _.filter(deliveries.included, {type: 'workflows'})
       apiWorkflows = apiWorkflows.map(function (workflow) {
         workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery['data']['id'])
 
@@ -304,9 +256,9 @@ function retrieveDeliveries () {
         // determine state
         if (workflow.attributes.eta < workflow.attributes['arrived-at']) {
           workflow.attributes.state = 'late'
-        }else if (workflow.attributes.eta > workflow.attributes['arrived-at']) {
+        } else if (workflow.attributes.eta > workflow.attributes['arrived-at']) {
           workflow.attributes.state = 'early'
-        }else {
+        } else {
           workflow.attributes.state = 'ontime'
         }
 
