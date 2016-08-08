@@ -4,30 +4,17 @@
   <link href='https://fonts.googleapis.com/css?family=Maven+Pro' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" href="styles.css">
 
-  <script src="scripts/jquery-2.2.2.min.js"></script>
-  <script src="scripts/d3.v3.min.js"></script>
+  <script src="scripts/vendor/jquery-2.2.2.min.js"></script>
+  <script src="scripts/vendor/lodash.4.14.2.min.js"></script>
+  <script src="scripts/vendor/d3.v3.min.js"></script>
+
   <script src="scripts/initialization.js"></script>
   <script src="scripts/helpers.js"></script>
   <script src="scripts/dataManipulation.js"></script>
   <script src="scripts/render.js"></script>
   <script src="scripts/deliveryDetail.js"></script>
-  <script>
-    "use strict";
-    console.log('Version 04 02 2016');
-    var xAxisTranslation = d3.behavior.zoom()
-      .scaleExtent([1, 1])
-      .translate([startingX,0])
-      .on("zoom", moveXAxis);
 
-    //Structure
-    setupSvgStructure();
-
-    //Create Data
-    retrieveDeliveries();
-    setInterval(function() {retrieveDeliveries()},pollrate);
-    window.onresize = resize;
-
-  </script>
+  <Script src="scripts/main.js"></script>
 
   <body>
     <h1 class="title">LIMERICK DASHBOARD</h1>
