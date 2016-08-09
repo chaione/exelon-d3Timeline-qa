@@ -85,20 +85,21 @@ var unixMinute = 1000 * 60
 var vpStartHours = (outerWidth / 2) / (xAxisWidth / 48); // startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
 console.log('vpStartHours', vpStartHours)
 var unixStartHours = unixHour * vpStartHours
-var now = new Date(Date.now())
-// now                = new Date(2016, 5, 20,9,30);// used for testing - june 20 2016 at 13:30 (some timezone..)
-var nowYear = now.getFullYear()
-var nowMonth = now.getMonth()
-var nowDay = now.getDate()
-var nowHours = now.getHours()
-var nowMinutes = now.getMinutes()
-var yesterday = new Date(now)
+var _now = new Date(Date.now())
+// now = new Date(2016, 5, 20,9,30);// used for testing - june 20 2016 at 13:30 (some timezone..)
+console.log('now', _now)
+
+var nowYear = _now.getFullYear()
+var nowMonth = _now.getMonth()
+var nowDay = _now.getDate()
+var nowHours = _now.getHours()
+var nowMinutes = _now.getMinutes()
+var yesterday = new Date(_now)
 yesterday.setDate(yesterday.getDate() - 1)
-var tomorrow = new Date(now)
+var tomorrow = new Date(_now)
 tomorrow.setDate(tomorrow.getDate() + 1)
 
 var isDetailDisplayed = false
-console.log('now', now)
 
 var vehicleShapeH = rowHeight - 10
 var svg,stationsGroup,delieveryStaticGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask

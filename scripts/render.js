@@ -114,18 +114,18 @@ function render (data) {
   xAxisGroup.call(xAxis)
   yAxisGroup.append('line')
     .attr('class', 'yAxis')
-    .attr('x1', xScale(now))
+    .attr('x1', xScale(_now))
     .attr('y1', margin.top)
-    .attr('x2', xScale(now))
+    .attr('x2', xScale(_now))
     .attr('y2', Math.max(stationHeight + xAxisHeight, outerHeight))
   yAxisGroup.append('rect')
-    .attr('x', xScale(now) - (120 / 2))
+    .attr('x', xScale(_now) - (120 / 2))
     .attr('y', 0)
     .attr('width', 120)
     .attr('height', 16)
     .attr('class', 'yAxisDateTimeBox')
   yAxisGroup.append('text')
-    .attr('x', xScale(now))
+    .attr('x', xScale(_now))
     .attr('y', 13)
     .attr('text-anchor', 'middle')
     .text(function (d, i) {return (nowMonth + 1) + '.' + nowDay + '.' + nowYear + ' // ' + nowHours + '.' + nowMinutes})
@@ -135,7 +135,7 @@ function render (data) {
     .attr('d', function (d) { return customShapes['dBook'](4);})
     .attr('class', 'yAxisDateTimeArrow')
     .attr('transform', function (d) {
-      return 'translate(' + xScale(now) + ',' + 16 + ')'
+      return 'translate(' + xScale(_now) + ',' + 16 + ')'
     })
 
   // Setup Stations
@@ -186,7 +186,7 @@ function render (data) {
     .attr('x', -1 * (vehicleShapeH / 2))
     .attr('y', -1 * (vehicleShapeH / 2))
     .attr('class', 'truckIconDiamond')
-    .attr('transform', function (d) {return 'translate(' + xScale(now) + ',' + 0 + ')'})
+    .attr('transform', function (d) {return 'translate(' + xScale(_now) + ',' + 0 + ')'})
     .on('click', function (delivery) {
       displayDetail(delivery)
     })
@@ -209,7 +209,7 @@ function render (data) {
           .attr('y1', 10)
           .attr('x2', function (d, i) {
             if (d['endTimestamp'] === null) {
-              return xScale(now)
+              return xScale(_now)
             }else {
               return xScale(d['endTimestamp'])
             }
@@ -320,7 +320,7 @@ function appendWorkflow (workflow, d) {
       workflow.append('svg:path')
         .attr('d', function (d) { return customShapes['lBook'](4);})
         .attr('class', function (d) {
-          if (arrivedAt < now) {
+          if (arrivedAt < _now) {
             return 'bookEnd notReached'
           }
         })
@@ -331,7 +331,7 @@ function appendWorkflow (workflow, d) {
       workflow.append('svg:path')
         .attr('d', function (d) { return customShapes['rBook'](4);})
         .attr('class', function (d) {
-          if (endedAt < now) {
+          if (endedAt < _now) {
             return 'bookEnd notReached'
           }
         })
@@ -359,7 +359,7 @@ function appendWorkflow (workflow, d) {
       workflow.append('svg:path')
         .attr('d', function (d) { return customShapes['lBook'](4);})
         .attr('class', function (d) {
-          if (arrivedAt < now) {
+          if (arrivedAt < _now) {
             return 'bookEnd notReached'
           }
         })
@@ -370,7 +370,7 @@ function appendWorkflow (workflow, d) {
       workflow.append('svg:path')
         .attr('d', function (d) { return customShapes['rBook'](4);})
         .attr('class', function (d) {
-          if (endedAt < now) {
+          if (endedAt < _now) {
             return 'bookEnd notReached'
           }
         })
@@ -382,7 +382,7 @@ function appendWorkflow (workflow, d) {
       workflow.append('line')
         .attr('x1', function (d, i) { return xScale(arrivedAt); })
         .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(now); })
+        .attr('x2', function (d, i) { return xScale(_now); })
         .attr('y2', function (d, i) { return 0;})
         .attr('class', function (d) {
           if (d.state === 'late') {
@@ -397,7 +397,7 @@ function appendWorkflow (workflow, d) {
       workflow.append('svg:path')
         .attr('d', function (d) { return customShapes['lBook'](4);})
         .attr('class', function (d) {
-          if (arrivedAt < now) {
+          if (arrivedAt < _now) {
             return 'bookEnd notReached'
           }
         })
@@ -407,7 +407,7 @@ function appendWorkflow (workflow, d) {
 
       // on right side of now
       workflow.append('line')
-        .attr('x1', function (d, i) { return xScale(now); })
+        .attr('x1', function (d, i) { return xScale(_now); })
         .attr('y1', function (d, i) { return 0;})
         .attr('x2', function (d, i) { return xScale(new Date(new Date(arrivedAt)).getTime() + EPT * oneMinute - 60000)})
         .attr('y2', function (d, i) { return .001;}) // IMPORTANT  if its flat its not displayed
@@ -464,7 +464,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
     currentWorkflow.append('line')
       .attr('x1', function (d, i) { return xScale(arrivedAt); })
       .attr('y1', function (d, i) { return 0;})
-      .attr('x2', function (d, i) { return xScale(now); })
+      .attr('x2', function (d, i) { return xScale(_now); })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', function (d) {
         return 'workflow'
@@ -472,7 +472,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
 
     // on right side of now
     currentWorkflow.append('line')
-      .attr('x1', function (d, i) { return xScale(now); })
+      .attr('x1', function (d, i) { return xScale(_now); })
       .attr('y1', function (d, i) { return 0;})
       .attr('x2', function (d, i) { return xScale(new Date(new Date(arrivedAt)).getTime() + nonsearchEPT * oneMinute)})
       .attr('y2', function (d, i) { return .001;}) // IMPORTANT  if its flat its not displayed
@@ -521,7 +521,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
     currentWorkflow.append('line') // part of substep 2 (that was is being completed)
       .attr('x1', function (d, i) { return xScale(nonsearchEnd); })
       .attr('y1', function (d, i) { return 0;})
-      .attr('x2', function (d, i) { return xScale(now); })
+      .attr('x2', function (d, i) { return xScale(_now); })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', function (d) {
         return 'workflow'
@@ -529,7 +529,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
 
     // on right side of now
     currentWorkflow.append('line') // future end of substep 2
-      .attr('x1', function (d, i) { return xScale(now); })
+      .attr('x1', function (d, i) { return xScale(_now); })
       .attr('y1', function (d, i) { return 0;})
       .attr('x2', function (d, i) { return xScale(new Date(new Date(arrivedAt)).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute)})
       .attr('y2', function (d, i) { return .001;}) // IMPORTANT  if its flat its not displayed
@@ -579,7 +579,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
     currentWorkflow.append('line') // part of step 3 done
       .attr('x1', function (d, i) { return xScale(searchEnd); })
       .attr('y1', function (d, i) { return 0;})
-      .attr('x2', function (d, i) { return xScale(now); })
+      .attr('x2', function (d, i) { return xScale(_now); })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', function (d) {
         return 'workflow'
@@ -587,7 +587,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
 
     // on right side of now
     currentWorkflow.append('line')
-      .attr('x1', function (d, i) { return xScale(now); })
+      .attr('x1', function (d, i) { return xScale(_now); })
       .attr('y1', function (d, i) { return 0;})
       .attr('x2', function (d, i) { return xScale(new Date(new Date(arrivedAt)).getTime() + EPT * oneMinute)})
       .attr('y2', function (d, i) { return .001;}) // IMPORTANT  if its flat its not displayed
@@ -607,7 +607,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
   currentWorkflow.append('svg:path') // LEFT BOOKEND IS AT BOTTOM SO IT DISPLAYS ON TOP
     .attr('d', function (d) { return customShapes['lBook'](4);})
     .attr('class', function (d) {
-      if (arrivedAt < now) {
+      if (arrivedAt < _now) {
         return 'bookEnd notReached'
       }
     })
