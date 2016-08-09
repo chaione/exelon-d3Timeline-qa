@@ -2,15 +2,15 @@ var pocContacts = ['POC', 'Delta10']
 var inspectionLabels = ['Scheduled', 'Actual']
 
 function displayDetail (delivery) {
-  console.log(delivery)
   delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status
   delivery.arrivedAt = new Date(deliveriesAPIData[parseInt(delivery.key)].attributes['arrive-at'])
-  // console.log('deliveriesAPIData',deliveriesAPIData[parseInt(delivery.key)])
+
   var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)]
-  var pocId = currentDeliveryData['relationships']['primary-poc']['data']['id']
-  delivery.primaryPocName = 'POC ' + pocsAPIData[pocId]['first-name'] + ' ' + pocsAPIData[pocId]['last-name']
+  var pocId = (currentDeliveryData['relationships']['primary-poc']['data'] || {}).id
+
+  delivery.primaryPocName = utils.getPocNameById(pocId)
   delivery.delay = detailCalculateDelay(delivery)
-  delivery.companyName = deliveriesAPIData[parseInt(delivery.key)].attributes['company-name']
+  delivery.companyName = deliveriesAPIData[parseInt(delivery.key)].attributes['company-name'] || ''
   delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery)
 
   // console.log('displayDetail', delivery)
@@ -62,9 +62,8 @@ function displayDetail (delivery) {
     .attr('class', 'detailDeliveryCloseRect')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
     .on('click', function () {
-      removeDetail()
+      dismissDeliveryDetail()
     })
-
 
   var detailDeliveryRect = detailSvg.append('rect')
     .attr('x', 0)
@@ -158,7 +157,12 @@ function displayDetail (delivery) {
     .attr('x', 344 - 5)
     .attr('y', 46)
     .text(function () {
-      if (delivery.delay > 15) {return 'Δ' + delivery.delay}else {return '+' + Math.abs(delivery.delay)}})
+      if (delivery.delay > 15) {
+        return 'Δ' + delivery.delay
+      } else {
+        return '+' + Math.abs(delivery.delay)
+      }
+    })
     .attr('class', function () {
       if (delivery.delay > 15) {return 'detailInfoDelay late'}
       else if (delivery.delay < -15) {return 'detailInfoDelay early'}else {return 'detailInfoDelay'}})
@@ -185,18 +189,18 @@ function displayDetail (delivery) {
   // .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight))
   detailDeliveryYAxisGroup.append('line')
     .attr('class', 'yAxis')
-    .attr('x1', xScale(now))
+    .attr('x1', xScale(_now))
     .attr('y1', 30)
-    .attr('x2', xScale(now))
+    .attr('x2', xScale(_now))
     .attr('y2', Math.max(stationHeight + xAxisHeight, outerHeight))
   detailDeliveryYAxisGroup.append('rect')
-    .attr('x', xScale(now) - (120 / 2))
+    .attr('x', xScale(_now) - (120 / 2))
     .attr('y', 14)
     .attr('width', 120)
     .attr('height', 16)
     .attr('class', 'yAxisDateTimeBox')
   detailDeliveryYAxisGroup.append('text')
-    .attr('x', xScale(now))
+    .attr('x', xScale(_now))
     .attr('y', 27)
     .attr('text-anchor', 'middle')
     .text(function (d, i) {return '3.31.16 // 9:30'})
@@ -206,7 +210,7 @@ function displayDetail (delivery) {
     .attr('d', function (d) { return customShapes['dBook'](4);})
     .attr('class', 'yAxisDateTimeArrow')
     .attr('transform', function (d) {
-      return 'translate(' + xScale(now) + ',' + (30) + ')'
+      return 'translate(' + xScale(_now) + ',' + (30) + ')'
     })
 
   var detailDeliveryDataScheduledGroup = detailDeliveryDataGroup.append('g')
@@ -224,16 +228,16 @@ function displayDetail (delivery) {
         workflow.append('line')
           .attr('x1', function (d, i) { return xScale(d['eta']); })
           .attr('y1', 0)
-          .attr('x2', function (d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 - 60000) })
+          .attr('x2', function (d) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 - 60000) })
           .attr('y2', 0)
           .attr('class', function (d) {
             return 'detailScheduledLine2'
           })
 
         workflow.append('line')
-          .attr('x1', function (d, i) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000) })
+          .attr('x1', function (d, i) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000) })
           .attr('y1', 0)
-          .attr('x2', function (d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 + d['search-estimated-processing-time'] * 60000 - 60000) })
+          .attr('x2', function (d) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 + (d['search-estimated-processing-time'] || 15) * 60000 - 60000) })
           .attr('y2', 0)
           .attr('class', function (d) {
             return 'detailScheduledLine2'
@@ -273,8 +277,8 @@ function displayDetail (delivery) {
         workflow.append('text')
           .attr('x', function (d) { return xScale(d['eta']);})
           .attr('y', -3)
-          .text(function (d, i) { if (d['eta'] > now) {
-              return stationAcronyms[d.station] + '.' + 1
+          .text(function (d, i) { if (d['eta'] > _now) {
+              return _stationAcronyms[d.station] + '.' + 1
             }})
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
@@ -282,7 +286,7 @@ function displayDetail (delivery) {
         workflow.append('text')
           .attr('x', function (d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000) })
           .attr('y', -3)
-          .text(function (d, i) { if (d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 > now) {
+          .text(function (d, i) { if (d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 > _now) {
               return 2
             }})
           .attr('class', 'detailScheduledLabels')
@@ -291,16 +295,20 @@ function displayDetail (delivery) {
         workflow.append('text')
           .attr('x', function (d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 + d['search-estimated-processing-time'] * 60000); })
           .attr('y', -3)
-          .text(function (d, i) { if (d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 + d['search-estimated-processing-time'] * 60000 > now) {
+          .text(function (d, i) {
+            if (d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 + d['search-estimated-processing-time'] * 60000 > _now) {
               return 3
-            }})
+            }
+          })
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
-      }else {
+      } else {
         workflow.append('text')
           .attr('x', function (d) { return xScale(d['eta']); })
           .attr('y', -3)
-          .text(function (d, i) { if (d['eta'] > now) {return stationAcronyms[d.station];}})
+          .text(function (d, i) { if (d['eta'] > _now) {
+            return _stationAcronyms[d.station]
+          }})
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
       }
@@ -336,7 +344,7 @@ function displayDetail (delivery) {
     //     .append("text")
     //     .attr("x", function(d,i) { return xScale(d['arrived-at']); })
     //     .attr("y", 14)
-    //     .text(function(d,i){ if(d['arrived-at']<now){return stationAcronyms[d.station]}})
+    //     .text(function(d,i){ if(d['arrived-at']<now){return _stationAcronyms[d.station]}})
     //     .attr("class","detailActualLabels")
     //     .attr("font-size", 14 + "px")
 
@@ -358,7 +366,7 @@ function displayDetail (delivery) {
       // var oneMinute    = 1000*60
       var workflow = d3.select(this)
 
-      if (d['arrived-at'] < now) {
+      if (d['arrived-at'] < _now) {
         if (d['station'] === 1 || d['station'] === 3) {
           var substep1State = substepState(d['arrived-at'], d['nonsearch-end'], d['nonsearch-estimated-processing-time'])
           var substep2State = substepState(d['nonsearch-end'], d['search-end'], d['search-estimated-processing-time'])
@@ -367,7 +375,7 @@ function displayDetail (delivery) {
             .attr('x', function (d) { return xScale(d['arrived-at']);})
             .attr('y', 14)
             .text(function (d, i) {
-              return stationAcronyms[d.station] + '.' + 1
+              return _stationAcronyms[d.station] + '.' + 1
             })
             .attr('class', function (d) {
               if (substep1State === 1) {return 'detailActualLabels late';}
@@ -375,7 +383,7 @@ function displayDetail (delivery) {
             })
             .attr('font-size', 14 + 'px')
 
-          if (d['nonsearch-end'] < now) {
+          if (d['nonsearch-end'] < _now) {
             workflow.append('text')
               .attr('x', function (d) { return xScale(d['nonsearch-end'])})
               .attr('y', 14)
@@ -387,7 +395,7 @@ function displayDetail (delivery) {
               .attr('font-size', 14 + 'px')
           }
 
-          if (d['search-end'] < now) {
+          if (d['search-end'] < _now) {
             workflow.append('text')
               .attr('x', function (d) { return xScale(d['search-end']) })
               .attr('y', 14)
@@ -402,7 +410,7 @@ function displayDetail (delivery) {
           workflow.append('text')
             .attr('x', function (d) { return xScale(d['arrived-at']); })
             .attr('y', 14)
-            .text(function (d, i) { return stationAcronyms[d.station];})
+            .text(function (d, i) { return _stationAcronyms[d.station];})
             .attr('class', function (d) {
               if (d.state === 'late') {
                 return 'detailActualLabels late'
@@ -427,10 +435,12 @@ function displayDetail (delivery) {
     .attr('x', -1 * (vehicleShapeH / 2))
     .attr('y', -1 * (vehicleShapeH / 2))
     .attr('class', 'truckIconDiamond')
-    .attr('transform', function (d) {return 'translate(' + xScale(now) + ',' + (detailPadding + eventHeight + eventHeight) + ')'})
+    .attr('transform', function (d) {return 'translate(' + xScale(_now) + ',' + (detailPadding + eventHeight + eventHeight) + ')'})
 
-  var deliveryEvents = eventsReqAndRespByDeliveryAPIData[delivery.key].events
-  var deliveryContacts = eventsReqAndRespByDeliveryAPIData[delivery.key].contacts
+  var currentDelivery  = eventsReqAndRespByDeliveryAPIData[delivery.key] || {}
+  var deliveryEvents   = currentDelivery.events || []
+  var deliveryContacts = currentDelivery.contacts || []
+
   var detailDeliveryDataEventsGroup = detailDeliveryDataGroup.append('g')
     .attr('class', 'detailScheduled')
     .attr('transform', 'translate(' + 0 + ',' + (detailPadding + eventHeight * 4) + ')')
@@ -445,7 +455,7 @@ function displayDetail (delivery) {
     .attr('y1', function (d, i) {return eventHeight * deliveryContacts.indexOf(d.role);})
     .attr('x2', function (d, i) {
       if (d['endTimestamp'] === null) {
-        return xScale(now)
+        return xScale(_now)
       }else {
         return xScale(d['endTimestamp'])
       }
@@ -511,10 +521,8 @@ function displayDetail (delivery) {
     .attr('font-size', 14 + 'px')
 }
 
-function removeDetail () {
-  console.log('removeDetail')
+function dismissDeliveryDetail () {
   isDetailDisplayed = false
-  // d3.select("#detailSvg").remove()
   d3.select('#detailSvg').style('opacity', 0.0).remove()
 }
 
@@ -529,8 +537,8 @@ function detailCalculateDelay (delivery) {
 
   if (delivery.currentStation === 0) { // enroute
     currentWF = delivery.values[0] // get last wf
-    if (currentWF.eta < now) {
-      return Math.round((now.getTime() - currentWF.eta.getTime()) / 60000)
+    if (currentWF.eta < _now) {
+      return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
     }
     return 0
   }
@@ -550,7 +558,7 @@ function detailCalculateDelay (delivery) {
   currentWF = delivery.values[delivery.currentStation - 1]
 
   minutesStartingLate = currentWF['arrived-at'] - currentWF['eta']
-  currentDuration = (now - currentWF['arrived-at'])
+  currentDuration = (_now - currentWF['arrived-at'])
   estimatedDuration = currentWF['estimated-processing-time'] * 60 * 1000
   currentStationOverTime = currentDuration - estimatedDuration
   if (currentStationOverTime > 0) {
@@ -558,17 +566,18 @@ function detailCalculateDelay (delivery) {
   }
   return Math.round(minutesStartingLate / 1000 / 60)
 }
+
 function calculateInfoboxCurrStation (delivery) {
   var currentWF = delivery.values[delivery.currentStation - 1]
 
   // leftside of now
   if (delivery.currentStation === 1 || delivery.currentStation === 3) {
     var currentSubStep = calcCurrentSubStep(currentWF)
-    return '(' + stationAcronyms[currentWF.station] + ' ' + currentSubStep + '/3)'
-  }else if (delivery.currentStation === 0 || delivery.currentStation === 6) {
+    return '(' + _stationAcronyms[currentWF.station] + ' ' + currentSubStep + '/3)'
+  } else if (delivery.currentStation === 0 || delivery.currentStation === 6) {
     return ''
   } else {
-    return '(' + stationAcronyms[currentWF.station] + ')'
+    return '(' + _stationAcronyms[currentWF.station] + ')'
   }
 }
 

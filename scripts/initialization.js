@@ -40,7 +40,7 @@ var stations = {
   5: 'PA',
   6: 'Exit'
 }
-var stationAcronyms = {
+var _stationAcronyms = {
   0: 'ER',
   1: 'S1',
   2: 'SG',
@@ -65,12 +65,12 @@ var VEHICLE_TYPE_TO_IMG = {
   'null': 'null'
 }
 
-var pollrate = 2455000
+var _pollRate = 2455000
 // var url = 'https://exelon-api.herokuapp.com/v1/'
 // var url = 'https://exelon-api-qa.herokuapp.com/v1/'
 // var url = 'https://exelon-api-production.herokuapp.com/v1/'
-
 var url = 'https://exelon-api-staging.herokuapp.com/v1/'
+
 var siteId = 1 // limerick
 // QA Token
 var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMyMDU5Nn0.CEuKdJVBDvoDOGksBmQWMxsnc7CtV5zp59H7IrxNGhc'
@@ -114,7 +114,7 @@ var duration, variation, variationMinutes
 var yDeliveryScale
 var deliveriesAPIData; // big one.  has all the details for every delivery by id
 var currentDeliveryDelayById = 12
-var pocsAPIData
+var _pocsAPIData
 var previousYTranslation = 0
 var vehiclesAPIData
 var eventsReqAndRespByDeliveryAPIData

@@ -7,7 +7,7 @@ function compare (a, b) {
     return 0
 }
 
-function calculatEeventsReqAndRespByDeliveryAPIData (deliveries) {
+function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
   var result = {}
   var eventsArray = _.filter(deliveries.included, {type: 'events'})
 
@@ -139,7 +139,7 @@ function isTimeBetweenTime (time, start, end) {
 
 function processApiData (workflowsData) {
   var deliveriesData = d3.nest() // group by delivery
-    .key(function (d) { return d.deliveryId; })
+    .key(function (d) { return d.deliveryId })
     .entries(workflowsData)
 
   // update deliveries w/ data
@@ -189,7 +189,7 @@ function getDeliveryyIndexAndData (element, index, array) {
 function resize () {
   console.log('resize')
 
-  removeDetail()
+  dismissDeliveryDetail()
   render(stationData)
 }
 
@@ -204,6 +204,7 @@ function retrieveDeliveries () {
     },
     success: function (deliveriesAPI) {
       console.log('deliveries recieved from api', deliveriesAPI)
+
       deliveries = deliveriesAPI
 
       deliveriesAPIData = {}
@@ -227,26 +228,25 @@ function retrieveDeliveries () {
         vehiclesAPIData[vehicle.id] = vehicle.attributes
       }
 
-      pocsAPIData = {}
-      var pocsArray = _.filter(deliveries.included, {type: 'pocs'})
-      for (var i = 0; i < pocsArray.length; i++) {
-        var poc = pocsArray[i]
-        pocsAPIData[poc.id] = poc.attributes
-      }
+      _pocsAPIData = {}
+      var pocs = _.filter(deliveries.included, {type: 'pocs'})
+      _.each(pocs, poc => {
+        _pocsAPIData[poc.id] = poc.attributes
+      })
 
       // 'delivery1'{
       //   'events':[event1,event2,...]
       //   'contacts':[contactId1,contactId2] (now we know which order)
       // },
       // 'delivery2':
-      eventsReqAndRespByDeliveryAPIData = calculatEeventsReqAndRespByDeliveryAPIData(deliveries)
+      eventsReqAndRespByDeliveryAPIData = calculateEventsReqAndRespByDeliveryAPIData(deliveries)
 
       var apiWorkflows = _.filter(deliveries.included, {type: 'workflows'})
       apiWorkflows = apiWorkflows.map(function (workflow) {
         workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery['data']['id'])
 
         workflow.attributes.station = workflow.attributes.step
-        workflow.attributes.eta = new Date(workflow.attributes.eta)
+        workflow.attributes.eta = new Date(workflow.attributes.eta || _now)
 
         workflow.attributes['arrived-at'] = getNullOrDate(workflow.attributes['arrived-at'])
         workflow.attributes['ended-at'] = getNullOrDate(workflow.attributes['ended-at'])
@@ -267,9 +267,9 @@ function retrieveDeliveries () {
       console.log('imported workflows', apiWorkflows)
 
       processApiData(apiWorkflows)
+      console.log('----------retrieveDeliveries')
     }
   })
-  console.log('----------retrieveDeliveries')
 }
 
 function stationCountCalc (deliveriesData) { // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
@@ -331,44 +331,42 @@ function stackDeliveriesCalc (stationStackedCount, stationData) { // we set the 
 }
 
 function updateCurrentStationCalc (deliveriesData) { // update every delivery w/ its current station
-  var workflow
   var currentStation = 0
   var isCurrentUpdated = false
-  // var now = new Date(Date.now())
 
-  // assums workflows are in ascending order
   for (var i = 0; i < deliveriesData.length; i++) {
     currentStation = 0
     isCurrentUpdated = false
-    for (var j = 0; j < deliveriesData[i].values.length; j++) {
-      workflow = deliveriesData[i].values[j]
 
+    _.each(deliveriesData[i].values, (workflow) => {
       if (!isCurrentUpdated) {
-        if (workflow['arrived-at'] != null && workflow['ended-at'] === null) {
+        if (workflow['started-at'] !== null && workflow['ended-at'] === null) {
           currentStation = workflow.station
           console.log('setting current station!', currentStation)
           isCurrentUpdated = true
         }
       }
-    }
+    })
 
-    if (currentStation == 1) {
+    if (currentStation === 1) {
       var firstWorkflowOfDelivery = deliveriesData[i].values[0]
 
-      if (firstWorkflowOfDelivery['arrived-at'] > now) {
+      if (firstWorkflowOfDelivery['arrived-at'] > _now) {
         currentStation = 0 // first station
       }
     }
 
-    if (currentStation == 0) {
-      var lastWorkflowOfDelivery = deliveriesData[i].values[deliveriesData[i].values.length - 1]
+    if (currentStation === 0) {
+      var lastWorkflowEndTime = _.last(deliveriesData[i].values)['ended-at']
 
-      if (lastWorkflowOfDelivery['ended-at'] < now) {
-        currentStation = 6 // last station
+      if (lastWorkflowEndTime && lastWorkflowEndTime < _now) {
+        currentStation = 6
       }
     }
+
     deliveriesData[i].currentStation = currentStation
   }
+
   return deliveriesData
 }
 
@@ -385,4 +383,3 @@ function generateCurrentDeliveryDelayById (deliveriesData) {
   console.log(delayData)
   return delayData
 }
-

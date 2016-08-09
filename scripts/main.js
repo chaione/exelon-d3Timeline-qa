@@ -12,5 +12,5 @@ setupSvgStructure()
 
 // Create Data
 retrieveDeliveries()
-setInterval(retrieveDeliveries, pollrate)
+setInterval(retrieveDeliveries, _pollRate)
 window.onresize = resize
