@@ -73,69 +73,6 @@ function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
   return result
 }
 
-function getVehicleImageName (vehicleInfo, deliveryStatus) {
-  var vehicleImageName = 'icn-'
-  // icn- + type + axles + status + priority
-
-  // special cases first
-  if (VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'emergency') {
-    if (deliveryStatus === 'arrived') {
-      vehicleImageName += 'emergency-arrived'
-    } else if (deliveryStatus === 'denied') {
-      vehicleImageName += 'emergency-denied'
-    } else {
-      vehicleImageName += 'emergency-enroute'
-    }
-  } else if (VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'construction' ||
-    VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'passnonIMP' ||
-    VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'passIMP') {
-    vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-'
-
-    if (deliveryStatus === 'arrived') {
-      vehicleImageName += 'arrived'
-    } else if (deliveryStatus === 'denied') {
-      vehicleImageName += 'denied'
-    } else {
-      vehicleImageName += 'enroute'
-    }
-
-    if (vehicleInfo.priority) {
-      vehicleImageName += '-pri'
-    }
-  } else {
-    if (vehicleInfo.axles != null) {
-      vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + vehicleInfo.axles + 'w-'
-    } else {
-      vehicleImageName += VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + 2 + 'w-'
-    }
-
-    if (deliveryStatus === 'arrived') {
-      vehicleImageName += 'arrived'
-    } else if (deliveryStatus === 'denied') {
-      vehicleImageName += 'denied'
-    } else {
-      vehicleImageName += 'enroute'
-    }
-
-    if (vehicleInfo.priority) {
-      vehicleImageName += '-pri'
-    }
-  }
-
-  return vehicleImageName
-}
-
-function filterEventByIsRequest (includedEvent) {
-  if (includedEvent['is-request'] == 'events') {
-    return true
-  } else {
-    return false
-  }
-}
-
-function isTimeBetweenTime (time, start, end) {
-  return start <= time && time <= end
-}
 
 function processApiData (workflowsData) {
   var deliveriesData = d3.nest() // group by delivery
@@ -146,7 +83,7 @@ function processApiData (workflowsData) {
   deliveriesData.forEach(function (delivery) {
     var vehicleInfo = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id]
     var deliveryStatus = deliveriesAPIData[parseInt(delivery.key)].attributes.status
-    delivery.vehicleType = getVehicleImageName(vehicleInfo, deliveryStatus)
+    delivery.vehicleType = utils.getVehicleImageName(vehicleInfo, deliveryStatus)
   })
 
   deliveriesData = updateCurrentStationCalc(deliveriesData)
@@ -189,8 +126,10 @@ function getDeliveryyIndexAndData (element, index, array) {
 function resize () {
   console.log('resize')
 
-  dismissDeliveryDetail()
-  render(stationData)
+  if (stationData) {
+    dismissDeliveryDetail()
+    render(stationData)
+  }
 }
 
 function retrieveDeliveries () {

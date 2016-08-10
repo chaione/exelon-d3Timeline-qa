@@ -50,7 +50,7 @@ var _stationAcronyms = {
   6: 'EX'
 }
 
-var VEHICLE_TYPE_TO_IMG = {
+var _VEHICLE_TYPE_TO_IMG = {
   'non_common_carrier': 'noncommon',
   'common_carrier': 'common',
   'bulk_materials': 'bulk',
