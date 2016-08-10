@@ -181,12 +181,6 @@ function displayDetail (delivery) {
 
   var detailDeliveryYAxisGroup = detailDeliveryDataGroup.append('g')
     .attr('class', 'y axis')
-  // detailDeliveryYAxisGroup.append("line")
-  // .attr("class","yAxis")
-  // .attr("x1", xScale(now))
-  // .attr("y1", -10)
-  // .attr("x2", xScale(now))
-  // .attr("y2", Math.max(stationHeight+ xAxisHeight, outerHeight))
   detailDeliveryYAxisGroup.append('line')
     .attr('class', 'yAxis')
     .attr('x1', xScale(_now))
@@ -203,11 +197,15 @@ function displayDetail (delivery) {
     .attr('x', xScale(_now))
     .attr('y', 27)
     .attr('text-anchor', 'middle')
-    .text(function (d, i) {return '3.31.16 // 9:30'})
+    .text(function (d, i) {
+      return (nowMonth + 1) + '.' + nowDay + '.' + nowYear + ' // ' + nowHours + '.' + nowMinutes
+    })
     .attr('class', 'yAxisDateTimeText')
     .attr('font-size', 14 + 'px')
   detailDeliveryYAxisGroup.append('svg:path')
-    .attr('d', function (d) { return customShapes['dBook'](4);})
+    .attr('d', function (d) {
+      return customShapes['dBook'](4)
+    })
     .attr('class', 'yAxisDateTimeArrow')
     .attr('transform', function (d) {
       return 'translate(' + xScale(_now) + ',' + (30) + ')'
