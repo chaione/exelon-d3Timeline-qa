@@ -242,9 +242,9 @@ function displayDetail (delivery) {
           })
 
         workflow.append('line')
-          .attr('x1', function (d, i) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 + d['search-estimated-processing-time'] * 60000) })
+          .attr('x1', function (d, i) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 + (d['search-estimated-processing-time'] || 15) * 60000) })
           .attr('y1', 0)
-          .attr('x2', function (d) { return xScale(d['eta'].getTime() + d['estimated-processing-time'] * 60000 - 60000) })
+          .attr('x2', function (d) { return xScale(d['eta'].getTime() + (d['estimated-processing-time'] || 15) * 60000 - 60000) })
           .attr('y2', 0)
           .attr('class', function (d) {
             return 'detailScheduledLine2'
@@ -262,7 +262,6 @@ function displayDetail (delivery) {
           })
       }
     })
-
 
   detailDeliveryDataScheduledGroup
     .selectAll('.detailScheduledLabels')
@@ -282,19 +281,19 @@ function displayDetail (delivery) {
           .attr('font-size', 14 + 'px')
 
         workflow.append('text')
-          .attr('x', function (d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000) })
+          .attr('x', function (d) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000) })
           .attr('y', -3)
-          .text(function (d, i) { if (d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 > _now) {
+          .text(function (d, i) { if (d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 > _now) {
               return 2
             }})
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
 
         workflow.append('text')
-          .attr('x', function (d) { return xScale(d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 + d['search-estimated-processing-time'] * 60000); })
+          .attr('x', function (d) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 + (d['search-estimated-processing-time'] || 15) * 60000); })
           .attr('y', -3)
           .text(function (d, i) {
-            if (d['eta'].getTime() + d['nonsearch-estimated-processing-time'] * 60000 + d['search-estimated-processing-time'] * 60000 > _now) {
+            if (d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 + (d['search-estimated-processing-time'] || 15) * 60000 > _now) {
               return 3
             }
           })
@@ -304,9 +303,11 @@ function displayDetail (delivery) {
         workflow.append('text')
           .attr('x', function (d) { return xScale(d['eta']); })
           .attr('y', -3)
-          .text(function (d, i) { if (d['eta'] > _now) {
-            return _stationAcronyms[d.station]
-          }})
+          .text(function (d, i) {
+            if (d['eta'] > _now) {
+              return _stationAcronyms[d.station]
+            }
+          })
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
       }
@@ -352,23 +353,14 @@ function displayDetail (delivery) {
     .enter()
     .append('g')
     .each(function (d) {
-      // console.log('-------------each',d)
-      // var arrivedAt    = d['arrived-at']
-      // var nonsearchEnd = d['nonsearch-end']
-      // var searchEnd    = d['search-end']
-      // var endedAt      = d['ended-at']
-      // var nonsearchEPT = d['nonsearch-estimated-processing-time']
-      // var searchEPT    = d['search-estimated-processing-time']
-      // var releaseEPT   = d['release-estimated-processing-time']
-      // var EPT          = d['estimated-processing-time']
-      // var oneMinute    = 1000*60
       var workflow = d3.select(this)
 
       if (d['arrived-at'] < _now) {
         if (d['station'] === 1 || d['station'] === 3) {
-          var substep1State = substepState(d['arrived-at'], d['nonsearch-end'], d['nonsearch-estimated-processing-time'])
-          var substep2State = substepState(d['nonsearch-end'], d['search-end'], d['search-estimated-processing-time'])
-          var substep3State = substepState(d['search-end'], d['ended-at'], d['release-estimated-processing-time'])
+          var substep1State = substepState(d['arrived-at'], d['nonsearch-end'], d['nonsearch-estimated-processing-time'] || 15)
+          var substep2State = substepState(d['nonsearch-end'], d['search-end'], d['search-estimated-processing-time'] || 15)
+          var substep3State = substepState(d['search-end'], d['ended-at'], d['release-estimated-processing-time'] || 15)
+
           workflow.append('text')
             .attr('x', function (d) { return xScale(d['arrived-at']);})
             .attr('y', 14)
@@ -534,12 +526,15 @@ function detailCalculateDelay (delivery) {
   var currentStationOverTime
 
   if (delivery.currentStation === 0) { // enroute
-    currentWF = delivery.values[0] // get last wf
-    if (currentWF.eta < _now) {
+    currentWF = _.first(delivery.values)
+
+    if (currentWF.eta && currentWF.eta < _now) {
       return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
     }
+
     return 0
   }
+
   if (delivery.currentStation === 6) { // exited
     // currentWF = delivery.values[4]//get last wf
     currentWF = delivery.values[delivery.values.length - 1] // get last wf

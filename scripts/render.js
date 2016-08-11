@@ -48,10 +48,13 @@ function render (data) {
 
   stationHeight = (stationStacked[stationStackedCount.length - 1].y0 * rowHeight) +
     (stationStacked[stationStackedCount.length - 1].deliveryCount * rowHeight)
-  panBounds = { top: 0,
+
+  panBounds = {
+    top: 0,
     right: 0,
     bottom: (-1 * stationHeight) + innerHeight - xAxisHeight,
-  left: (-1 * xAxisWidth) + outerWidth}
+    left: (-1 * xAxisWidth) + outerWidth
+  }
 
   // clear it out (for now... hope to just update some day!)
   svg.remove()
@@ -65,10 +68,10 @@ function render (data) {
   var stationsLabelStationRectSelectAll = stationsLabelSelectAll.selectAll('.stationRect')
 
   stationsLabelStationRectSelectAll
-    .attr('x', function (d, i) { return 0;})
-    .attr('y', function (d, i) { return d.y0 * rowHeight + (rowHeight / 2);})
+    .attr('x', function (d, i) { return 0 })
+    .attr('y', function (d, i) { return d.y0 * rowHeight + (rowHeight / 2) })
     .attr('width', innerWidth)
-    .attr('height', function (d, i) {return d.deliveryCount * rowHeight;})
+    .attr('height', function (d, i) { return d.deliveryCount * rowHeight })
 
   stationsLabelSelectAllG.append('text')
     .attr('x', function (d, i) { return stationTextPadding.left;})
@@ -97,12 +100,12 @@ function render (data) {
     .data(deliveryyIndexInfo)
     .enter()
     .append('text')
-    .attr('x', function (d, i) { return outerWidth - 20})
-    .attr('y', function (d, i) { return yDeliveryScale(d.yIndex + 1) + 6}) // why is the 6 needed???
+    .attr('x', function (d, i) { return outerWidth - 20 })
+    .attr('y', function (d, i) { return yDeliveryScale(d.yIndex + 1) + 6 }) // why is the 6 needed???
     .text(function (d, i) {
       if (d.status === 'denied') {
         return '!! DENYING ENTRY !!'
-      }else {
+      } else {
         return ''
       }
     })
@@ -110,7 +113,7 @@ function render (data) {
     .attr('text-anchor', 'end')
     .attr('font-size', stationTextHeight + 'px')
 
-  // Setup axii
+  // Setup axis
   xAxisGroup.call(xAxis)
   yAxisGroup.append('line')
     .attr('class', 'yAxis')
@@ -118,6 +121,7 @@ function render (data) {
     .attr('y1', margin.top)
     .attr('x2', xScale(_now))
     .attr('y2', Math.max(stationHeight + xAxisHeight, outerHeight))
+
   yAxisGroup.append('rect')
     .attr('x', xScale(_now) - (120 / 2))
     .attr('y', 0)
@@ -128,11 +132,15 @@ function render (data) {
     .attr('x', xScale(_now))
     .attr('y', 13)
     .attr('text-anchor', 'middle')
-    .text(function (d, i) {return (nowMonth + 1) + '.' + nowDay + '.' + nowYear + ' // ' + nowHours + '.' + nowMinutes})
+    .text(function (d, i) {
+      return (nowMonth + 1) + '.' + nowDay + '.' + nowYear + ' // ' + nowHours + '.' + nowMinutes
+    })
     .attr('class', 'yAxisDateTimeText')
     .attr('font-size', 14 + 'px')
   yAxisGroup.append('svg:path')
-    .attr('d', function (d) { return customShapes['dBook'](4);})
+    .attr('d', function (d) {
+      return customShapes['dBook'](4)
+    })
     .attr('class', 'yAxisDateTimeArrow')
     .attr('transform', function (d) {
       return 'translate(' + xScale(_now) + ',' + 16 + ')'
@@ -154,9 +162,10 @@ function render (data) {
     })
 
   // Setup Workflows
-  var workflowsSelectAll = deliveriesSelectAllG.selectAll('.workflow').data(function (d) {
-    return d.values
-  })
+  var workflowsSelectAll = deliveriesSelectAllG.selectAll('.workflow')
+    .data(function (d) {
+      return d.values
+    })
   var prevData = {}
   var workflowsSelectAllG = workflowsSelectAll.enter().append('g')
   // workflowsSelectAll.exit().remove()
@@ -164,11 +173,12 @@ function render (data) {
     .each(function (d, i) {
       var workflow = d3.select(this)
       workflow = appendWorkflow(workflow, d)
-      if (d.step === 1 && d.eta < d['arrived-at']) {
+
+      if (d.step === 1 && d.eta < d['started-at']) {
         prependEtaLine(workflow, d)
       }
 
-      if (i > 0 && d['arrived-at'] != null && prevData['ended-at'] != null) {
+      if (i > 0 && d['started-at'] !== null && prevData['ended-at'] !== null) {
         appendLineBetweenPorts(workflow, d, prevData)
       }
 
@@ -210,7 +220,7 @@ function render (data) {
           .attr('x2', function (d, i) {
             if (d['endTimestamp'] === null) {
               return xScale(_now)
-            }else {
+            } else {
               return xScale(d['endTimestamp'])
             }
           })
@@ -225,6 +235,11 @@ function render (data) {
 
 // RENDER HELPERS
 function prependEtaLine (firstWorkflow, d) {
+  console.log('prepending eta line')
+  console.log(d)
+  console.log(d['eta'])
+  console.log(d['arrived-at'])
+
   firstWorkflow.append('line')
     .attr('x1', function (d, i) { return xScale(d['eta']); })
     .attr('y1', function (d, i) { return 0;})
@@ -239,93 +254,104 @@ function prependEtaLine (firstWorkflow, d) {
       return 'translate(' + xScale(d['eta']) + ',' + 0 + ')'
     })
 }
+
 function appendLineBetweenPorts (workflow, WFData, prevWFData) {
   workflow.append('line')
-    .attr('x1', function (d, i) { return xScale(WFData['arrived-at']); })
-    .attr('y1', function (d, i) { return 0;})
-    .attr('x2', function (d, i) { return xScale(prevWFData['ended-at']); })
-    .attr('y2', function (d, i) { return 0;})
+    .attr('x1', function (d, i) { return xScale(new Date(WFData['started-at'])) })
+    .attr('y1', function (d, i) { return 0 })
+    .attr('x2', function (d, i) { return xScale(prevWFData['ended-at']) })
+    .attr('y2', function (d, i) { return 0 })
     .attr('class', 'workflow betweenPorts')
 }
+
 function appendWorkflow (workflow, d) {
-  var arrivedAt = d['arrived-at']
-  var nonsearchEnd = d['nonsearch-end']
-  var searchEnd = d['search-end']
+  var startedAt = d['started-at']
   var endedAt = d['ended-at']
+
+  var searchEnd = d['search-end']
+  var nonsearchEnd = d['nonsearch-end']
+
   var nonsearchEPT = d['nonsearch-estimated-processing-time']
   var searchEPT = d['search-estimated-processing-time']
   var releaseEPT = d['release-estimated-processing-time']
   var EPT = d['estimated-processing-time']
+
   var oneMinute = 1000 * 60
 
   if (d.step === 1 || d.step === 3) { // Has Substeps--------------------------------------------------------------
-    if (arrivedAt === null && endedAt === null) { // workflow hasnt started yet
+    if (startedAt === null && endedAt === null) { // workflow hasnt started yet
       workflow.append('line') // nonsearch notreached
-        .attr('x1', function (d, i) { return xScale(new Date(d.eta.getTime() + currentDeliveryDelayById[d.deliveryId] * 60000));})
-        .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute - 60000 + currentDeliveryDelayById[d.deliveryId] * 60000); })
-        .attr('y2', function (d, i) { return 0;})
+        .attr('x1', function (d, i) { return xScale(new Date(d.eta.getTime() + currentDeliveryDelayById[d.deliveryId] * 60000)) })
+        .attr('y1', function (d, i) { return 0 })
+        .attr('x2', function (d, i) { return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute - 60000 + currentDeliveryDelayById[d.deliveryId] * 60000) })
+        .attr('y2', function (d, i) { return 0 })
         .attr('class', 'workflow notReached')
 
       workflow.append('line') // search notreached
-        .attr('x1', function (d, i) { return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute + currentDeliveryDelayById[d.deliveryId] * 60000); })
-        .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000 + currentDeliveryDelayById[d.deliveryId] * 60000); })
-        .attr('y2', function (d, i) { return 0;})
+        .attr('x1', function (d, i) {
+          return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute + currentDeliveryDelayById[d.deliveryId] * 60000)
+        })
+        .attr('y1', function (d, i) { return 0 })
+        .attr('x2', function (d, i) {
+          return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000 + currentDeliveryDelayById[d.deliveryId] * 60000)
+        })
+        .attr('y2', function (d, i) { return 0 })
         .attr('class', 'workflow notReached')
 
       workflow.append('line') // release notreached
-        .attr('x1', function (d, i) { return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + currentDeliveryDelayById[d.deliveryId] * 60000); })
-        .attr('x2', function (d, i) { return xScale(new Date(d.eta.getTime() + EPT * oneMinute - 60000 + currentDeliveryDelayById[d.deliveryId] * 60000)); })
-        .attr('y2', function (d, i) { return 0;})
+        .attr('x1', function (d, i) {
+          return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + currentDeliveryDelayById[d.deliveryId] * 60000)
+        })
+        .attr('x2', function (d, i) {
+          return xScale(new Date(d.eta.getTime() + EPT * oneMinute - 60000 + currentDeliveryDelayById[d.deliveryId] * 60000))
+        })
+        .attr('y2', function (d, i) { return 0 })
         .attr('class', 'workflow notReached')
-    } else if (arrivedAt != null && endedAt === null) { // current workflow
+    } else if (startedAt !== null && endedAt === null) { // current workflow
       workflow = appendCurrentWorkflowWithSubsteps(workflow, d)
-    } else if (arrivedAt != null && endedAt != null) { // completed workflow
-      var substep1State = substepState(arrivedAt, nonsearchEnd, nonsearchEPT)
+    } else if (startedAt !== null && endedAt !== null) { // completed workflow
+      var substep1State = substepState(startedAt, nonsearchEnd, nonsearchEPT)
       var substep2State = substepState(nonsearchEnd, searchEnd, searchEPT)
       var substep3State = substepState(searchEnd, endedAt, releaseEPT)
 
       workflow.append('line') // substep 1
-        .attr('x1', function (d, i) { return xScale(arrivedAt); })
-        .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(nonsearchEnd - 60000); })
-        .attr('y2', function (d, i) { return 0;})
+        .attr('x1', function (d, i) {
+          return xScale(new Date(startedAt))
+        })
+        .attr('y1', function (d, i) { return 0 })
+        .attr('x2', function (d, i) { return xScale(nonsearchEnd - 60000) })
+        .attr('y2', function (d, i) { return 0 })
         .attr('class', function (d) {
-          if (substep1State === 1) {return 'workflow late';}
-          else if (substep1State === -1) {return 'workflow ahead';}else {return 'workflow';}
+          return utils.getSubstepState(substep1State)
         })
 
       workflow.append('line') // substep 2
-        .attr('x1', function (d, i) { return xScale(nonsearchEnd); })
-        .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(searchEnd - 60000); })
-        .attr('y2', function (d, i) { return 0;})
+        .attr('x1', function (d, i) { return xScale(nonsearchEnd) })
+        .attr('y1', function (d, i) { return 0 })
+        .attr('x2', function (d, i) { return xScale(searchEnd - 60000) })
+        .attr('y2', function (d, i) { return 0 })
         .attr('class', function (d) {
-          if (substep2State === 1) {return 'workflow late';}
-          else if (substep2State === -1) {return 'workflow ahead';}else {return 'workflow';}
+          return utils.getSubstepState(substep2State)
         })
 
       workflow.append('line') // substep 3
-        .attr('x1', function (d, i) { return xScale(searchEnd); })
-        .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(endedAt); })
-        .attr('y2', function (d, i) { return 0;})
+        .attr('x1', function (d, i) { return xScale(searchEnd) })
+        .attr('y1', function (d, i) { return 0 })
+        .attr('x2', function (d, i) { return xScale(endedAt) })
+        .attr('y2', function (d, i) { return 0 })
         .attr('class', function (d) {
-          if (substep3State === 1) {return 'workflow late';}
-          else if (substep3State === -1) {return 'workflow ahead';}else {return 'workflow'
-          }
+          return utils.getSubstepState(substep3State)
         })
 
       workflow.append('svg:path')
         .attr('d', function (d) { return customShapes['lBook'](4);})
         .attr('class', function (d) {
-          if (arrivedAt < _now) {
+          if (startedAt < _now) {
             return 'bookEnd notReached'
           }
         })
         .attr('transform', function (d) {
-          return 'translate(' + xScale(arrivedAt) + ',' + 0 + ')'
+          return 'translate(' + xScale(new Date(startedAt)) + ',' + 0 + ')'
         })
 
       workflow.append('svg:path')
@@ -339,13 +365,16 @@ function appendWorkflow (workflow, d) {
           return 'translate(' + xScale(endedAt) + ',' + 0 + ')'
         })
     }
-  } else { // Doesnt have substeps -------------------------------------------------------------------------
-    if (arrivedAt != null && endedAt != null) { // completed workflow
+  } else { // Does not have substeps -------------------------------------------------------------------------
+    console.log('黄河长江第二步')
+    console.log(startedAt)
+    console.log(endedAt)
+    if (startedAt !== null && endedAt !== null) { // completed workflow
       workflow.append('line')
-        .attr('x1', function (d, i) { return xScale(arrivedAt); })
-        .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(endedAt); })
-        .attr('y2', function (d, i) { return 0;})
+        .attr('x1', function (d, i) { return xScale(new Date(startedAt)) })
+        .attr('y1', function (d, i) { return 0 })
+        .attr('x2', function (d, i) { return xScale(endedAt) })
+        .attr('y2', function (d, i) { return 0 })
         .attr('class', function (d) {
           if (d.state === 'late') {
             return 'workflow late'
@@ -359,12 +388,12 @@ function appendWorkflow (workflow, d) {
       workflow.append('svg:path')
         .attr('d', function (d) { return customShapes['lBook'](4);})
         .attr('class', function (d) {
-          if (arrivedAt < _now) {
+          if (startedAt < _now) {
             return 'bookEnd notReached'
           }
         })
         .attr('transform', function (d) {
-          return 'translate(' + xScale(arrivedAt) + ',' + 0 + ')'
+          return 'translate(' + xScale(startedAt) + ',' + 0 + ')'
         })
 
       workflow.append('svg:path')
@@ -377,19 +406,24 @@ function appendWorkflow (workflow, d) {
         .attr('transform', function (d) {
           return 'translate(' + xScale(endedAt) + ',' + 0 + ')'
         })
-    } else if (arrivedAt != null && endedAt === null) { // current workflow
+    } else if (startedAt !== null && endedAt === null) { // current workflow
+      console.log('黄河 2')
       // leftside of now
       workflow.append('line')
-        .attr('x1', function (d, i) { return xScale(arrivedAt); })
-        .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(_now); })
-        .attr('y2', function (d, i) { return 0;})
+        .attr('x1', function (d, i) {
+          return xScale(new Date(startedAt))
+        })
+        .attr('y1', function (d, i) { return 0 })
+        .attr('x2', function (d, i) { return xScale(_now)  })
+        .attr('y2', function (d, i) { return 0 })
         .attr('class', function (d) {
+          console.log('决定 workflow 是不是 late')
+          console.log(d)
           if (d.state === 'late') {
             return 'workflow late'
-          }else if (d.state === 'early') {
+          } else if (d.state === 'early') {
             return 'workflow ahead'
-          }else {
+          } else {
             return 'workflow'
           }
         })
@@ -397,20 +431,20 @@ function appendWorkflow (workflow, d) {
       workflow.append('svg:path')
         .attr('d', function (d) { return customShapes['lBook'](4);})
         .attr('class', function (d) {
-          if (arrivedAt < _now) {
+          if (startedAt < _now) {
             return 'bookEnd notReached'
           }
         })
         .attr('transform', function (d) {
-          return 'translate(' + xScale(arrivedAt) + ',' + 0 + ')'
+          return 'translate(' + xScale(new Date(startedAt)) + ',' + 0 + ')'
         })
 
       // on right side of now
       workflow.append('line')
-        .attr('x1', function (d, i) { return xScale(_now); })
-        .attr('y1', function (d, i) { return 0;})
-        .attr('x2', function (d, i) { return xScale(new Date(new Date(arrivedAt)).getTime() + EPT * oneMinute - 60000)})
-        .attr('y2', function (d, i) { return .001;}) // IMPORTANT  if its flat its not displayed
+        .attr('x1', function (d, i) { return xScale(_now) })
+        .attr('y1', function (d, i) { return 0 })
+        .attr('x2', function (d, i) { return xScale(new Date(new Date(startedAt)).getTime() + EPT * oneMinute - 60000)})
+        .attr('y2', function (d, i) { return .001 }) // IMPORTANT  if its flat its not displayed
         .style('stroke-dasharray', ('2, 2'))
         .style('stroke-width', 4)
         .attr('class', function (d) {
@@ -422,7 +456,8 @@ function appendWorkflow (workflow, d) {
             return 'workflow onTimeGradient'
           }
         })
-    } else if (arrivedAt === null && endedAt === null) { // workflow hasnt started yet
+    } else if (startedAt === null && endedAt === null) { // workflow hasnt started yet
+      console.log('黄河 3')
       workflow.append('line')
         .attr('x1', function (d, i) { return xScale(new Date(d.eta.getTime() + currentDeliveryDelayById[d.deliveryId] * 60000)); })
         .attr('y1', function (d, i) { return 0;})
@@ -431,19 +466,21 @@ function appendWorkflow (workflow, d) {
         .attr('class', 'workflow notReached')
     }
   }
+
   return workflow
 }
 
 function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
-  var arrivedAt = d['arrived-at']
+  var arrivedAt = d['started-at']
   var nonsearchEnd = d['nonsearch-end']
   var searchEnd = d['search-end']
   var endedAt = d['ended-at']
-  var nonsearchEPT = d['nonsearch-estimated-processing-time']
-  var searchEPT = d['search-estimated-processing-time']
-  var releaseEPT = d['release-estimated-processing-time']
+  var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
+  var searchEPT = d['search-estimated-processing-time'] || 15
+  var releaseEPT = d['release-estimated-processing-time'] || 15
   var EPT = d['estimated-processing-time']
   var oneMinute = 1000 * 60
+
   // leftside of now
   var currentSubStep
   if (nonsearchEnd === null) {
@@ -462,13 +499,11 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
     // var substep3State = substepState(searchEnd,endedAt,releaseEPT)
     // leftside of now
     currentWorkflow.append('line')
-      .attr('x1', function (d, i) { return xScale(arrivedAt); })
-      .attr('y1', function (d, i) { return 0;})
-      .attr('x2', function (d, i) { return xScale(_now); })
-      .attr('y2', function (d, i) { return 0;})
-      .attr('class', function (d) {
-        return 'workflow'
-      })
+      .attr('x1', function (d, i) { return xScale(new Date(arrivedAt)) })
+      .attr('y1', function (d, i) { return 0 })
+      .attr('x2', function (d, i) { return xScale(_now) })
+      .attr('y2', function (d, i) { return 0 })
+      .attr('class', function (d) { return 'workflow' })
 
     // on right side of now
     currentWorkflow.append('line')
@@ -481,9 +516,9 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .attr('class', function (d) {
         if (d.state === 'late') {
           return 'workflow lateGradient'
-        }else if (d.state === 'early') {
+        } else if (d.state === 'early') {
           return 'workflow aheadGradient'
-        }else {
+        } else {
           return 'workflow onTimeGradient'
         }
       })
@@ -538,9 +573,9 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .attr('class', function (d) {
         if (d.state === 'late') {
           return 'workflow lateGradient'
-        }else if (d.state === 'early') {
+        } else if (d.state === 'early') {
           return 'workflow aheadGradient'
-        }else {
+        } else {
           return 'workflow onTimeGradient'
         }
       })
@@ -605,14 +640,16 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
   }
 
   currentWorkflow.append('svg:path') // LEFT BOOKEND IS AT BOTTOM SO IT DISPLAYS ON TOP
-    .attr('d', function (d) { return customShapes['lBook'](4);})
+    .attr('d', function (d) {
+      return customShapes['lBook'](4)
+    })
     .attr('class', function (d) {
       if (arrivedAt < _now) {
         return 'bookEnd notReached'
       }
     })
     .attr('transform', function (d) {
-      return 'translate(' + xScale(arrivedAt) + ',' + 0 + ')'
+      return 'translate(' + xScale(new Date(arrivedAt)) + ',' + 0 + ')'
     })
 
   return currentWorkflow

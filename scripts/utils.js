@@ -97,9 +97,60 @@ function _getVehicleImageName (vehicleInfo, deliveryStatus) {
   return vehicleImageName
 }
 
+function _calculateWorkflowETAs (workflows) {
+  var groupedWorkflows = _.groupBy(workflows, 'deliveryId')
+
+  _.each(groupedWorkflows, function (subWorkflows, deliveryId) {
+    var orderedWorkflows = _.orderBy(subWorkflows, 'step')
+
+    _.each(orderedWorkflows, function (workflow, index) {
+      var wEPT = workflow['estimated-processing-time'] * 60000
+      if (index === 0) {
+        if (workflow['started-at']) {
+          workflow.eta = new Date(workflow['started-at']).getTime() + wEPT
+        } else {
+          workflow.eta = _now.getTime() + wEPT
+        }
+      } else {
+        if (workflow['started-at']) {
+          workflow.eta = new Date(workflow['started-at']).getTime() + wEPT
+        } else {
+          if (orderedWorkflows[index - 1]['ended-at']) {
+            workflow.eta = new Date(orderedWorkflows[index - 1]['ended-at']).getTime() + wEPT
+          } else {
+            workflow.eta = new Date(orderedWorkflows[index - 1].eta).getTime() + wEPT
+          }
+        }
+      }
+
+      workflow.eta = new Date(workflow.eta)
+      console.log(deliveryId, workflow.step, workflow.eta)
+
+      if (workflow['started-at']) {
+        if (workflow.eta < workflow['started-at']) {
+          workflow.state = 'late'
+        } else {
+          workflow.state = 'ontime'
+        }
+      } else {
+        if (workflow.eta < _now) {
+          workflow.state = 'late'
+        } else {
+          workflow.state = 'ontime'
+        }
+      }
+      console.log(workflow['started-at'], workflow.state)
+      console.log(workflow['delivery-arrival-time'])
+    })
+  })
+
+  return _.flatten(_.values(groupedWorkflows))
+}
+
 var utils = {
   getNullOrDate: _getNullOrDate,
   getPocNameById: _getPocNameById,
   getSubstepState: _getSubstepState,
-  getVehicleImageName: _getVehicleImageName
+  getVehicleImageName: _getVehicleImageName,
+  calculateWorkflowETAs: _calculateWorkflowETAs
 }

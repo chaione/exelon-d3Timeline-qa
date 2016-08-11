@@ -16,30 +16,25 @@ function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
     item.attributes.deliveryId = parseInt(item.relationships.eventable.data.id)
     item.attributes.timestamp = new Date(item.attributes['created-at'])
     result[item.id] = item.attributes
+
     return result
   }, {})
 
   // add the endTime
-  for (key in eventsAPIData) {
+  for (var key in eventsAPIData) {
     var temp = eventsAPIData[key]
     if (temp['is-request']) {
       temp.endTimestamp = null
       for (key in eventsAPIData) {
         var temp2 = eventsAPIData[key]
-        if (temp.uuid == temp2.uuid && temp2['is-request'] === false) {
+        if (temp.uuid === temp2.uuid && temp2['is-request'] === false) {
           temp.endTimestamp = new Date(temp2['created-at'])
-          console.log('FOUNDONE')
-          console.log(temp.uuid)
-          console.log(temp.timestamp)
-          console.log(temp.endTimestamp)
+          // console.log('FOUNDONE')
+          // console.log(temp.uuid)
+          // console.log(temp.timestamp)
+          // console.log(temp.endTimestamp)
         }
       }
-    // OLD WAY
-    // if(temp.acceptedResponseId!=null){
-    //   temp.endTimestamp = eventsAPIData[temp.acceptedResponseId].timestamp
-    // }else {
-    //   temp.endTimestamp = null
-    // }
     }
   }
 
@@ -49,7 +44,7 @@ function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
   //   'contacts':[contactId1,contactId2] (now we know which order)
   // },
   // 'delivery2':
-  for (key in eventsAPIData) {
+  for (var key in eventsAPIData) {
     var temp = eventsAPIData[key]
     // i have all events for all the deliveries.  Im only storing the requests
     if (temp['is-request']) {
@@ -179,33 +174,40 @@ function retrieveDeliveries () {
       // },
       // 'delivery2':
       eventsReqAndRespByDeliveryAPIData = calculateEventsReqAndRespByDeliveryAPIData(deliveries)
+      console.log('calculated req and res data by deliver')
+      console.log(eventsReqAndRespByDeliveryAPIData)
 
       var apiWorkflows = _.filter(deliveries.included, {type: 'workflows'})
+
       apiWorkflows = apiWorkflows.map(function (workflow) {
         workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery['data']['id'])
+        workflow.attributes['delivery-arrive-time'] = _.find(deliveries.data, {id: workflow.attributes.deliveryId + ''})['arrive-at']
+        workflow.attributes['estimated-processing-time'] = workflow.attributes['estimated-processing-time'] || 15
+        workflow.attributes['nonsearch-ept'] = workflow.attributes['nonsearch-ept'] || 15
+        workflow.attributes['search-ept'] = workflow.attributes['search-ept'] || 15
+        workflow.attributes['release-ept'] = workflow.attributes['release-ept'] || 15
 
         workflow.attributes.station = workflow.attributes.step
-        workflow.attributes.eta = new Date(workflow.attributes.eta || _now)
 
-        workflow.attributes['arrived-at'] = getNullOrDate(workflow.attributes['arrived-at'])
-        workflow.attributes['ended-at'] = getNullOrDate(workflow.attributes['ended-at'])
-        workflow.attributes['nonsearch-end'] = getNullOrDate(workflow.attributes['nonsearch-end'])
-        workflow.attributes['search-end'] = getNullOrDate(workflow.attributes['search-end'])
-
-        // determine state
-        if (workflow.attributes.eta < workflow.attributes['arrived-at']) {
-          workflow.attributes.state = 'late'
-        } else if (workflow.attributes.eta > workflow.attributes['arrived-at']) {
-          workflow.attributes.state = 'early'
-        } else {
-          workflow.attributes.state = 'ontime'
-        }
+        var importantDates = [
+          'started-at',
+          'arrived-at', 'ended-at',
+          'nonsearch-end', 'search-end'
+        ]
+        _.each(importantDates, function (item) {
+          workflow.attributes[item] = utils.getNullOrDate(workflow.attributes[item])
+        })
 
         return workflow.attributes
       })
-      console.log('imported workflows', apiWorkflows)
+
+      console.log('processed api workflows')
+      console.log(apiWorkflows)
+      apiWorkflows = utils.calculateWorkflowETAs(apiWorkflows)
+      console.log(apiWorkflows)
 
       processApiData(apiWorkflows)
+
       console.log('----------retrieveDeliveries')
     }
   })
@@ -260,7 +262,7 @@ function stackDeliveriesCalc (stationStackedCount, stationData) { // we set the 
     for (var j = 0; j < stationData[i].values.length; j++) {
       if (stationData[i].key == 0) {
         stationData[i].values[j].yIndex = j
-      }else {
+      } else {
         stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key - 1] + j
       }
     }
