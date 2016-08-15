@@ -91,6 +91,11 @@ function processApiData (workflowsData) {
   stationStacked = stationStackedCalc(stationCounts, stationStackedCount, stations); // [{name:EnRoute, y:7,y0:0},Object...]
   var deliveriesDataSorted = deliveriesData.sort(compare) // is this necesary
 
+  console.log('deliveriesData', deliveriesData)
+  console.log('stationCounts', stationCounts)
+  console.log('stationStackedCount', stationStackedCount)
+  console.log('stationStacked', stationStacked)
+
   _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
   stationData = d3.nest() // groupByStation
@@ -241,13 +246,15 @@ function stationStackedCountCalc (stationCounts) { // [7, 12, 17, 18, 22, 23, 24
   return stationStackedCount
 }
 
-function stationStackedCalc (stationCounts, stationStackedCount, stations) { // stacks each station with its y0 index and height
-  var stationStacked = []; // [Object(name:EnRoute, y:7,y0:0),Object...]
+// stacks each station with its y0 index and height
+function stationStackedCalc (stationCounts, stationStackedCount, stations) {
+  var stationStacked = [] // [Object(name:EnRoute, y:7,y0:0),Object...]
 
   stationStacked[0] = {
     'y0': 0,
     'deliveryCount': stationCounts[0],
-  'name': stations[0]}
+    'name': stations[0]
+  }
 
   // this needs to factor in zooming, or add it to zoom section
   for (var i = 1; i < stationStackedCount.length; i++) {
@@ -257,6 +264,7 @@ function stationStackedCalc (stationCounts, stationStackedCount, stations) { // 
       'name': stations[i]
     }
   }
+
   return stationStacked
 }
 
@@ -299,8 +307,8 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
     if (currentStation === 1) {
       var firstWorkflowOfDelivery = currentDelivery.values[0]
 
-      if (firstWorkflowOfDelivery['arrived-at'] > _now) {
-        currentStation = 0 // first station
+      if (!firstWorkflowOfDelivery['started-at']) {
+        currentStation = 0
       }
     }
 
