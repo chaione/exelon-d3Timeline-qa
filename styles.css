@@ -191,7 +191,7 @@ body {
     .detailActualLabels.late {
       fill:#CF0C13;
     }
-  
+
     .detailInfoDelay {
       fill:#0A5D7F;
     }
@@ -246,10 +246,10 @@ body {
     .name{
       fill: #BFFFEA;
     }
-  
+
     .workflow {
       stroke: #017AAA;
-      stroke-width:    1px;
+      stroke-width: 1px;
     }
     .workflow.betweenPorts {
       stroke: #535353;
@@ -279,11 +279,11 @@ body {
     }
     .workflow.lateGradient {
       stroke: url(#lateGradient);
-      
+
     }
     .workflow.onTimeGradient {
       stroke: url(#onTimeGradient);
-      
+
     }
 
     .yAxis {

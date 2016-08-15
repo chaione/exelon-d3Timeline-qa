@@ -1,10 +1,11 @@
 function compare (a, b) {
-  if (a.currentStation < b.currentStation)
+  if (a.currentStation < b.currentStation) {
     return -1
-  else if (a.currentStation > b.currentStation)
+  } else if (a.currentStation > b.currentStation) {
     return 1
-  else
+  } else {
     return 0
+  }
 }
 
 function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
@@ -75,10 +76,12 @@ function processApiData (workflowsData) {
     .entries(workflowsData)
 
   // update deliveries w/ data
-  deliveriesData.forEach(function (delivery) {
+  _.each(deliveriesData, function (delivery) {
     var vehicleInfo = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id]
     var deliveryStatus = deliveriesAPIData[parseInt(delivery.key)].attributes.status
+
     delivery.vehicleType = utils.getVehicleImageName(vehicleInfo, deliveryStatus)
+    delivery.currentLocation = deliveriesAPIData[parseInt(delivery.key)].attributes['current-location']
   })
 
   deliveriesData = updateCurrentStationCalc(deliveriesData)
@@ -88,12 +91,17 @@ function processApiData (workflowsData) {
   stationStacked = stationStackedCalc(stationCounts, stationStackedCount, stations); // [{name:EnRoute, y:7,y0:0},Object...]
   var deliveriesDataSorted = deliveriesData.sort(compare) // is this necesary
 
-  currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
+  _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
   stationData = d3.nest() // groupByStation
-    .key(function (d) { return d.currentStation; })
-    .sortValues(function (a, b) { return b.values[0].endTime - a.values[0].endTime; })
+    .key(function (d) {
+      return d.currentStation
+    })
+    .sortValues(function (a, b) {
+      return b.values[0].endTime - a.values[0].endTime
+    })
     .entries(deliveriesDataSorted)
+
   stationData = stackDeliveriesCalc(stationStackedCount, stationData)
   console.log('stationData', stationData)
 
@@ -180,8 +188,8 @@ function retrieveDeliveries () {
       var apiWorkflows = _.filter(deliveries.included, {type: 'workflows'})
 
       apiWorkflows = apiWorkflows.map(function (workflow) {
+        workflow.attributes.id = workflow['id']
         workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery['data']['id'])
-        workflow.attributes['delivery-arrive-time'] = _.find(deliveries.data, {id: workflow.attributes.deliveryId + ''})['arrive-at']
         workflow.attributes['estimated-processing-time'] = workflow.attributes['estimated-processing-time'] || 15
         workflow.attributes['nonsearch-ept'] = workflow.attributes['nonsearch-ept'] || 15
         workflow.attributes['search-ept'] = workflow.attributes['search-ept'] || 15
@@ -201,11 +209,7 @@ function retrieveDeliveries () {
         return workflow.attributes
       })
 
-      console.log('processed api workflows')
-      console.log(apiWorkflows)
       apiWorkflows = utils.calculateWorkflowETAs(apiWorkflows)
-      console.log(apiWorkflows)
-
       processApiData(apiWorkflows)
 
       console.log('----------retrieveDeliveries')
@@ -272,25 +276,28 @@ function stackDeliveriesCalc (stationStackedCount, stationData) { // we set the 
 }
 
 function updateCurrentStationCalc (deliveriesData) { // update every delivery w/ its current station
-  var currentStation = 0
-  var isCurrentUpdated = false
+  _.each(deliveriesData, function (currentDelivery) {
+    var currentStation = 0
+    var isCurrentUpdated = false
+    console.log('calculating current station')
 
-  for (var i = 0; i < deliveriesData.length; i++) {
-    currentStation = 0
-    isCurrentUpdated = false
-
-    _.each(deliveriesData[i].values, (workflow) => {
-      if (!isCurrentUpdated) {
-        if (workflow['started-at'] !== null && workflow['ended-at'] === null) {
-          currentStation = workflow.station
-          console.log('setting current station!', currentStation)
-          isCurrentUpdated = true
+    if (currentDelivery.currentLocation && currentDelivery.currentLocation.id) {
+      currentStation = currentDelivery.currentLocation.id
+    } else {
+      _.each(currentDelivery.values, (workflow) => {
+        if (!isCurrentUpdated) {
+          if (workflow['started-at'] !== null && workflow['ended-at'] === null) {
+            currentStation = workflow.station
+            console.log('setting current station!', currentStation)
+            isCurrentUpdated = true
+          }
         }
-      }
-    })
+      })
+      console.log(currentStation)
+    }
 
     if (currentStation === 1) {
-      var firstWorkflowOfDelivery = deliveriesData[i].values[0]
+      var firstWorkflowOfDelivery = currentDelivery.values[0]
 
       if (firstWorkflowOfDelivery['arrived-at'] > _now) {
         currentStation = 0 // first station
@@ -298,29 +305,33 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
     }
 
     if (currentStation === 0) {
-      var lastWorkflowEndTime = _.last(deliveriesData[i].values)['ended-at']
+      console.log('en route delivery')
+      console.log(currentDelivery)
+      var lastWorkflowEndTime = _.last(currentDelivery.values)['ended-at']
 
       if (lastWorkflowEndTime && lastWorkflowEndTime < _now) {
         currentStation = 6
       }
     }
 
-    deliveriesData[i].currentStation = currentStation
-  }
+    currentDelivery.currentStation = currentStation
+  })
+
+  console.log('currentStation result')
+  _.each(deliveriesData, function (d) {
+    console.log(d['key'], d.currentStation)
+  })
 
   return deliveriesData
 }
 
 function generateCurrentDeliveryDelayById (deliveriesData) {
   var delayData = {}
-  console.log('deliveriesdata', deliveriesData)
-  // debugger
-  // detailCalculateDelay
+
   for (var i = 0; i < deliveriesData.length; i++) {
     var delivery = deliveriesData[i]
-    // var deliveryData = deliveriesAPIData[parseInt(delivery.key)]
     delayData[delivery.key] = detailCalculateDelay(delivery)
   }
-  console.log(delayData)
+
   return delayData
 }

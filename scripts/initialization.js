@@ -28,24 +28,26 @@ var stationTextPadding = {top: 10, right: 0, bottom: 0, left: 10}
 var margin = {top: 0, right: 0, bottom: 30, left: 0}
 var outerWidth = document.documentElement.clientWidth
 var outerHeight = document.documentElement.clientHeight - 83
-console.log(outerWidth)
-console.log(outerHeight)
 var startOfDayHour = 6 // used for fake data
+
+var _LOCATIONS = {}
+
 var stations = {
   0: 'En Route',
-  1: 'Sierra One',
+  1: 'Sierra 1',
   2: 'Stinger Gate',
-  3: 'Sally Port',
-  4: 'Warehouse',
+  3: 'Warehouse',
+  4: 'Sally Port',
   5: 'PA',
   6: 'Exit'
 }
+
 var _stationAcronyms = {
   0: 'ER',
   1: 'S1',
   2: 'SG',
-  3: 'SP',
   4: 'WH',
+  3: 'SP',
   5: 'PA',
   6: 'EX'
 }
@@ -81,13 +83,10 @@ var titleHeight = 83
 var innerWidth = outerWidth - margin.left - margin.right
 var innerHeight = outerHeight - margin.top - margin.bottom
 var unixHour = 1000 * 60 * 60
-var unixMinute = 1000 * 60
+var _UNIX_MINUTE = 1000 * 60
 var vpStartHours = (outerWidth / 2) / (xAxisWidth / 48); // startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
-console.log('vpStartHours', vpStartHours)
 var unixStartHours = unixHour * vpStartHours
 var _now = new Date(Date.now())
-// now = new Date(2016, 5, 20,9,30);// used for testing - june 20 2016 at 13:30 (some timezone..)
-console.log('now', _now)
 
 var nowYear = _now.getFullYear()
 var nowMonth = _now.getMonth()
@@ -113,7 +112,7 @@ var startingX
 var duration, variation, variationMinutes
 var yDeliveryScale
 var deliveriesAPIData; // big one.  has all the details for every delivery by id
-var currentDeliveryDelayById = 12
+var _currentDeliveryDelayById = {}
 var _pocsAPIData
 var previousYTranslation = 0
 var vehiclesAPIData

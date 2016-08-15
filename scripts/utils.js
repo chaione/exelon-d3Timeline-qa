@@ -105,26 +105,19 @@ function _calculateWorkflowETAs (workflows) {
 
     _.each(orderedWorkflows, function (workflow, index) {
       var wEPT = workflow['estimated-processing-time'] * 60000
+
       if (index === 0) {
-        if (workflow['started-at']) {
-          workflow.eta = new Date(workflow['started-at']).getTime() + wEPT
-        } else {
-          workflow.eta = _now.getTime() + wEPT
-        }
-      } else {
-        if (workflow['started-at']) {
-          workflow.eta = new Date(workflow['started-at']).getTime() + wEPT
-        } else {
-          if (orderedWorkflows[index - 1]['ended-at']) {
-            workflow.eta = new Date(orderedWorkflows[index - 1]['ended-at']).getTime() + wEPT
-          } else {
-            workflow.eta = new Date(orderedWorkflows[index - 1].eta).getTime() + wEPT
-          }
-        }
+        // This isn't necessary in real situation
+        // As first workflow should always have an ETA
+        workflow.eta = workflow.eta || workflow['started-at'] || (_now.getTime() + wEPT)
+      }
+
+      if (index !== 0) {
+        var lastWF = orderedWorkflows[index - 1]
+        workflow.eta = (lastWF['started-at'] || lastWF['eta']).getTime() + wEPT
       }
 
       workflow.eta = new Date(workflow.eta)
-      console.log(deliveryId, workflow.step, workflow.eta)
 
       if (workflow['started-at']) {
         if (workflow.eta < workflow['started-at']) {
@@ -139,8 +132,15 @@ function _calculateWorkflowETAs (workflows) {
           workflow.state = 'ontime'
         }
       }
-      console.log(workflow['started-at'], workflow.state)
-      console.log(workflow['delivery-arrival-time'])
+
+      console.log(
+        deliveryId,
+        'step: ' + workflow.step,
+        'eta: ' + workflow.eta,
+        'started at:' + workflow['started-at'],
+        'ended at:' + workflow['ended-at'],
+        '\n========================================='
+      )
     })
   })
 
