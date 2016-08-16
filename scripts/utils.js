@@ -1,3 +1,27 @@
+function _calculateSubstepDelayStatus (startTime, endTime, estimated) {
+  var difference = endTime - startTime
+  estimated = estimated * 60000
+
+  if (difference > estimated * (1 + _AHEAD_OR_BEHIND_PCT)) {
+    return 1
+  } else if (difference < estimated * (1 - _AHEAD_OR_BEHIND_PCT)) {
+    return -1
+  } else {
+    return 0
+  }
+}
+
+function _prepareSubStepEndTimes (workflow) {
+  if (workflow['nonsearch-end'] && workflow['search-end']) {
+    return
+  }
+
+  var totalTime = workflow['ended-at'].getTime() - workflow['started-at'].getTime()
+
+  workflow['nonsearch-end'] = workflow['nonsearch-end'] || new Date(workflow['started-at'].getTime() + totalTime / 3)
+  workflow['search-end'] = workflow['search-end'] || new Date(workflow['started-at'].getTime() + totalTime / 3 * 2)
+}
+
 function _cleanupStationsData (stations) {
   var results = stations.map(function (obj) {
     var rObj = {}
@@ -138,7 +162,7 @@ function _calculateWorkflowETAs (workflows) {
     var orderedWorkflows = _.orderBy(subWorkflows, 'step')
 
     _.each(orderedWorkflows, function (workflow, index) {
-      var wEPT = workflow['estimated-processing-time'] * 60000
+      var wEPT = 15 * 60000
 
       if (index === 0) {
         // This isn't necessary in real situation
@@ -150,20 +174,25 @@ function _calculateWorkflowETAs (workflows) {
         var lastWF = orderedWorkflows[index - 1]
         workflow.eta = (lastWF['started-at'] || lastWF['eta']).getTime() + wEPT
       }
-
       workflow.eta = new Date(workflow.eta)
+      workflow.state = 'ontime'
 
-      if (workflow['started-at']) {
-        if (workflow.eta < workflow['started-at']) {
+      if (workflow.step === 1 || workflow.step === 3) {
+        var estimated = 45 * 60000
+      } else {
+        var estimated = 15 * 60000
+      }
+      if (workflow['ended-at']) {
+        if (workflow['ended-at'].getTime() > (workflow['eta'].getTime() + estimated)) {
           workflow.state = 'late'
-        } else {
-          workflow.state = 'ontime'
+        }
+      } else if (workflow['started-at']) {
+        if ((workflow['started-at'].getTime() + estimated) < _now.getTime()) {
+          workflow.state = 'late'
         }
       } else {
-        if (workflow.eta < _now) {
+        if ((workflow['eta'].getTime() + estimated) < _now.getTime()) {
           workflow.state = 'late'
-        } else {
-          workflow.state = 'ontime'
         }
       }
 
@@ -191,4 +220,6 @@ var utils = {
   getStationId: _getStationId,
   getStaionIndexInStations: _getStaionIndexInStations,
   cleanupStationsData: _cleanupStationsData,
+  prepareSubStepEndTimes: _prepareSubStepEndTimes,
+  calculateSubstepDelayStatus: _calculateSubstepDelayStatus,
 }

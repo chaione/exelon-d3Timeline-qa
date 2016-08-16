@@ -357,9 +357,9 @@ function displayDetail (delivery) {
 
       if (d['arrived-at'] < _now) {
         if (d['station'] === 1 || d['station'] === 3) {
-          var substep1State = substepState(d['arrived-at'], d['nonsearch-end'], d['nonsearch-estimated-processing-time'] || 15)
-          var substep2State = substepState(d['nonsearch-end'], d['search-end'], d['search-estimated-processing-time'] || 15)
-          var substep3State = substepState(d['search-end'], d['ended-at'], d['release-estimated-processing-time'] || 15)
+          var substep1State = utils.calculateSubstepDelayStatus(d['arrived-at'], d['nonsearch-end'], d['nonsearch-estimated-processing-time'] || 15)
+          var substep2State = utils.calculateSubstepDelayStatus(d['nonsearch-end'], d['search-end'], d['search-estimated-processing-time'] || 15)
+          var substep3State = utils.calculateSubstepDelayStatus(d['search-end'], d['ended-at'], d['release-estimated-processing-time'] || 15)
 
           workflow.append('text')
             .attr('x', function (d) { return xScale(d['arrived-at']);})

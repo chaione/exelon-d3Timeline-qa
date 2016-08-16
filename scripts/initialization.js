@@ -77,16 +77,17 @@ var siteId = 1 // limerick
 // QA Token
 var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMyMDU5Nn0.CEuKdJVBDvoDOGksBmQWMxsnc7CtV5zp59H7IrxNGhc'
 
-var aheadOrBehindPct = .25; // if behind .25 estimated time its longer.   if ahead by .25.. its faster
+var _AHEAD_OR_BEHIND_PCT = .25 // if behind .25 estimated time its longer. if ahead by .25.. its faster
 var titleHeight = 83
 // Calculated Variables
 var innerWidth = outerWidth - margin.left - margin.right
 var innerHeight = outerHeight - margin.top - margin.bottom
 var unixHour = 1000 * 60 * 60
 var _UNIX_MINUTE = 1000 * 60
-var vpStartHours = (outerWidth / 2) / (xAxisWidth / 48); // startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
+var vpStartHours = (outerWidth / 2) / (xAxisWidth / 48) // startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
 var unixStartHours = unixHour * vpStartHours
 var _now = new Date(Date.now())
+var _WORKFLOW_OFFSET = 60000
 
 var nowYear = _now.getFullYear()
 var nowMonth = _now.getMonth()
