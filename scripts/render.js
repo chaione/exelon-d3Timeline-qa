@@ -81,7 +81,7 @@ function render (data) {
     .attr('font-size', stationTextHeight + 'px')
 
   stationsLabelSelectAll.selectAll('.deliveryBGStatuss') // denying entry bg
-    .data(_deliveryIndexInfo.filter(filterWorkflowsByHasStatus))
+    .data(_.filter(_deliveryIndexInfo, {status: 'denied'}))
     .enter()
     .append('rect')
     // .attr("xlink:href",function(i){
@@ -292,7 +292,9 @@ function appendWorkflow (workflow, d) {
     if (startedAt === null && endedAt === null) { // workflow hasnt started yet
       workflow.append('line') // nonsearch notreached
         .attr('x1', function (d, i) {
-          return xScale(new Date(d.eta.getTime() + _currentDeliveryDelayById[d.deliveryId] * 60000))
+          return xScale(
+            new Date(d.eta.getTime() + _currentDeliveryDelayById[d.deliveryId] * 60000)
+          )
         })
         .attr('y1', function (d, i) { return 0 })
         .attr('x2', function (d, i) {
@@ -325,7 +327,7 @@ function appendWorkflow (workflow, d) {
         .attr('y1', function (d, i) { return 0 })
         .attr('x2', function (d, i) {
           return xScale(
-            new Date(d.eta).getTime() + EPT * oneMinute - 60000 + _currentDeliveryDelayById[d.deliveryId] * 60000
+            new Date(d.eta).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000 + _currentDeliveryDelayById[d.deliveryId] * 60000
           )
         })
         .attr('y2', function (d, i) { return 0 })
@@ -691,13 +693,5 @@ function substepState (stepStartTime, stepEndtime, estimatedTimeInMinutes) { // 
     return -1
   } else {
     return 0
-  }
-}
-
-function filterWorkflowsByHasStatus (includedObj) {
-  if (includedObj.status == 'denied') {
-    return true
-  } else {
-    return false
   }
 }

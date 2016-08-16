@@ -143,7 +143,7 @@ function _calculateWorkflowETAs (workflows) {
       if (index === 0) {
         // This isn't necessary in real situation
         // As first workflow should always have an ETA
-        workflow.eta = workflow.eta || workflow['started-at'] || (_now.getTime() + wEPT)
+        workflow.eta = workflow.eta || workflow['started-at'] || (_now.getTime() + _WORKFLOW_OFFSET)
       }
 
       if (index !== 0) {
