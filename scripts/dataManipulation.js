@@ -220,12 +220,14 @@ function retrieveDeliveries () {
 }
 
 function stationCountCalc (deliveriesData) { // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  var stationCounts = [0, 0, 0, 0, 0, 0, 0]
+  var stationCounts = _.fill(Array(_STATIONS.length), 0)
 
-  for (var i = 0;i < deliveriesData.length;i++) {
-    stationCounts[deliveriesData[i].currentStation]++
-  }
-  for (var i = 0; i < stationCounts.length; i++) { // make sure they have at least 1
+  _.each(deliveriesData, function (delivery) {
+    var stationIndex = utils.getStaionIndexInStations(delivery.currentStation, _STATIONS)
+    stationCounts[stationIndex]++
+  })
+
+  for (var i = 0; i < stationCounts.length; i++) {
     stationCounts[i] = stationCounts[i] || 1
   }
 
@@ -265,17 +267,19 @@ function stationStackedCalc (stationCounts, stationStackedCount, stations) {
   return stationStacked
 }
 
-function stackDeliveriesCalc (stationStackedCount, stationData) { // we set the starting yIndex. of each Delivery.  We have to account for stations w/o a delivery
-
-  for (var i = 0; i < stationData.length; i++) {
-    for (var j = 0; j < stationData[i].values.length; j++) {
-      if (stationData[i].key == 0) {
-        stationData[i].values[j].yIndex = j
+// Calculate yIndex for every deliveries. Also allocate 1 unit for empty stations.
+function stackDeliveriesCalc (stationStackedCount, stationData) {
+  _.each(stationData, function (station, i) {
+    _.each(station.values, function (delivery, j) {
+      if (parseInt(station.key) === 0) {
+        delivery.yIndex = j
       } else {
-        stationData[i].values[j].yIndex = stationStackedCount[stationData[i].key - 1] + j
+        var stationIndex = utils.getStaionIndexInStations(parseInt(station.key), _STATIONS)
+
+        delivery.yIndex = stationStackedCount[stationIndex - 1] + j
       }
-    }
-  }
+    })
+  })
 
   return stationData
 }

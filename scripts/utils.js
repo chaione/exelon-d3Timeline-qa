@@ -28,7 +28,7 @@ function _getStationId (stationName, stations) {
 
 function _getStaionIndexInStations (realStationId, stations) {
   return _.findIndex(stations, function (station) {
-    return _.keys(station)[0] === parseInt(realStationId)
+    return parseInt(_.keys(station)[0]) === parseInt(realStationId)
   })
 }
 

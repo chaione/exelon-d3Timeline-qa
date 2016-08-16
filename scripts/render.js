@@ -147,17 +147,23 @@ function render (data) {
     })
 
   // Setup Stations
-  var stationsSelectAll = deliveriesGroup.selectAll('.station').data(data)
-  stationsSelectAll.enter().append('g').attr('class', 'station')
+  var stationsSelectAll = deliveriesGroup.selectAll('.station')
+    .data(data, function (d) {
+      return d.key
+    })
+  stationsSelectAll.enter().append('g').attr('class', function (d)  {
+    return 'station ' + d.key
+  })
   stationsSelectAll.exit().remove()
 
   // Setup Deliveries
   var deliveriesSelectAll = stationsSelectAll.selectAll('.delivery').data(function (d) {
     return d.values
   })
+
   // The delivery group
   var deliveriesSelectAllG = deliveriesSelectAll.enter().append('g').attr('class', function (d) {
-    return 'delivery ' + d.deliveryId
+    return 'delivery ' + d.key
   })
 
   deliveriesSelectAllG
