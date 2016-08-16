@@ -30,7 +30,7 @@ var outerWidth = document.documentElement.clientWidth
 var outerHeight = document.documentElement.clientHeight - 83
 var startOfDayHour = 6 // used for fake data
 
-var _LOCATIONS = {}
+var _STATIONS = []
 
 var stations = {
   0: 'En Route',

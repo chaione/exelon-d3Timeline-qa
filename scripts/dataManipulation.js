@@ -161,8 +161,8 @@ function retrieveDeliveries () {
         deliveriesAPIData[delivery.id] = delivery
       }
 
-      var locations = _.filter(deliveries.included, {type: 'locations'})
-      locations = locations.map(function (obj) {
+      _STATIONS = _.filter(deliveries.included, {type: 'locations'})
+      _STATIONS = _STATIONS.map(function (obj) {
         var rObj = {}
         rObj[obj.id] = obj.attributes.name
         return rObj
@@ -318,7 +318,7 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
       var lastWorkflowEndTime = _.last(currentDelivery.values)['ended-at']
 
       if (lastWorkflowEndTime && lastWorkflowEndTime < _now) {
-        currentStation = 6
+        currentStation = utils.getExitStationId(_STATIONS)
       }
     }
 

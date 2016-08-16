@@ -1,3 +1,11 @@
+function _getExitStationId (stations) {
+  var station = _.find(stations, function (value, key) {
+    return _.values(value)[0] === 'Exit'
+  })
+
+  return _.keys(station)[0]
+}
+
 function _getNullOrDate (dateString) {
   if (dateString) {
     return new Date(dateString)
@@ -152,5 +160,6 @@ var utils = {
   getPocNameById: _getPocNameById,
   getSubstepState: _getSubstepState,
   getVehicleImageName: _getVehicleImageName,
-  calculateWorkflowETAs: _calculateWorkflowETAs
+  calculateWorkflowETAs: _calculateWorkflowETAs,
+  getExitStationId: _getExitStationId,
 }
