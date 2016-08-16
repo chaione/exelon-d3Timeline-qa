@@ -172,6 +172,10 @@ function _calculateWorkflowETAs (workflows) {
 
       if (index !== 0) {
         var lastWF = orderedWorkflows[index - 1]
+        if (lastWF.step === 1 || lastWF.step === 3) {
+          wEPT = 45 * 60000
+        }
+
         workflow.eta = (lastWF['started-at'] || lastWF['eta']).getTime() + wEPT
       }
       workflow.eta = new Date(workflow.eta)
