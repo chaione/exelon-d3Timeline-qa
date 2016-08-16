@@ -101,7 +101,8 @@ tomorrow.setDate(tomorrow.getDate() + 1)
 var isDetailDisplayed = false
 
 var vehicleShapeH = rowHeight - 10
-var svg,stationsGroup,delieveryStaticGroup,g,deliveriesGroup,xAxisGroup,yAxisGroup,xAxisMask
+var svg, stationsGroup, delieveryStaticGroup, g, deliveriesGroup, xAxisGroup, yAxisGroup, xAxisMask
+
 var stationCounts = []
 var stationStackedCount = []
 var stationStacked = []
@@ -125,15 +126,15 @@ var panBounds
 
 var customShapes = {
   lBook: function (r) {
-    var points = [ [0, r], [0, -r], [r, 0], [0, r]]
+    var points = [[0, r], [0, -r], [r, 0], [0, r]]
     return d3.svg.line()(points)
   },
   rBook: function (r) {
-    var points = [ [0, r], [0, -r], [-r, 0], [0, r]]
+    var points = [[0, r], [0, -r], [-r, 0], [0, r]]
     return d3.svg.line()(points)
   },
   dBook: function (r) {
-    var points = [ [-r, 0], [r, 0], [0, r], [-r, 0]]
+    var points = [[-r, 0], [r, 0], [0, r], [-r, 0]]
     return d3.svg.line()(points)
   }
 }
@@ -156,8 +157,7 @@ var viewportScale = d3.time.scale.utc()
   .domain([+new Date(nowYear, nowMonth, yesterday.getDate(), 12) + unixStartHours, +new Date(nowYear, nowMonth, tomorrow.getDate(), 12) - unixStartHours])
   .range([0, -1 * xAxisWidth + outerWidth])
 
-// startingX = viewportScale(new Date(nowYear,nowMonth,nowDay,nowHours,nowMinutes))
-startingX = viewportScale(new Date(nowYear, nowMonth, nowDay, 9, 30))
+startingX = viewportScale(new Date(nowYear, nowMonth, nowDay, nowHours, nowMinutes))
 detailStartingX = startingX
 
 var xAxis = d3.svg.axis()
