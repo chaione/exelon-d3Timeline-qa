@@ -9,7 +9,7 @@ function displayDetail (delivery) {
   var pocId = (currentDeliveryData['relationships']['primary-poc']['data'] || {}).id
 
   delivery.primaryPocName = utils.getPocNameById(pocId)
-  delivery.delay = detailCalculateDelay(delivery)
+  delivery.delay = utils.detailCalculateDelay(delivery)
   delivery.companyName = deliveriesAPIData[parseInt(delivery.key)].attributes['company-name'] || ''
   delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery)
 
@@ -516,54 +516,11 @@ function dismissDeliveryDetail () {
   d3.select('#detailSvg').style('opacity', 0.0).remove()
 }
 
-function detailCalculateDelay (delivery) {
-  var delay = 0
-  var wfDelay = 0
-  var currentWF
-  var minutesStartingLate
-  var currentDuration
-  var estimatedDuration
-  var currentStationOverTime
-
-  if (delivery.currentStation === 0) { // enroute
-    currentWF = _.first(delivery.values)
-
-    if (currentWF.eta && currentWF.eta < _now) {
-      return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
-    }
-
-    return 0
-  }
-
-  if (delivery.currentStation === utils.getExitStationId(_STATIONS)) { // exited
-    // currentWF = delivery.values[4]//get last wf
-    currentWF = delivery.values[delivery.values.length - 1] // get last wf
-    // debugger
-    if (currentWF == null) {
-      debugger
-    }
-
-    var a = currentWF.eta.getTime() + currentWF['estimated-processing-time'] * 60 * 1000
-    var b = currentWF['ended-at'] - a
-    return Math.round(b / 1000 / 60)
-  }
-
-  currentWF = delivery.values[delivery.currentStation - 1]
-
-  minutesStartingLate = currentWF['started-at'] - currentWF['eta']
-  currentDuration = (_now - currentWF['started-at'])
-  estimatedDuration = currentWF['estimated-processing-time'] * 60 * 1000
-  currentStationOverTime = currentDuration - estimatedDuration
-  if (currentStationOverTime > 0) {
-    minutesStartingLate += currentStationOverTime
-  }
-  return Math.round(minutesStartingLate / 1000 / 60)
-}
-
 function calculateInfoboxCurrStation (delivery) {
-  var currentWF = delivery.values[delivery.currentStation - 1]
+  var stationId = utils.getStaionIndexInStations(delivery.currentStation, _STATIONS)
+  var currentWF = delivery.values[stationId]
 
-  // leftside of now
+  // left side of now
   if (delivery.currentStation === 1 || delivery.currentStation === 3) {
     var currentSubStep = calcCurrentSubStep(currentWF)
     return '(' + _stationAcronyms[currentWF.station] + ' ' + currentSubStep + '/3)'

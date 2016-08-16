@@ -69,7 +69,6 @@ function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
   return result
 }
 
-
 function processApiData (workflowsData) {
   var deliveriesData = d3.nest() // group by delivery
     .key(function (d) { return d.deliveryId })
@@ -86,15 +85,16 @@ function processApiData (workflowsData) {
 
   deliveriesData = updateCurrentStationCalc(deliveriesData)
 
+  _.each(deliveriesData, function (delivery) {
+    _.each(delivery.values, function (workflow) {
+      workflow.station = delivery.currentStation
+    })
+  })
+
   stationCounts = stationCountCalc(deliveriesData); // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
   stationStackedCount = stationStackedCountCalc(stationCounts); // [7, 12, 17, 18, 22, 23, 24, 25]
   stationStacked = stationStackedCalc(stationCounts, stationStackedCount, stations); // [{name:EnRoute, y:7,y0:0},Object...]
   var deliveriesDataSorted = deliveriesData.sort(compare) // is this necesary
-
-  console.log('deliveriesData', deliveriesData)
-  console.log('stationCounts', stationCounts)
-  console.log('stationStackedCount', stationStackedCount)
-  console.log('stationStacked', stationStacked)
 
   _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
@@ -196,8 +196,6 @@ function retrieveDeliveries () {
         workflow.attributes['nonsearch-ept'] = workflow.attributes['nonsearch-ept'] || 15
         workflow.attributes['search-ept'] = workflow.attributes['search-ept'] || 15
         workflow.attributes['release-ept'] = workflow.attributes['release-ept'] || 15
-
-        workflow.attributes.station = workflow.attributes.step
 
         var importantDates = [
           'started-at',
@@ -326,11 +324,6 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
     currentDelivery.currentStation = currentStation
   })
 
-  console.log('currentStation result')
-  _.each(deliveriesData, function (d) {
-    console.log(d['key'], d.currentStation)
-  })
-
   return deliveriesData
 }
 
@@ -339,8 +332,10 @@ function generateCurrentDeliveryDelayById (deliveriesData) {
 
   for (var i = 0; i < deliveriesData.length; i++) {
     var delivery = deliveriesData[i]
-    delayData[delivery.key] = detailCalculateDelay(delivery)
+    delayData[delivery.key] = utils.detailCalculateDelay(delivery)
   }
+
+  window.DELIVERIES = deliveriesData
 
   return delayData
 }

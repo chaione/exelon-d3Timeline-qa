@@ -1,3 +1,52 @@
+function _getCurrentWorkflow (workflows) {
+  return _.find(workflows, function (workflow, index) {
+    if (index === 0) {
+      return !workflow['ended-at']
+    }
+
+    return workflow['started-at'] && !workflow['ended-at']
+  })
+}
+
+function _detailCalculateDelay (delivery) {
+  var delay = 0
+  var wfDelay = 0
+
+  // enroute
+  if (delivery.currentStation === 0) {
+    var currentWF = _.first(delivery.values)
+
+    if (currentWF.eta && currentWF.eta < _now) {
+      return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
+    }
+
+    return 0
+  }
+
+  // Exited
+  if (delivery.currentStation === utils.getExitStationId(_STATIONS)) {
+    var currentWF = _.last(delivery.values)
+
+    var a = currentWF.eta.getTime() + currentWF['estimated-processing-time'] * 60 * 1000
+    var b = currentWF['ended-at'] - a
+
+    return Math.round(b / 1000 / 60)
+  }
+
+  var stationId = _getStaionIndexInStations(delivery.currentStation, _STATIONS)
+  var currentWF = delivery.values[stationId]
+
+  var minutesStartingLate = currentWF['started-at'] - currentWF['eta']
+  var currentDuration = _now - currentWF['started-at']
+  var estimatedDuration = currentWF['estimated-processing-time'] * 60 * 1000
+  var currentStationOverTime = currentDuration - estimatedDuration
+
+  if (currentStationOverTime > 0) {
+    minutesStartingLate += currentStationOverTime
+  }
+  return Math.round(minutesStartingLate / 1000 / 60)
+}
+
 function _calculateSubstepDelayStatus (startTime, endTime, estimated) {
   var difference = endTime - startTime
   estimated = estimated * 60000
@@ -171,15 +220,23 @@ function _calculateWorkflowETAs (workflows) {
       }
 
       if (index !== 0) {
-        var lastWF = orderedWorkflows[index - 1]
-        if (lastWF.step === 1 || lastWF.step === 3) {
+        var lwf = orderedWorkflows[index - 1]
+        if (lwf.step === 1 || lwf.step === 3) {
           wEPT = 45 * 60000
         }
 
-        workflow.eta = (lastWF['started-at'] || lastWF['eta']).getTime() + wEPT
+        if (lwf['started-at']) {
+          if (lwf['ended-at']) {
+            workflow.eta = lwf['ended-at']
+          } else {
+            workflow.eta = _now.getTime() + wEPT
+          }
+        } else {
+          workflow.eta = lwf.eta.getTime() + wEPT
+        }
       }
-      workflow.eta = new Date(workflow.eta)
       workflow.state = 'ontime'
+      workflow.eta = new Date(workflow.eta)
 
       if (workflow.step === 1 || workflow.step === 3) {
         var estimated = 45 * 60000
@@ -199,15 +256,6 @@ function _calculateWorkflowETAs (workflows) {
           workflow.state = 'late'
         }
       }
-
-      console.log(
-        deliveryId,
-        'step: ' + workflow.step,
-        'eta: ' + workflow.eta,
-        'started at:' + workflow['started-at'],
-        'ended at:' + workflow['ended-at'],
-        '\n========================================='
-      )
     })
   })
 
@@ -226,4 +274,6 @@ var utils = {
   cleanupStationsData: _cleanupStationsData,
   prepareSubStepEndTimes: _prepareSubStepEndTimes,
   calculateSubstepDelayStatus: _calculateSubstepDelayStatus,
+  detailCalculateDelay: _detailCalculateDelay,
+  getCurrentWorkflow: _getCurrentWorkflow,
 }

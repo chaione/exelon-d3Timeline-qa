@@ -130,15 +130,18 @@ var customShapes = {
     var points = [[0, r], [0, -r], [r, 0], [0, r]]
     return d3.svg.line()(points)
   },
+
   rBook: function (r) {
     var points = [[0, r], [0, -r], [-r, 0], [0, r]]
     return d3.svg.line()(points)
   },
+
   dBook: function (r) {
     var points = [[-r, 0], [r, 0], [0, r], [-r, 0]]
     return d3.svg.line()(points)
   }
 }
+
 // scales
 // var xScale = d3.time.scale.utc()
 //       .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                +new Date(nowYear, nowMonth, nowDay+1,12)])
