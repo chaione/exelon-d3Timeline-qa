@@ -161,12 +161,9 @@ function retrieveDeliveries () {
         deliveriesAPIData[delivery.id] = delivery
       }
 
-      _STATIONS = _.filter(deliveries.included, {type: 'locations'})
-      _STATIONS = _STATIONS.map(function (obj) {
-        var rObj = {}
-        rObj[obj.id] = obj.attributes.name
-        return rObj
-      })
+      _STATIONS = utils.cleanupStationsData(
+        _.filter(deliveries.included, {type: 'locations'})
+      )
 
       vehiclesAPIData = {}
       var vehiclesArray = _.filter(deliveries.included, {type: 'vehicles'})

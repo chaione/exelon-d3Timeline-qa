@@ -1,9 +1,35 @@
-function _getExitStationId (stations) {
-  var station = _.find(stations, function (value, key) {
-    return _.values(value)[0] === 'Exit'
+function _cleanupStationsData (stations) {
+  var results = stations.map(function (obj) {
+    var rObj = {}
+    rObj[obj.id] = obj.attributes.name
+    return rObj
   })
 
-  return _.keys(station)[0]
+  if (utils.getStationId('En Route', results) === -1) {
+    results.splice(0, 0, {
+      0: 'En Route'
+    })
+  }
+
+  return results
+}
+
+function _getExitStationId (stations) {
+  return _getStationId('Exit', stations)
+}
+
+function _getStationId (stationName, stations) {
+  var station = _.find(stations, function (value, key) {
+    return _.values(value)[0] === stationName
+  })
+
+  return _.keys(station)[0] || -1
+}
+
+function _getStaionIndexInStations (realStationId, stations) {
+  return _.findIndex(stations, function (station) {
+    return _.keys(station)[0] === parseInt(realStationId)
+  })
 }
 
 function _getNullOrDate (dateString) {
@@ -162,4 +188,7 @@ var utils = {
   getVehicleImageName: _getVehicleImageName,
   calculateWorkflowETAs: _calculateWorkflowETAs,
   getExitStationId: _getExitStationId,
+  getStationId: _getStationId,
+  getStaionIndexInStations: _getStaionIndexInStations,
+  cleanupStationsData: _cleanupStationsData,
 }

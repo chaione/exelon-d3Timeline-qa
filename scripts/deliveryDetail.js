@@ -535,7 +535,7 @@ function detailCalculateDelay (delivery) {
     return 0
   }
 
-  if (delivery.currentStation === 6) { // exited
+  if (delivery.currentStation === utils.getExitStationId(_STATIONS)) { // exited
     // currentWF = delivery.values[4]//get last wf
     currentWF = delivery.values[delivery.values.length - 1] // get last wf
     // debugger
@@ -550,8 +550,8 @@ function detailCalculateDelay (delivery) {
 
   currentWF = delivery.values[delivery.currentStation - 1]
 
-  minutesStartingLate = currentWF['arrived-at'] - currentWF['eta']
-  currentDuration = (_now - currentWF['arrived-at'])
+  minutesStartingLate = currentWF['started-at'] - currentWF['eta']
+  currentDuration = (_now - currentWF['started-at'])
   estimatedDuration = currentWF['estimated-processing-time'] * 60 * 1000
   currentStationOverTime = currentDuration - estimatedDuration
   if (currentStationOverTime > 0) {

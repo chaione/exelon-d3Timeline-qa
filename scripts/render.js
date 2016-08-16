@@ -651,9 +651,9 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .attr('class', function (d) {
         if (d.state === 'late') {
           return 'workflow lateGradient'
-        }else if (d.state === 'early') {
+        } else if (d.state === 'early') {
           return 'workflow aheadGradient'
-        }else {
+        } else {
           return 'workflow onTimeGradient'
         }
       })
