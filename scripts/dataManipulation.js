@@ -116,7 +116,7 @@ function processApiData (workflowsData) {
     for (var j = 0; j < tempStation.values.length; j++) {
       var tempDelivery = tempStation.values[j]
 
-      deliveryyIndexInfo.push({
+      _deliveryIndexInfo.push({
         status: deliveriesAPIData[parseInt(tempDelivery.key)].attributes.status,
         deliveryId: tempDelivery.key,
         yIndex: tempDelivery.yIndex

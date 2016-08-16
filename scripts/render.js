@@ -81,7 +81,7 @@ function render (data) {
     .attr('font-size', stationTextHeight + 'px')
 
   stationsLabelSelectAll.selectAll('.deliveryBGStatuss') // denying entry bg
-    .data(deliveryyIndexInfo.filter(filterWorkflowsByHasStatus))
+    .data(_deliveryIndexInfo.filter(filterWorkflowsByHasStatus))
     .enter()
     .append('rect')
     // .attr("xlink:href",function(i){
@@ -97,7 +97,7 @@ function render (data) {
     .attr('transform', function (d) {return 'translate(' + 0 + ',' + (yDeliveryScale(d.yIndex + 1) - rowHeight / 2) + ')'})
 
   var delieveryStaticGroupSelectAll = delieveryStaticGroup.selectAll('.deliveryStatuss') // denying entry text
-    .data(deliveryyIndexInfo)
+    .data(_deliveryIndexInfo)
     .enter()
     .append('text')
     .attr('x', function (d, i) { return outerWidth - 20 })

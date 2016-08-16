@@ -108,7 +108,7 @@ var stationStackedCount = []
 var stationStacked = []
 var stationHeight
 var workflowsFakeData = []
-var deliveryyIndexInfo = []
+var _deliveryIndexInfo = []
 var startingX
 var duration, variation, variationMinutes
 var yDeliveryScale
