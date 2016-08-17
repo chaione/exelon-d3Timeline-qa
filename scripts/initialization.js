@@ -99,7 +99,7 @@ yesterday.setDate(yesterday.getDate() - 1)
 var tomorrow = new Date(_now)
 tomorrow.setDate(tomorrow.getDate() + 1)
 
-var isDetailDisplayed = false
+var _isDetailDisplayed = false
 
 var vehicleShapeH = rowHeight - 10
 var svg, stationsGroup, delieveryStaticGroup, g, deliveriesGroup, xAxisGroup, yAxisGroup, xAxisMask

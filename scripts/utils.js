@@ -4,6 +4,10 @@ function _getCurrentWorkflow (workflows) {
       return !workflow['ended-at']
     }
 
+    if (index === (workflows.length - 1)) {
+      return workflow['ended-at']
+    }
+
     return workflow['started-at'] && !workflow['ended-at']
   })
 }
@@ -96,7 +100,7 @@ function _getStationId (stationName, stations) {
     return _.values(value)[0] === stationName
   })
 
-  return _.keys(station)[0] || -1
+  return parseInt(_.keys(station)[0] || -1)
 }
 
 function _getStaionIndexInStations (realStationId, stations) {
@@ -113,7 +117,7 @@ function _getNullOrDate (dateString) {
   return null
 }
 
-function calcCurrentSubStep (workflow) {
+function _calcCurrentSubStep (workflow) {
   if (workflow['nonsearch-end'] === null) {
     return 1
   } else if (workflow['search-end'] === null) {
@@ -276,4 +280,5 @@ var utils = {
   calculateSubstepDelayStatus: _calculateSubstepDelayStatus,
   detailCalculateDelay: _detailCalculateDelay,
   getCurrentWorkflow: _getCurrentWorkflow,
+  calcCurrentSubStep: _calcCurrentSubStep,
 }

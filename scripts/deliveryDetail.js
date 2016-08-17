@@ -512,23 +512,25 @@ function displayDetail (delivery) {
     .attr('font-size', 14 + 'px')
 }
 
-function dismissDeliveryDetail () {
-  isDetailDisplayed = false
-  d3.select('#detailSvg').style('opacity', 0.0).remove()
-}
-
 function calculateInfoboxCurrStation (delivery) {
-  var stationId = utils.getStaionIndexInStations(delivery.currentStation, _STATIONS)
-  var currentWF = delivery.values[stationId]
+  var currentWF = utils.getCurrentWorkflow(delivery.values)
 
-  // left side of now
-  if (delivery.currentStation === 1 || delivery.currentStation === 3) {
-    var currentSubStep = calcCurrentSubStep(currentWF)
+  var s1StationId = utils.getStationId('Sierra 1', _STATIONS)
+  var spStationId = utils.getStationId('Sally Port', _STATIONS)
+  var erStationId = utils.getStationId('En Route', _STATIONS)
+  var exitStationId = utils.getStationId('Exit', _STATIONS)
+
+  if (delivery.currentStation === s1StationId || delivery.currentStation === spStationId) {
+    var currentSubStep = utils.calcCurrentSubStep(currentWF)
     return '(' + _stationAcronyms[currentWF.station] + ' ' + currentSubStep + '/3)'
-  } else if (delivery.currentStation === 0 || delivery.currentStation === 6) {
+  } else if (delivery.currentStation === erStationId || delivery.currentStation === exitStationId) {
     return ''
   } else {
     return '(' + _stationAcronyms[currentWF.station] + ')'
   }
 }
 
+function dismissDeliveryDetail () {
+  _isDetailDisplayed = false
+  d3.select('#detailSvg').style('opacity', 0.0).remove()
+}
