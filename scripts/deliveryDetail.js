@@ -2,20 +2,19 @@ var pocContacts = ['POC', 'Delta10']
 var inspectionLabels = ['Scheduled', 'Actual']
 
 function displayDetail (delivery) {
-  var deliveryData = deliveriesAPIData[parseInt(delivery.key)]
-  delivery.status = deliveryData.attributes.status
-  delivery.arrivedAt = utils.getNullOrDate(deliveryData.attributes['arrive-at'])
-
   var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)]
+  delivery.status = currentDeliveryData.attributes.status
+  delivery.arriveAt = utils.getNullOrDate(currentDeliveryData.attributes['arrive-at'])
   var pocId = (currentDeliveryData['relationships']['primary-poc']['data'] || {}).id
 
   delivery.primaryPocName = utils.getPocNameById(pocId)
   delivery.delay = utils.detailCalculateDelay(delivery)
-  delivery.companyName = deliveriesAPIData[parseInt(delivery.key)].attributes['company-name'] || ''
+  delivery.companyName = currentDeliveryData.attributes['company-name'] || ''
   delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery)
 
   // console.log('displayDetail', delivery)
   isDetailDisplayed = true
+  _isDetailDisplayed = true
   detailYStart = 0
 
   var eventHeight = 30
@@ -48,6 +47,7 @@ function displayDetail (delivery) {
   //         detailDeliveryInfoPOC
   //         detailDeliveryInfoCompanyName
 
+  // setup the popup
   detailSvg = d3.select('body').append('svg')
     .attr('width', outerWidth)
     .attr('height', outerHeight - xAxisHeight)
@@ -55,6 +55,7 @@ function displayDetail (delivery) {
     .style('opacity', .97)
     .call(xAxisTranslation)
 
+  // setup click to close
   var detailDeliveryCloseRect = detailSvg.append('rect')
     .attr('x', 0)
     .attr('y', 0)
@@ -66,6 +67,7 @@ function displayDetail (delivery) {
       dismissDeliveryDetail()
     })
 
+  // setup the text box on the top roght corner
   var detailDeliveryRect = detailSvg.append('rect')
     .attr('x', 0)
     .attr('y', detailDeliveryRectY)
@@ -74,11 +76,6 @@ function displayDetail (delivery) {
     .attr('opacity', 1)
     .attr('class', function (d) {
       return 'detailDeliveryRect'
-    // if (delivery.status === "denied") {
-    //     return "detailDeliveryRect denied"
-    // } else {
-    //     return "detailDeliveryRect"
-    // }
     })
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
@@ -105,10 +102,12 @@ function displayDetail (delivery) {
       .attr('transform', function (d) {return 'translate(' + 0 + ',' + detailDeliveryRectY + ')'})
   }
 
+  // Location title on top left
+  var stationIndex = utils.getStaionIndexInStations(delivery.currentStation, _STATIONS)
   var detailDeliveryStationLabel = detailSvg.append('text')
     .attr('x', 10)
     .attr('y', detailDeliveryRectY - 10)
-    .text(stations[delivery.currentStation])
+    .text(stations[stationIndex])
     .attr('class', 'detailName')
     .attr('font-size', stationTextHeight + 'px')
 
@@ -145,11 +144,15 @@ function displayDetail (delivery) {
     .attr('class', 'detailInfoCompanyName')
     .attr('font-size', 16 + 'px')
 
+  var arriveTimeText = ''
+  if (delivery.arriveAt) {
+    arriveTimeText = 'A ' + delivery.arriveAt.getHours() + ':' + ('0' + delivery.arriveAt.getMinutes()).slice(-2)
+  }
   var detailDeliveryInfoArrivaltime = detailDeliveryInfoGroup.append('text')
     .attr('text-anchor', 'END')
     .attr('x', 344 - 5)
     .attr('y', 26)
-    .text('A ' + delivery.arrivedAt.getHours() + ':' + ('0' + delivery.arrivedAt.getMinutes()).slice(-2))
+    .text(arriveTimeText)
     .attr('class', 'detailInfoArrivaltime')
     .attr('font-size', 16 + 'px')
 
@@ -481,8 +484,6 @@ function displayDetail (delivery) {
           .attr('class', 'detailEventEnd')
       }
     })
-
-  // debugger
 
   var detailCommunicationLabelsGroup = detailSvg.append('g')
     .attr('transform', 'translate(' + stationTextPadding.left + ',' + (detailDeliveryRectY - 50 + detailPadding + eventHeight * 2 - 7) + ')')

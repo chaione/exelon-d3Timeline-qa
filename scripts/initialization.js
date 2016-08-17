@@ -38,7 +38,7 @@ var stations = {
   2: 'Stinger Gate',
   3: 'Warehouse',
   4: 'Sally Port',
-  5: 'PA',
+  5: 'Protected Area',
   6: 'Exit'
 }
 
