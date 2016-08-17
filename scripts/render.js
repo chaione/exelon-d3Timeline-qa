@@ -297,13 +297,13 @@ function appendWorkflow (workflow, d) {
       workflow.append('line') // nonsearch notreached
         .attr('x1', function (d, i) {
           return xScale(
-            new Date(d.eta.getTime() + _currentDeliveryDelayById[d.deliveryId] * 60000)
+            d.eta.getTime() // + _currentDeliveryDelayById[d.deliveryId] * 60000
           )
         })
         .attr('y1', function (d, i) { return 0 })
         .attr('x2', function (d, i) {
           return xScale(
-            new Date(d.eta).getTime() + nonsearchEPT * oneMinute - 60000 + _currentDeliveryDelayById[d.deliveryId] * 60000
+            d.eta.getTime() + nonsearchEPT * oneMinute - 60000 // + _currentDeliveryDelayById[d.deliveryId] * 60000
           )
         })
         .attr('y2', function (d, i) { return 0 })
@@ -312,12 +312,14 @@ function appendWorkflow (workflow, d) {
       workflow.append('line') // search notreached
         .attr('x1', function (d, i) {
           return xScale(
-            new Date(d.eta).getTime() + nonsearchEPT * oneMinute + _currentDeliveryDelayById[d.deliveryId] * 60000
+            d.eta.getTime() + nonsearchEPT * oneMinute // + _currentDeliveryDelayById[d.deliveryId] * 60000
           )
         })
         .attr('y1', function (d, i) { return 0 })
         .attr('x2', function (d, i) {
-          return xScale(new Date(d.eta).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000 + _currentDeliveryDelayById[d.deliveryId] * 60000)
+          return xScale(
+            d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000 // + _currentDeliveryDelayById[d.deliveryId] * 60000
+          )
         })
         .attr('y2', function (d, i) { return 0 })
         .attr('class', 'workflow notReached 1-3-1 ' + d.deliveryId)
@@ -325,13 +327,13 @@ function appendWorkflow (workflow, d) {
       workflow.append('line') // release notreached
         .attr('x1', function (d, i) {
           return xScale(
-            new Date(d.eta).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + _currentDeliveryDelayById[d.deliveryId] * 60000
+            d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute // + _currentDeliveryDelayById[d.deliveryId] * 60000
           )
         })
         .attr('y1', function (d, i) { return 0 })
         .attr('x2', function (d, i) {
           return xScale(
-            new Date(d.eta).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000 + _currentDeliveryDelayById[d.deliveryId] * 60000
+            d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000 // + _currentDeliveryDelayById[d.deliveryId] * 60000
           )
         })
         .attr('y2', function (d, i) { return 0 })
@@ -562,7 +564,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
           _now.getTime() + nonsearchEPT * oneMinute - 60000
         )
       })
-      .attr('y2', function (d, i) { return .001;}) // IMPORTANT  if its flat its not displayed
+      .attr('y2', function (d, i) { return .001 }) // IMPORTANT  if its flat its not displayed
       .style('stroke-dasharray', ('2, 2'))
       .style('stroke-width', 4)
       .attr('class', function (d) {
@@ -581,14 +583,24 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
           _now.getTime() + nonsearchEPT * oneMinute
         )
       })
-      .attr('y1', function (d, i) { return 0;})
+      .attr('y1', 0)
       .attr('x2', function (d, i) {
         return xScale(
           _now.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000
         )
       })
-      .attr('y2', function (d, i) { return 0;})
-      .attr('class', 'workflow notReached')
+      .attr('y2', 0.01)
+      .style('stroke-dasharray', ('2, 2'))
+      .style('stroke-width', 4)
+      .attr('class', function (d) {
+        if (d.state === 'late') {
+          return 'workflow lateGradient'
+        } else if (d.state === 'early') {
+          return 'workflow aheadGradient'
+        } else {
+          return 'workflow onTimeGradient'
+        }
+      })
 
     currentWorkflow.append('line') // release notreached
       .attr('x1', function (d, i) {
@@ -596,13 +608,24 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
           _now.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute
         )
       })
+      .attr('y1', 0)
       .attr('x2', function (d, i) {
         return xScale(
           _now.getTime() + 45 * oneMinute - 60000
         )
       })
-      .attr('y2', function (d, i) { return 0;})
-      .attr('class', 'workflow notReached')
+      .attr('y2', 0.01)
+      .style('stroke-dasharray', ('2, 2'))
+      .style('stroke-width', 4)
+      .attr('class', function (d) {
+        if (d.state === 'late') {
+          return 'workflow lateGradient'
+        } else if (d.state === 'early') {
+          return 'workflow aheadGradient'
+        } else {
+          return 'workflow onTimeGradient'
+        }
+      })
   } else if (currentSubStep === 2) {
     var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
     currentWorkflow.append('line') // substep 1 complted
