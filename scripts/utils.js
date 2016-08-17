@@ -75,8 +75,8 @@ function _prepareSubStepEndTimes (workflow) {
   workflow['search-end'] = workflow['search-end'] || new Date(workflow['started-at'].getTime() + totalTime / 3 * 2)
 }
 
-function _cleanupStationsData (stations) {
-  var results = stations.map(function (obj) {
+function _cleanupStationsData (receivedStations) {
+  var results = receivedStations.map(function (obj) {
     var rObj = {}
     rObj[obj.id] = obj.attributes.name
     return rObj
@@ -87,6 +87,13 @@ function _cleanupStationsData (stations) {
       0: 'En Route'
     })
   }
+  _.each(stations, function(station, index) {
+    if (utils.getStationId(station, results) === -1) {
+      var temp = {}
+      temp[parseInt(index) + 1] = station
+      results.splice(index, 0, temp)
+    }
+  })
 
   return results
 }
