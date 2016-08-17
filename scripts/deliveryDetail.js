@@ -2,8 +2,9 @@ var pocContacts = ['POC', 'Delta10']
 var inspectionLabels = ['Scheduled', 'Actual']
 
 function displayDetail (delivery) {
-  delivery.status = deliveriesAPIData[parseInt(delivery.key)].attributes.status
-  delivery.arrivedAt = new Date(deliveriesAPIData[parseInt(delivery.key)].attributes['arrive-at'])
+  var deliveryData = deliveriesAPIData[parseInt(delivery.key)]
+  delivery.status = deliveryData.attributes.status
+  delivery.arrivedAt = utils.getNullOrDate(deliveryData.attributes['arrive-at'])
 
   var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)]
   var pocId = (currentDeliveryData['relationships']['primary-poc']['data'] || {}).id

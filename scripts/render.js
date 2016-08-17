@@ -38,7 +38,7 @@ function moveXAxis (a, b) {
 }
 
 function render (data) {
-  console.log('render-------------')
+  console.log('rendering...........')
 
   outerWidth = document.documentElement.clientWidth
   outerHeight = document.documentElement.clientHeight - 83
@@ -239,8 +239,6 @@ function render (data) {
           .style('stroke-dasharray', ('1, 1'))
       }
     })
-
-  console.log('-------------render')
 }
 
 // RENDER HELPERS

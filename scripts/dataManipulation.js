@@ -108,7 +108,6 @@ function processApiData (workflowsData) {
     .entries(deliveriesDataSorted)
 
   stationData = stackDeliveriesCalc(stationStackedCount, stationData)
-  console.log('stationData', stationData)
 
   // create a dictionary of yindex and status / info.  Used for static information
   for (var i = 0; i < stationData.length; i++) {
@@ -141,8 +140,6 @@ function resize () {
 }
 
 function retrieveDeliveries () {
-  console.log('retrieveDeliveries----------')
-
   $.ajax({
     url: url + 'deliveries?filter=all',
     headers: {
@@ -150,8 +147,6 @@ function retrieveDeliveries () {
       'Authorization': 'Bearer ' + bearerToken
     },
     success: function (deliveriesAPI) {
-      console.log('deliveries recieved from api', deliveriesAPI)
-
       deliveries = deliveriesAPI
 
       deliveriesAPIData = {}
@@ -184,8 +179,6 @@ function retrieveDeliveries () {
       // },
       // 'delivery2':
       eventsReqAndRespByDeliveryAPIData = calculateEventsReqAndRespByDeliveryAPIData(deliveries)
-      console.log('calculated req and res data by deliver')
-      console.log(eventsReqAndRespByDeliveryAPIData)
 
       var apiWorkflows = _.filter(deliveries.included, {type: 'workflows'})
 
@@ -211,8 +204,6 @@ function retrieveDeliveries () {
 
       apiWorkflows = utils.calculateWorkflowETAs(apiWorkflows)
       processApiData(apiWorkflows)
-
-      console.log('----------retrieveDeliveries')
     }
   })
 }
@@ -286,7 +277,6 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
   _.each(deliveriesData, function (currentDelivery) {
     var currentStation = 0
     var isCurrentUpdated = false
-    console.log('calculating current station')
 
     if (currentDelivery.currentLocation && currentDelivery.currentLocation.id) {
       currentStation = currentDelivery.currentLocation.id
@@ -295,12 +285,10 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
         if (!isCurrentUpdated) {
           if (workflow['started-at'] !== null && workflow['ended-at'] === null) {
             currentStation = workflow.station
-            console.log('setting current station!', currentStation)
             isCurrentUpdated = true
           }
         }
       })
-      console.log(currentStation)
     }
 
     if (currentStation === 1) {
@@ -312,8 +300,6 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
     }
 
     if (currentStation === 0) {
-      console.log('en route delivery')
-      console.log(currentDelivery)
       var lastWorkflowEndTime = _.last(currentDelivery.values)['ended-at']
 
       if (lastWorkflowEndTime && lastWorkflowEndTime < _now) {
