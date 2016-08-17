@@ -13,7 +13,6 @@ function displayDetail (delivery) {
   delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery)
 
   // console.log('displayDetail', delivery)
-  isDetailDisplayed = true
   _isDetailDisplayed = true
   detailYStart = 0
 
@@ -384,28 +383,21 @@ function displayDetail (delivery) {
     .enter()
     .append('g')
     .each(function (d, i) {
+      if (d.station === 0) {
+        return
+      }
+
       var workflow = d3.select(this)
       workflow = appendWorkflow(workflow, d)
-      if (d.step === 1 && d.eta < d['arrived-at']) {
+      if (d.step === 1 && d.eta < d['started-at']) {
         prependEtaLine(workflow, d)
       }
-      if (i > 0 && d['arrived-at'] != null && prevData['ended-at'] != null) {
+      if (i > 0 && d['started-at'] != null && prevData['ended-at'] != null) {
         appendLineBetweenPorts(workflow, d, prevData)
       }
 
       prevData = d
     })
-
-  // detailDeliveryDataActualGroup
-    //     .selectAll(".detailActualLabels")
-    //     .data(delivery.values)
-    //     .enter()
-    //     .append("text")
-    //     .attr("x", function(d,i) { return xScale(d['arrived-at']); })
-    //     .attr("y", 14)
-    //     .text(function(d,i){ if(d['arrived-at']<now){return _stationAcronyms[d.station]}})
-    //     .attr("class","detailActualLabels")
-    //     .attr("font-size", 14 + "px")
 
   detailDeliveryDataActualGroup
     .selectAll('.detailActualLabels')
@@ -415,27 +407,42 @@ function displayDetail (delivery) {
     .each(function (d) {
       var workflow = d3.select(this)
 
-      if (d['arrived-at'] < _now) {
-        if (d['station'] === 1 || d['station'] === 3) {
-          var substep1State = utils.calculateSubstepDelayStatus(d['arrived-at'], d['nonsearch-end'], d['nonsearch-estimated-processing-time'] || 15)
-          var substep2State = utils.calculateSubstepDelayStatus(d['nonsearch-end'], d['search-end'], d['search-estimated-processing-time'] || 15)
-          var substep3State = utils.calculateSubstepDelayStatus(d['search-end'], d['ended-at'], d['release-estimated-processing-time'] || 15)
+      var startedAt = d['started-at']
+      var endedAt = d['ended-at']
+      var searchEnd = d['search-end']
+      var nonsearchEnd = d['nonsearch-end']
+      var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
+      var searchEPT = d['search-estimated-processing-time'] || 15
+      var releaseEPT = d['release-estimated-processing-time'] || 15
+      var EPT = d['estimated-processing-time'] || 15
+
+      if (startedAt & startedAt < _now) {
+        if (d.step === 1 || d.step === 3) {
+          var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
+          var substep2State = utils.calculateSubstepDelayStatus(nonsearchEnd, searchEnd, searchEPT)
+          var substep3State = utils.calculateSubstepDelayStatus(searchEnd, endedAt, releaseEPT)
 
           workflow.append('text')
-            .attr('x', function (d) { return xScale(d['arrived-at']);})
+            .attr('x1', xScale(startedAt))
             .attr('y', 14)
             .text(function (d, i) {
-              return _stationAcronyms[d.station] + '.' + 1
+              var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
+              return _stationAcronyms[stationIndex] + '.' + 1
             })
             .attr('class', function (d) {
-              if (substep1State === 1) {return 'detailActualLabels late';}
-              else if (substep1State === -1) {return 'detailActualLabels ahead';}else {return 'detailActualLabels';}
+              if (substep1State === 1) {
+                return 'detailActualLabels late'
+              } else if (substep1State === -1) {
+                return 'detailActualLabels ahead'
+              } else {
+                return 'detailActualLabels'
+              }
             })
             .attr('font-size', 14 + 'px')
 
-          if (d['nonsearch-end'] < _now) {
+          if (nonsearchEnd & nonsearchEnd < _now) {
             workflow.append('text')
-              .attr('x', function (d) { return xScale(d['nonsearch-end'])})
+              .attr('x', function (d) { return xScale(nonsearchEnd)})
               .attr('y', 14)
               .text(2)
               .attr('class', function (d) {
@@ -445,9 +452,9 @@ function displayDetail (delivery) {
               .attr('font-size', 14 + 'px')
           }
 
-          if (d['search-end'] < _now) {
+          if (searchEnd & searchEnd < _now) {
             workflow.append('text')
-              .attr('x', function (d) { return xScale(d['search-end']) })
+              .attr('x', function (d) { return xScale(searchEnd & searchEnd) })
               .attr('y', 14)
               .text(3)
               .attr('class', function (d) {
@@ -458,9 +465,12 @@ function displayDetail (delivery) {
           }
         } else {
           workflow.append('text')
-            .attr('x', function (d) { return xScale(d['arrived-at']); })
+            .attr('x', function (d) { return xScale(startedAt) })
             .attr('y', 14)
-            .text(function (d, i) { return _stationAcronyms[d.station];})
+            .text(function (d, i) { 
+              var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
+              return _stationAcronyms[stationIndex]
+            })
             .attr('class', function (d) {
               if (d.state === 'late') {
                 return 'detailActualLabels late'
@@ -474,7 +484,6 @@ function displayDetail (delivery) {
         }
       }
     })
-
 
   detailDeliveryDataGroup.append('image')
     .attr('xlink:href', function (i) {
@@ -495,7 +504,6 @@ function displayDetail (delivery) {
     .attr('class', 'detailScheduled')
     .attr('transform', 'translate(' + 0 + ',' + (detailPadding + eventHeight * 4) + ')')
 
-  // console.log(deliveryContacts)
   detailDeliveryDataEventsGroup
     .selectAll('.detailEventLine')
     .data(deliveryEvents)
@@ -506,7 +514,7 @@ function displayDetail (delivery) {
     .attr('x2', function (d, i) {
       if (d['endTimestamp'] === null) {
         return xScale(_now)
-      }else {
+      } else {
         return xScale(d['endTimestamp'])
       }
     })
