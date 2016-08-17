@@ -111,9 +111,11 @@ function displayDetail (delivery) {
     .attr('class', 'detailName')
     .attr('font-size', stationTextHeight + 'px')
 
+  // Positioning
   var detailDeliveryInfoGroup = detailSvg.append('g')
     .attr('transform', 'translate(' + (outerWidth - 344 - 20) + ',' + (detailDeliveryRectY - 50) + ')')
 
+  // Styling 
   if (delivery.status === 'denied') {
     var detailDeliveryInfoRect = detailDeliveryInfoGroup.append('rect')
       .attr('x', 0)
@@ -130,6 +132,7 @@ function displayDetail (delivery) {
       .attr('class', 'detailInfoRect')
   }
 
+  // POC Info
   var detailDeliveryInfoPOC = detailDeliveryInfoGroup.append('text')
     .attr('x', 16)
     .attr('y', 26)
@@ -156,6 +159,7 @@ function displayDetail (delivery) {
     .attr('class', 'detailInfoArrivaltime')
     .attr('font-size', 16 + 'px')
 
+  // Delay information
   var detailDeliveryInfoDelay = detailDeliveryInfoGroup.append('text')
     .attr('text-anchor', 'END')
     .attr('x', 344 - 5)
@@ -167,22 +171,23 @@ function displayDetail (delivery) {
         return '+' + Math.abs(delivery.delay)
       }
     })
-    .attr('class', function () {
-      if (delivery.delay > 15) {return 'detailInfoDelay late'}
-      else if (delivery.delay < -15) {return 'detailInfoDelay early'}else {return 'detailInfoDelay'}})
+    .attr('class', function (d) {
+      if (delivery.delay > 15) {
+        return 'detailInfoDelay late'
+      } else if (delivery.delay < -15) {
+        return 'detailInfoDelay early'
+      } else {
+        return 'detailInfoDelay'
+      }
+    })
     .attr('font-size', 16 + 'px')
 
-  // .attr("x", 10)
-    // .attr("y", ((outerHeight-xAxisHeight)/2)- (detailDeliveryRectHeight/2) - 10)
-    // .text(stations[delivery.currentStation])
-    // .attr("class","detailName")
-    // .attr("font-size", stationTextHeight + "px")
-
-
+  // Positioning the delay text
   detailDeliveryDataGroup = detailSvg.append('g')
     .attr('class', 'detailDelivery')
     .attr('transform', 'translate(' + detailStartingX + ',' + detailDeliveryRectY + ')')
 
+  // Setup Axis and the time label
   var detailDeliveryYAxisGroup = detailDeliveryDataGroup.append('g')
     .attr('class', 'y axis')
   detailDeliveryYAxisGroup.append('line')
@@ -215,6 +220,7 @@ function displayDetail (delivery) {
       return 'translate(' + xScale(_now) + ',' + (30) + ')'
     })
 
+  // The first line group
   var detailDeliveryDataScheduledGroup = detailDeliveryDataGroup.append('g')
     .attr('class', 'detailScheduled')
     .attr('transform', 'translate(' + 0 + ',' + (detailPadding + eventHeight) + ')')
@@ -226,43 +232,75 @@ function displayDetail (delivery) {
     .append('g')
     .each(function (d) {
       var workflow = d3.select(this)
-      if (d['station'] === 1 || d['station'] === 3) {
+      var s1StationId = utils.getStationId('Sierra 1', _STATIONS)
+      var spStationId = utils.getStationId('Sally Port', _STATIONS)
+      var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
+      var searchEPT = d['search-estimated-processing-time'] || 15
+      var releaseEPT = d['release-estimated-processing-time'] || 15
+      var EPT = d['estimated-processing-time'] || 15
+      var oneMinute = 1000 * 60
+
+      if (d.step === s1StationId || d.step === spStationId) {
         workflow.append('line')
-          .attr('x1', function (d, i) { return xScale(d['eta']); })
+          .attr('x1', function (d, i) { return xScale(d['eta']) })
           .attr('y1', 0)
-          .attr('x2', function (d) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 - 60000) })
+          .attr('x2', function (d) { 
+            return xScale(
+              d.eta.getTime() + nonsearchEPT * oneMinute - 60000 
+            ) 
+          })
           .attr('y2', 0)
           .attr('class', function (d) {
             return 'detailScheduledLine2'
           })
 
         workflow.append('line')
-          .attr('x1', function (d, i) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000) })
+          .attr('x1', function (d, i) {
+            return xScale(
+              d.eta.getTime() + nonsearchEPT * oneMinute
+            )
+          })
           .attr('y1', 0)
-          .attr('x2', function (d) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 + (d['search-estimated-processing-time'] || 15) * 60000 - 60000) })
+          .attr('x2', function (d) { 
+            return xScale(
+              d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000
+            ) 
+          })
           .attr('y2', 0)
           .attr('class', function (d) {
             return 'detailScheduledLine2'
           })
 
         workflow.append('line')
-          .attr('x1', function (d, i) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 + (d['search-estimated-processing-time'] || 15) * 60000) })
+          .attr('x1', function (d, i) {
+            return xScale(
+              d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute
+            )
+          })
           .attr('y1', 0)
-          .attr('x2', function (d) { return xScale(d['eta'].getTime() + (d['estimated-processing-time'] || 15) * 60000 - 60000) })
+          .attr('x2', function (d, i) {
+            return xScale(
+              d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
+            )
+          })
           .attr('y2', 0)
           .attr('class', function (d) {
             return 'detailScheduledLine2'
           })
       } else {
         workflow.append('line')
-          .attr('x1', function (d, i) { return xScale(d['eta']); })
+          .attr('x1', function (d, i) { 
+            return xScale(d['eta'])
+          })
           .attr('y1', 0)
           .attr('x2', function (d, i) {
-            return xScale(new Date(d['eta'].getTime() + (d['estimated-processing-time'] * 60 * 1000 - 60000)))
+            return xScale(
+              d['eta'].getTime() + d['estimated-processing-time'] * 60000 - 60000
+            )
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            return 'detailScheduledLine2'
+            return 'detailScheduledLine2 ' + d.step
           })
       }
     })
