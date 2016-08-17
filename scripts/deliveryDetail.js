@@ -115,7 +115,7 @@ function displayDetail (delivery) {
   var detailDeliveryInfoGroup = detailSvg.append('g')
     .attr('transform', 'translate(' + (outerWidth - 344 - 20) + ',' + (detailDeliveryRectY - 50) + ')')
 
-  // Styling 
+  // Styling
   if (delivery.status === 'denied') {
     var detailDeliveryInfoRect = detailDeliveryInfoGroup.append('rect')
       .attr('x', 0)
@@ -244,10 +244,10 @@ function displayDetail (delivery) {
         workflow.append('line')
           .attr('x1', function (d, i) { return xScale(d['eta']) })
           .attr('y1', 0)
-          .attr('x2', function (d) { 
+          .attr('x2', function (d) {
             return xScale(
-              d.eta.getTime() + nonsearchEPT * oneMinute - 60000 
-            ) 
+              d.eta.getTime() + nonsearchEPT * oneMinute - 60000
+            )
           })
           .attr('y2', 0)
           .attr('class', function (d) {
@@ -261,10 +261,10 @@ function displayDetail (delivery) {
             )
           })
           .attr('y1', 0)
-          .attr('x2', function (d) { 
+          .attr('x2', function (d) {
             return xScale(
               d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000
-            ) 
+            )
           })
           .attr('y2', 0)
           .attr('class', function (d) {
@@ -289,7 +289,7 @@ function displayDetail (delivery) {
           })
       } else {
         workflow.append('line')
-          .attr('x1', function (d, i) { 
+          .attr('x1', function (d, i) {
             return xScale(d['eta'])
           })
           .attr('y1', 0)
@@ -312,30 +312,47 @@ function displayDetail (delivery) {
     .append('g')
     .each(function (d) {
       var workflow = d3.select(this)
-      if (d['station'] === 1 || d['station'] === 3) {
+      var s1StationId = utils.getStationId('Sierra 1', _STATIONS)
+      var spStationId = utils.getStationId('Sally Port', _STATIONS)
+      var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
+      var searchEPT = d['search-estimated-processing-time'] || 15
+      var releaseEPT = d['release-estimated-processing-time'] || 15
+      var EPT = d['estimated-processing-time'] || 15
+      var oneMinute = 1000 * 60
+
+      if (d.step === s1StationId || d.step === spStationId) {
         workflow.append('text')
           .attr('x', function (d) { return xScale(d['eta']);})
           .attr('y', -3)
-          .text(function (d, i) { if (d['eta'] > _now) {
-              return _stationAcronyms[d.station] + '.' + 1
-            }})
+          .text(function (d, i) {
+            var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
+            if (d['eta'] > _now) {
+              return _stationAcronyms[stationIndex] + '.' + 1
+            }
+          })
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
 
         workflow.append('text')
-          .attr('x', function (d) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000) })
-          .attr('y', -3)
-          .text(function (d, i) { if (d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 > _now) {
-              return 2
-            }})
-          .attr('class', 'detailScheduledLabels')
-          .attr('font-size', 14 + 'px')
-
-        workflow.append('text')
-          .attr('x', function (d) { return xScale(d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 + (d['search-estimated-processing-time'] || 15) * 60000); })
+          .attr('x', function (d) {
+            return xScale(
+              d.eta.getTime() + nonsearchEPT * 60000
+            )
+          })
           .attr('y', -3)
           .text(function (d, i) {
-            if (d['eta'].getTime() + (d['nonsearch-estimated-processing-time'] || 15) * 60000 + (d['search-estimated-processing-time'] || 15) * 60000 > _now) {
+            if (d.eta.getTime() + nonsearchEPT * 60000 > _now) {
+              return 2
+            }
+          })
+          .attr('class', 'detailScheduledLabels')
+          .attr('font-size', 14 + 'px')
+
+        workflow.append('text')
+          .attr('x', function (d) { return xScale(d['eta'].getTime() + nonsearchEPT * 60000 + (d['search-estimated-processing-time'] || 15) * 60000); })
+          .attr('y', -3)
+          .text(function (d, i) {
+            if (d['eta'].getTime() + nonsearchEPT * 60000 + (d['search-estimated-processing-time'] || 15) * 60000 > _now) {
               return 3
             }
           })
@@ -346,8 +363,9 @@ function displayDetail (delivery) {
           .attr('x', function (d) { return xScale(d['eta']); })
           .attr('y', -3)
           .text(function (d, i) {
+            var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
             if (d['eta'] > _now) {
-              return _stationAcronyms[d.station]
+              return _stationAcronyms[stationIndex]
             }
           })
           .attr('class', 'detailScheduledLabels')
