@@ -231,19 +231,21 @@ function _calculateWorkflowETAs (workflows) {
       }
 
       if (index !== 0) {
-        var lwf = orderedWorkflows[index - 1]
-        if (lwf.step === 1 || lwf.step === 3) {
-          wEPT = 45 * 60000
-        }
-
-        if (lwf['started-at']) {
-          if (lwf['ended-at']) {
-            workflow.eta = lwf['ended-at']
-          } else {
-            workflow.eta = _now.getTime() + wEPT
+        if (!workflow.eta) {
+          var lwf = orderedWorkflows[index - 1]
+          if (lwf.step === 1 || lwf.step === 3) {
+            wEPT = 45 * 60000
           }
-        } else {
-          workflow.eta = lwf.eta.getTime() + wEPT
+
+          if (lwf['started-at']) {
+            if (lwf['ended-at']) {
+              workflow.eta = lwf['ended-at']
+            } else {
+              workflow.eta = _now.getTime() + wEPT
+            }
+          } else {
+            workflow.eta = lwf.eta.getTime() + wEPT
+          }
         }
       }
       workflow.state = 'ontime'
