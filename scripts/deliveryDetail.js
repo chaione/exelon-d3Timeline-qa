@@ -241,7 +241,11 @@ function displayDetail (delivery) {
 
       if (d.step === s1StationId || d.step === spStationId) {
         workflow.append('line')
-          .attr('x1', function (d, i) { return xScale(d['eta']) })
+          .attr('x1', function (d, i) {
+            return xScale(
+              d.eta
+            )
+          })
           .attr('y1', 0)
           .attr('x2', function (d) {
             return xScale(
@@ -321,10 +325,16 @@ function displayDetail (delivery) {
 
       if (d.step === s1StationId || d.step === spStationId) {
         workflow.append('text')
-          .attr('x', function (d) { return xScale(d['eta']);})
+          .attr('x', function (d) {
+            return xScale(
+              d.eta
+            )
+          })
           .attr('y', -3)
           .text(function (d, i) {
-            var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
+            var realStationId = d.locationOrder[d.step - 1]
+            var stationIndex = utils.getStaionIndexInStations(realStationId, _STATIONS)
+
             if (d['eta'] > _now) {
               return _stationAcronyms[stationIndex] + '.' + 1
             }
@@ -359,11 +369,18 @@ function displayDetail (delivery) {
           .attr('font-size', 14 + 'px')
       } else {
         workflow.append('text')
-          .attr('x', function (d) { return xScale(d['eta']); })
+          .attr('x', function (d) {
+            return xScale(d['eta'])
+          })
           .attr('y', -3)
           .text(function (d, i) {
-            var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
-            if (d['eta'] > _now) {
+            if (d.step === 1 && !d['started-at']) {
+              var stationIndex = 0
+            } else {
+              var realStationId = d.locationOrder[d.step - 1]
+              var stationIndex = utils.getStaionIndexInStations(realStationId, _STATIONS)
+            }
+            if (d.eta > _now) {
               return _stationAcronyms[stationIndex]
             }
           })
@@ -467,7 +484,7 @@ function displayDetail (delivery) {
           workflow.append('text')
             .attr('x', function (d) { return xScale(startedAt) })
             .attr('y', 14)
-            .text(function (d, i) { 
+            .text(function (d, i) {
               var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
               return _stationAcronyms[stationIndex]
             })

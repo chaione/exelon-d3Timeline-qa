@@ -183,12 +183,16 @@ function retrieveDeliveries () {
       var apiWorkflows = _.filter(deliveries.included, {type: 'workflows'})
 
       apiWorkflows = apiWorkflows.map(function (workflow) {
+        var deliveryId = parseInt(workflow.relationships.delivery['data']['id'])
         workflow.attributes.id = workflow['id']
-        workflow.attributes.deliveryId = parseInt(workflow.relationships.delivery['data']['id'])
+        workflow.attributes.deliveryId = deliveryId
         workflow.attributes['estimated-processing-time'] = workflow.attributes['estimated-processing-time'] || 15
         workflow.attributes['nonsearch-ept'] = workflow.attributes['nonsearch-ept'] || 15
         workflow.attributes['search-ept'] = workflow.attributes['search-ept'] || 15
         workflow.attributes['release-ept'] = workflow.attributes['release-ept'] || 15
+        workflow.attributes.locationOrder = _.map(deliveriesAPIData[deliveryId].relationships.locations.data, function (location) {
+          return parseInt(location.id)
+        })
 
         var importantDates = [
           'started-at',

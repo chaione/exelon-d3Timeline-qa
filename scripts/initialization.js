@@ -36,21 +36,21 @@ var stations = {
   0: 'En Route',
   1: 'Sierra 1',
   2: 'Stinger Gate',
-  3: 'Warehouse',
-  4: 'Sally Port',
+  3: 'Sally Port',
+  4: 'Warehouse',
   5: 'Protected Area',
   6: 'Exit'
 }
 
-var _stationAcronyms = {
-  0: 'ER',
-  1: 'S1',
-  2: 'SG',
-  4: 'WH',
-  3: 'SP',
-  5: 'PA',
-  6: 'EX'
-}
+var _stationAcronyms = [
+  'ER',
+  'S1',
+  'SG',
+  'SP',
+  'WH',
+  'PA',
+  'EX'
+]
 
 var _VEHICLE_TYPE_TO_IMG = {
   'non_common_carrier': 'noncommon',
