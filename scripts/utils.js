@@ -1,3 +1,12 @@
+function _inSubstepLocation (workflow) {
+  var locationId = workflow.locationOrder[workflow.step - 1]
+  var locationName = _.find(_STATIONS, function (value) {
+    return value[locationId]
+  })[locationId]
+
+  return _.includes(_HAS_SUBSTEP_LOCATIONS, locationName)
+}
+
 function _getCurrentWorkflow (workflows) {
   return _.find(workflows, function (workflow, index) {
     if (index === 0) {
@@ -290,4 +299,5 @@ var utils = {
   detailCalculateDelay: _detailCalculateDelay,
   getCurrentWorkflow: _getCurrentWorkflow,
   calcCurrentSubStep: _calcCurrentSubStep,
+  inSubstepLocation: _inSubstepLocation,
 }

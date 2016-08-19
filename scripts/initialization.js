@@ -32,6 +32,11 @@ var startOfDayHour = 6 // used for fake data
 
 var _STATIONS = []
 
+var _HAS_SUBSTEP_LOCATIONS = [
+  'Sierra 1',
+  'Sally Port'
+]
+
 var stations = {
   0: 'En Route',
   1: 'Sierra 1',

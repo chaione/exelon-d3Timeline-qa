@@ -231,15 +231,13 @@ function displayDetail (delivery) {
     .append('g')
     .each(function (d) {
       var workflow = d3.select(this)
-      var s1StationId = utils.getStationId('Sierra 1', _STATIONS)
-      var spStationId = utils.getStationId('Sally Port', _STATIONS)
       var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
       var searchEPT = d['search-estimated-processing-time'] || 15
       var releaseEPT = d['release-estimated-processing-time'] || 15
       var EPT = d['estimated-processing-time'] || 15
       var oneMinute = 1000 * 60
 
-      if (d.step === s1StationId || d.step === spStationId) {
+      if (utils.inSubstepLocation(d)) {
         workflow.append('line')
           .attr('x1', function (d, i) {
             return xScale(
@@ -315,15 +313,13 @@ function displayDetail (delivery) {
     .append('g')
     .each(function (d) {
       var workflow = d3.select(this)
-      var s1StationId = utils.getStationId('Sierra 1', _STATIONS)
-      var spStationId = utils.getStationId('Sally Port', _STATIONS)
       var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
       var searchEPT = d['search-estimated-processing-time'] || 15
       var releaseEPT = d['release-estimated-processing-time'] || 15
       var EPT = d['estimated-processing-time'] || 15
       var oneMinute = 1000 * 60
 
-      if (d.step === s1StationId || d.step === spStationId) {
+      if (utils.inSubstepLocation(d)) {
         workflow.append('text')
           .attr('x', function (d) {
             return xScale(
@@ -434,7 +430,7 @@ function displayDetail (delivery) {
       var EPT = d['estimated-processing-time'] || 15
 
       if (startedAt & startedAt < _now) {
-        if (d.step === 1 || d.step === 3) {
+        if (utils.inSubstepLocation(d)) {
           var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
           var substep2State = utils.calculateSubstepDelayStatus(nonsearchEnd, searchEnd, searchEPT)
           var substep3State = utils.calculateSubstepDelayStatus(searchEnd, endedAt, releaseEPT)
