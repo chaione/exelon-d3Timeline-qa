@@ -22,7 +22,7 @@ function _getCurrentWorkflow (workflows) {
 }
 
 function _detailCalculateDelay (delivery) {
-  if (delivery.currentStation === 0) {
+  if (delivery.currentStation === utils.getStationId('En Route', _STATIONS)) {
     if (delivery.eta && delivery.eta < _now) {
       return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
     }
