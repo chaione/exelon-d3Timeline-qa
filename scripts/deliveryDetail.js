@@ -4,15 +4,17 @@ var inspectionLabels = ['Scheduled', 'Actual']
 function displayDetail (delivery) {
   var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)]
   delivery.status = currentDeliveryData.attributes.status
+  delivery.eta = currentDeliveryData.attributes.eta
   delivery.arriveAt = utils.getNullOrDate(currentDeliveryData.attributes['arrive-at'])
   var pocId = (currentDeliveryData['relationships']['primary-poc']['data'] || {}).id
 
   delivery.primaryPocName = utils.getPocNameById(pocId)
+
   delivery.delay = utils.detailCalculateDelay(delivery)
+
   delivery.companyName = currentDeliveryData.attributes['company-name'] || ''
   delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery)
 
-  // console.log('displayDetail', delivery)
   _isDetailDisplayed = true
   detailYStart = 0
 

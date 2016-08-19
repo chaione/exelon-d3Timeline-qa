@@ -22,14 +22,8 @@ function _getCurrentWorkflow (workflows) {
 }
 
 function _detailCalculateDelay (delivery) {
-  var delay = 0
-  var wfDelay = 0
-
-  // enroute
   if (delivery.currentStation === 0) {
-    var currentWF = _.first(delivery.values)
-
-    if (currentWF.eta && currentWF.eta < _now) {
+    if (delivery.eta && delivery.eta < _now) {
       return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
     }
 
