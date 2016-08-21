@@ -291,7 +291,7 @@ function appendWorkflow (workflow, d) {
 
   var oneMinute = 1000 * 60
 
-  if (d.step === 1 || d.step === 3) { // Has Substeps--------------------------------------------------------------
+  if (utils.inSubstepLocation(d)) { // Has Substeps--------------------------------------------------------------
     if (startedAt === null && endedAt === null) { // workflow hasnt started yet
       workflow.append('line') // nonsearch notreached
         .attr('x1', function (d, i) {
@@ -525,14 +525,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
   var oneMinute = 1000 * 60
 
   // left side of now
-  var currentSubStep
-  if (nonsearchEnd === null) {
-    currentSubStep = 1
-  } else if (searchEnd === null) {
-    currentSubStep = 2
-  } else {
-    currentSubStep = 3
-  }
+  var currentSubStep = utils.getCurrentSubstep(d)
 
   if (currentSubStep === 1) {
     currentWorkflow.append('line')
@@ -676,9 +669,11 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
     var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
     var substep2State = utils.calculateSubstepDelayStatus(nonsearchEnd, searchEnd, searchEPT)
     currentWorkflow.append('line') // substep 1
-      .attr('x1', function (d, i) { return xScale(startedAt); })
-      .attr('y1', function (d, i) { return 0;})
-      .attr('x2', function (d, i) { return xScale(nonsearchEnd - 60000); })
+      .attr('x1', function (d, i) { return xScale(startedAt.getTime()) })
+      .attr('y1', function (d, i) { return 0 })
+      .attr('x2', function (d, i) { 
+        return xScale(nonsearchEnd - 60000)
+      })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', function (d) {
         if (substep1State === 1) {return 'workflow late';}
@@ -697,19 +692,21 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
 
     currentWorkflow.append('line') // part of step 3 done
       .attr('x1', function (d, i) { return xScale(searchEnd); })
-      .attr('y1', function (d, i) { return 0;})
+      .attr('y1', function (d, i) { return 0 })
       .attr('x2', function (d, i) { return xScale(_now); })
-      .attr('y2', function (d, i) { return 0;})
+      .attr('y2', function (d, i) { return 0 })
       .attr('class', function (d) {
         return 'workflow'
       })
 
     // on right side of now
     currentWorkflow.append('line')
-      .attr('x1', function (d, i) { return xScale(_now); })
-      .attr('y1', function (d, i) { return 0;})
-      .attr('x2', function (d, i) { return xScale(new Date(new Date(startedAt)).getTime() + EPT * oneMinute)})
-      .attr('y2', function (d, i) { return .001;}) // IMPORTANT  if its flat its not displayed
+      .attr('x1', function (d, i) { return xScale(_now.getTime()) })
+      .attr('y1', function (d, i) { return 0 })
+      .attr('x2', function (d, i) {
+        return xScale(_now.getTime() + EPT * oneMinute)
+      })
+      .attr('y2', function (d, i) { return .001 })
       .style('stroke-dasharray', ('2, 2'))
       .style('stroke-width', 4)
       .attr('class', function (d) {

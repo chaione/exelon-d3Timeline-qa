@@ -1,3 +1,15 @@
+function _getCurrentSubstep (workflow) {
+  if (!workflow['nonsearch-end']) {
+    return 1
+  }
+
+  if (!workflow['search-end']) {
+    return 2
+  }
+
+  return 3
+}
+
 function _inSubstepLocation (workflow) {
   var locationId = workflow.locationOrder[workflow.step - 1]
   var locationName = _.find(_LOCATIONS, function (value) {
@@ -303,4 +315,5 @@ var utils = {
   calcCurrentSubStep: _calcCurrentSubStep,
   inSubstepLocation: _inSubstepLocation,
   getLocationIdFromLocationName: _getLocationIdFromLocationName,
+  getCurrentSubstep: _getCurrentSubstep,
 }
