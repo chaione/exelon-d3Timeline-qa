@@ -255,30 +255,31 @@ function _calculateWorkflowETAs (workflows) {
 
       if (index !== 0) {
         if (!workflow.eta) {
-          var lwf = orderedWorkflows[index - 1]
-          if (lwf.step === 1 || lwf.step === 3) {
-            wEPT = 45 * 60000
+          var lastWorkflow = orderedWorkflows[index - 1]
+          if (utils.inSubstepLocation(lastWorkflow)) {
+            var substep = utils.getCurrentSubstep(lastWorkflow)
+            wEPT = 15 * (3 - substep + 1)  * 60000
           }
 
-          if (lwf['started-at']) {
-            if (lwf['ended-at']) {
-              workflow.eta = lwf['ended-at']
+          if (lastWorkflow['started-at']) {
+            if (lastWorkflow['ended-at']) {
+              workflow.eta = lastWorkflow['ended-at']
             } else {
               workflow.eta = _now.getTime() + wEPT
             }
           } else {
-            workflow.eta = lwf.eta.getTime() + wEPT
+            workflow.eta = lastWorkflow.eta.getTime() + wEPT
           }
         }
       }
       workflow.state = 'ontime'
       workflow.eta = new Date(workflow.eta)
 
-      if (workflow.step === 1 || workflow.step === 3) {
-        var estimated = 45 * 60000
-      } else {
-        var estimated = 15 * 60000
+      if (utils.inSubstepLocation(workflow)) {
+        var substep = utils.getCurrentSubstep(workflow)
+        var estimated = 15 * (3 - substep + 1)  * 60000
       }
+
       if (workflow['ended-at']) {
         if (workflow['ended-at'].getTime() > (workflow['eta'].getTime() + estimated)) {
           workflow.state = 'late'

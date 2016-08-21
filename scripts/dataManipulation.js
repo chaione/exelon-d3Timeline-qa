@@ -1,4 +1,4 @@
-/* global _ */
+/* global _, d3 */
 function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
   var result = {}
   var eventsArray = _.filter(deliveries.included, {type: 'events'})
@@ -82,10 +82,10 @@ function processApiData (workflowsData) {
   stationStacked = stationStackedCalc(stationCounts, stationStackedCount, stations) // [{name:EnRoute, y:7,y0:0},Object...]
   var deliveriesDataSorted = _.sortBy(deliveriesData, 'currentStation') // is this necesary
 
-
   _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
-  stationData = d3.nest() // groupByStation
+  // groupByStation
+  stationData = d3.nest()
     .key(function (d) {
       return d.currentStation
     })

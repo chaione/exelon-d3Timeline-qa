@@ -1,3 +1,4 @@
+/* global _, d3 */
 var pocContacts = ['POC', 'Delta10']
 var inspectionLabels = ['Scheduled', 'Actual']
 
