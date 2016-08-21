@@ -47,14 +47,14 @@ function render (data) {
   innerWidth = outerWidth - margin.left - margin.right
   innerHeight = outerHeight - margin.top - margin.bottom
 
-  stationHeight = (stationStacked[stationStackedCount.length - 1].y0 * rowHeight) +
+  _locationHeight = (stationStacked[stationStackedCount.length - 1].y0 * rowHeight) +
     (stationStacked[stationStackedCount.length - 1].deliveryCount * rowHeight)
 
   panBounds = {
     top: 0,
     right: 0,
-    bottom: (-1 * stationHeight) + innerHeight - xAxisHeight,
-    left: (-1 * xAxisWidth) + outerWidth
+    bottom: (-1 * _locationHeight) + innerHeight - _X_AXIS_HEIGHT,
+    left: (-1 * _X_AXIS_WIDTH) + outerWidth
   }
 
   // clear it out (for now... hope to just update some day!)
@@ -121,7 +121,7 @@ function render (data) {
     .attr('x1', xScale(_now))
     .attr('y1', margin.top)
     .attr('x2', xScale(_now))
-    .attr('y2', Math.max(stationHeight + xAxisHeight, outerHeight))
+    .attr('y2', Math.max(_locationHeight + _X_AXIS_HEIGHT, outerHeight))
 
   yAxisGroup.append('rect')
     .attr('x', xScale(_now) - (120 / 2))

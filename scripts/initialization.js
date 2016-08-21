@@ -1,4 +1,4 @@
-/* global _ */
+/* global _, d3 */
 // safari rotate bug fix
 ;(function (doc) {
   var addEvent = 'addEventListener'
@@ -21,8 +21,8 @@
 
 // User Defined Variables
 var rowHeight = 45
-var xAxisHeight = 30
-var xAxisWidth = 4500
+var _X_AXIS_HEIGHT = 30
+var _X_AXIS_WIDTH = 4500
 var stationTextHeight = 20
 var stationTextPadding = {top: 10, right: 0, bottom: 0, left: 10}
 
@@ -31,9 +31,7 @@ var outerWidth = document.documentElement.clientWidth
 var outerHeight = document.documentElement.clientHeight - 83
 var startOfDayHour = 6 // used for fake data
 
-
-var _DELIVERIES = []
-
+var _DELIVERIES = [] // Raw Data of API Returned Delivery Data
 var _LOCATIONS = []
 var _HAS_SUBSTEP_LOCATIONS = [
   'Sierra 1',
@@ -101,7 +99,7 @@ var innerWidth = outerWidth - margin.left - margin.right
 var innerHeight = outerHeight - margin.top - margin.bottom
 var unixHour = 1000 * 60 * 60
 var _UNIX_MINUTE = 1000 * 60
-var vpStartHours = (outerWidth / 2) / (xAxisWidth / 48) // startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
+var vpStartHours = (outerWidth / 2) / (_X_AXIS_WIDTH / 48) // startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
 var unixStartHours = unixHour * vpStartHours
 var _now = new Date(Date.now())
 var _WORKFLOW_OFFSET = 60000
@@ -121,10 +119,10 @@ var _isDetailDisplayed = false
 var vehicleShapeH = rowHeight - 10
 var svg, stationsGroup, delieveryStaticGroup, g, deliveriesGroup, xAxisGroup, yAxisGroup, xAxisMask
 
+var _locationHeight
 var stationCounts = []
 var stationStackedCount = []
 var stationStacked = []
-var stationHeight
 var workflowsFakeData = []
 var _deliveryIndexInfo = []
 var startingX
@@ -157,24 +155,23 @@ var customShapes = {
   }
 }
 
-// scales
-// var xScale = d3.time.scale.utc()
-//       .domain([+new Date(nowYear, nowMonth, nowDay-1,12),                +new Date(nowYear, nowMonth, nowDay+1,12)])
-//       .range( [0,                                     xAxisWidth])
 var xScale = d3.time.scale.utc()
-  .domain([+new Date(nowYear, nowMonth, yesterday.getDate(), 12), +new Date(nowYear, nowMonth, tomorrow.getDate(), 12)])
-  .range([0, xAxisWidth])
+  .domain(
+    [+new Date(nowYear, nowMonth, yesterday.getDate(), 12), +new Date(nowYear, nowMonth, tomorrow.getDate(), 12)]
+  )
+  .range(
+    [0, _X_AXIS_WIDTH]
+  )
 
 var yDeliveryScale = d3.scale.linear()
   .domain([1, 7])
   .range([1 + rowHeight, 7 * rowHeight])
 
-// var viewportScale = d3.time.scale.utc()
-//       .domain([+new Date(nowYear, nowMonth, nowDay-1,12)+unixStartHours,  +new Date(nowYear, nowMonth, nowDay+1,12)-unixStartHours])
-//       .range( [0,                                     -1*xAxisWidth+outerWidth])
 var viewportScale = d3.time.scale.utc()
-  .domain([+new Date(nowYear, nowMonth, yesterday.getDate(), 12) + unixStartHours, +new Date(nowYear, nowMonth, tomorrow.getDate(), 12) - unixStartHours])
-  .range([0, -1 * xAxisWidth + outerWidth])
+  .domain(
+    [+new Date(nowYear, nowMonth, yesterday.getDate(), 12) + unixStartHours, +new Date(nowYear, nowMonth, tomorrow.getDate(), 12) - unixStartHours]
+  )
+  .range([0, -1 * _X_AXIS_WIDTH + outerWidth])
 
 startingX = viewportScale(new Date(nowYear, nowMonth, nowDay, nowHours, nowMinutes))
 detailStartingX = startingX
@@ -304,9 +301,9 @@ function setupSvgStructure () {
     .attr('x', 0)
     .attr('y', 0)
     .attr('width', outerWidth)
-    .attr('height', xAxisHeight * 2)
+    .attr('height', _X_AXIS_HEIGHT * 2)
     .attr('class', 'maskingGradient')
-    .attr('transform', 'translate(' + 0 + ',' + (outerHeight - (xAxisHeight * 2) + 1) + ')')
+    .attr('transform', 'translate(' + 0 + ',' + (outerHeight - (_X_AXIS_HEIGHT * 2) + 1) + ')')
 
   xAxisGroup = g.append('g')
     .attr('class', 'x axis ')
@@ -316,7 +313,7 @@ function setupSvgStructure () {
     .attr('x', 0)
     .attr('y', 0)
     .attr('width', 120)
-    .attr('height', outerHeight - xAxisHeight)
+    .attr('height', outerHeight - _X_AXIS_HEIGHT)
     .attr('class', 'maskingGradientHorizontal')
     .attr('transform', 'translate(' + 0 + ',' + 0 + ')')
 

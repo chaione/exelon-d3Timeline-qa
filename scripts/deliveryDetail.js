@@ -26,8 +26,8 @@ function displayDetail (delivery) {
   var detailDeliveryRectHeight = ((eventCount + 1) * eventHeight) + (detailPadding * 2)
   if (detailDeliveryRectY < 50) {
     detailDeliveryRectY = 50
-  } else if (detailDeliveryRectY > innerHeight - xAxisHeight - detailDeliveryRectHeight) {
-    detailDeliveryRectY = innerHeight - xAxisHeight - detailDeliveryRectHeight
+  } else if (detailDeliveryRectY > innerHeight - _X_AXIS_HEIGHT - detailDeliveryRectHeight) {
+    detailDeliveryRectY = innerHeight - _X_AXIS_HEIGHT - detailDeliveryRectHeight
   }
   // detailDeliveryRectY = detailDeliveryRectY+100
   // detailSvg
@@ -51,7 +51,7 @@ function displayDetail (delivery) {
   // setup the popup
   detailSvg = d3.select('body').append('svg')
     .attr('width', outerWidth)
-    .attr('height', outerHeight - xAxisHeight)
+    .attr('height', outerHeight - _X_AXIS_HEIGHT)
     .attr('id', 'detailSvg')
     .style('opacity', .97)
     .call(xAxisTranslation)
@@ -61,7 +61,7 @@ function displayDetail (delivery) {
     .attr('x', 0)
     .attr('y', 0)
     .attr('width', outerWidth)
-    .attr('height', outerHeight - xAxisHeight)
+    .attr('height', outerHeight - _X_AXIS_HEIGHT)
     .attr('class', 'detailDeliveryCloseRect')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
     .on('click', function () {
@@ -196,7 +196,7 @@ function displayDetail (delivery) {
     .attr('x1', xScale(_now))
     .attr('y1', 30)
     .attr('x2', xScale(_now))
-    .attr('y2', Math.max(stationHeight + xAxisHeight, outerHeight))
+    .attr('y2', Math.max(_locationHeight + _X_AXIS_HEIGHT, outerHeight))
   detailDeliveryYAxisGroup.append('rect')
     .attr('x', xScale(_now) - (120 / 2))
     .attr('y', 14)
