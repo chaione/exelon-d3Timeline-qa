@@ -1,13 +1,4 @@
-function compare (a, b) {
-  if (a.currentStation < b.currentStation) {
-    return -1
-  } else if (a.currentStation > b.currentStation) {
-    return 1
-  } else {
-    return 0
-  }
-}
-
+/* global _ */
 function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
   var result = {}
   var eventsArray = _.filter(deliveries.included, {type: 'events'})
@@ -86,10 +77,11 @@ function processApiData (workflowsData) {
 
   deliveriesData = updateCurrentStationCalc(deliveriesData)
 
-  stationCounts = stationCountCalc(deliveriesData); // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  stationStackedCount = stationStackedCountCalc(stationCounts); // [7, 12, 17, 18, 22, 23, 24, 25]
-  stationStacked = stationStackedCalc(stationCounts, stationStackedCount, stations); // [{name:EnRoute, y:7,y0:0},Object...]
-  var deliveriesDataSorted = deliveriesData.sort(compare) // is this necesary
+  stationCounts = stationCountCalc(deliveriesData) // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
+  stationStackedCount = stationStackedCountCalc(stationCounts) // [7, 12, 17, 18, 22, 23, 24, 25]
+  stationStacked = stationStackedCalc(stationCounts, stationStackedCount, stations) // [{name:EnRoute, y:7,y0:0},Object...]
+  var deliveriesDataSorted = _.sortBy(deliveriesData, 'currentStation') // is this necesary
+
 
   _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
@@ -144,7 +136,7 @@ function retrieveDeliveries () {
     success: function (deliveryResults) {
       _DELIVERIES = _.filter(deliveryResults.data, {type: 'deliveries'})
 
-      _STATIONS = utils.cleanupStationsData(
+      _LOCATIONS = utils.cleanupStationsData(
         _.filter(deliveryResults.included, {type: 'locations'})
       )
 
@@ -202,10 +194,10 @@ function retrieveDeliveries () {
 }
 
 function stationCountCalc (deliveriesData) { // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  var stationCounts = _.fill(Array(_STATIONS.length), 0)
+  var stationCounts = _.fill(Array(_LOCATIONS.length), 0)
 
   _.each(deliveriesData, function (delivery) {
-    var stationIndex = utils.getStaionIndexInStations(delivery.currentStation, _STATIONS)
+    var stationIndex = utils.getStaionIndexInStations(delivery.currentStation, _LOCATIONS)
     stationCounts[stationIndex]++
   })
 
@@ -256,7 +248,7 @@ function stackDeliveriesCalc (stationStackedCount, stationData) {
       if (parseInt(station.key) === 0) {
         delivery.yIndex = j
       } else {
-        var stationIndex = utils.getStaionIndexInStations(parseInt(station.key), _STATIONS)
+        var stationIndex = utils.getStaionIndexInStations(parseInt(station.key), _LOCATIONS)
 
         delivery.yIndex = stationStackedCount[stationIndex - 1] + j
       }
@@ -296,7 +288,7 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
       var lastWorkflowEndTime = _.last(currentDelivery.values)['ended-at']
 
       if (lastWorkflowEndTime && lastWorkflowEndTime < _now) {
-        currentStation = utils.getExitStationId(_STATIONS)
+        currentStation = utils.getExitStationId(_LOCATIONS)
       }
     }
 

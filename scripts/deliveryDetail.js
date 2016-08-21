@@ -104,7 +104,7 @@ function displayDetail (delivery) {
   }
 
   // Location title on top left
-  var stationIndex = utils.getStaionIndexInStations(delivery.currentStation, _STATIONS)
+  var stationIndex = utils.getStaionIndexInStations(delivery.currentStation, _LOCATIONS)
   var detailDeliveryStationLabel = detailSvg.append('text')
     .attr('x', 10)
     .attr('y', detailDeliveryRectY - 10)
@@ -331,7 +331,7 @@ function displayDetail (delivery) {
           .attr('y', -3)
           .text(function (d, i) {
             var realStationId = d.locationOrder[d.step - 1]
-            var stationIndex = utils.getStaionIndexInStations(realStationId, _STATIONS)
+            var stationIndex = utils.getStaionIndexInStations(realStationId, _LOCATIONS)
 
             if (d['eta'] > _now) {
               return _stationAcronyms[stationIndex] + '.' + 1
@@ -376,7 +376,7 @@ function displayDetail (delivery) {
               var stationIndex = 0
             } else {
               var realStationId = d.locationOrder[d.step - 1]
-              var stationIndex = utils.getStaionIndexInStations(realStationId, _STATIONS)
+              var stationIndex = utils.getStaionIndexInStations(realStationId, _LOCATIONS)
             }
             if (d.eta > _now) {
               return _stationAcronyms[stationIndex]
@@ -441,7 +441,7 @@ function displayDetail (delivery) {
             .attr('x1', xScale(startedAt))
             .attr('y', 14)
             .text(function (d, i) {
-              var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
+              var stationIndex = utils.getStaionIndexInStations(d.step, _LOCATIONS)
               return _stationAcronyms[stationIndex] + '.' + 1
             })
             .attr('class', function (d) {
@@ -483,7 +483,7 @@ function displayDetail (delivery) {
             .attr('x', function (d) { return xScale(startedAt) })
             .attr('y', 14)
             .text(function (d, i) {
-              var stationIndex = utils.getStaionIndexInStations(d.step, _STATIONS)
+              var stationIndex = utils.getStaionIndexInStations(d.step, _LOCATIONS)
               return _stationAcronyms[stationIndex]
             })
             .attr('class', function (d) {
@@ -595,10 +595,10 @@ function displayDetail (delivery) {
 function calculateInfoboxCurrStation (delivery) {
   var currentWF = utils.getCurrentWorkflow(delivery.values)
 
-  var s1StationId = utils.getStationId('Sierra 1', _STATIONS)
-  var spStationId = utils.getStationId('Sally Port', _STATIONS)
-  var erStationId = utils.getStationId('En Route', _STATIONS)
-  var exitStationId = utils.getStationId('Exit', _STATIONS)
+  var s1StationId = utils.getStationId('Sierra 1', _LOCATIONS)
+  var spStationId = utils.getStationId('Sally Port', _LOCATIONS)
+  var erStationId = utils.getStationId('En Route', _LOCATIONS)
+  var exitStationId = utils.getStationId('Exit', _LOCATIONS)
 
   if (delivery.currentStation === s1StationId || delivery.currentStation === spStationId) {
     var currentSubStep = utils.calcCurrentSubStep(currentWF)

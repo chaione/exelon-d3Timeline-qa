@@ -1,3 +1,4 @@
+/* global _ */
 function moveXAxis (a, b) {
   var eventxTranslation = d3.event.translate[0]
   var eventyTranslation = d3.event.translate[1]

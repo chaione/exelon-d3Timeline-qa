@@ -1,6 +1,6 @@
 function _inSubstepLocation (workflow) {
   var locationId = workflow.locationOrder[workflow.step - 1]
-  var locationName = _.find(_STATIONS, function (value) {
+  var locationName = _.find(_LOCATIONS, function (value) {
     return value[locationId]
   })[locationId]
 
@@ -22,7 +22,7 @@ function _getCurrentWorkflow (workflows) {
 }
 
 function _detailCalculateDelay (delivery) {
-  if (delivery.currentStation === utils.getStationId('En Route', _STATIONS)) {
+  if (delivery.currentStation === utils.getStationId('En Route', _LOCATIONS)) {
     if (delivery.eta && delivery.eta < _now) {
       return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
     }
@@ -31,7 +31,7 @@ function _detailCalculateDelay (delivery) {
   }
 
   // Exited
-  if (delivery.currentStation === utils.getExitStationId(_STATIONS)) {
+  if (delivery.currentStation === utils.getExitStationId(_LOCATIONS)) {
     var currentWF = _.last(delivery.values)
 
     var a = currentWF.eta.getTime() + currentWF['estimated-processing-time'] * 60 * 1000
@@ -40,7 +40,7 @@ function _detailCalculateDelay (delivery) {
     return Math.round(b / 1000 / 60)
   }
 
-  var stationId = _getStaionIndexInStations(delivery.currentStation, _STATIONS)
+  var stationId = _getStaionIndexInStations(delivery.currentStation, _LOCATIONS)
   var currentWF = delivery.values[stationId]
 
   var minutesStartingLate = currentWF['started-at'] - currentWF['eta']
@@ -106,7 +106,7 @@ function _getExitStationId (stations) {
 }
 
 function _getLocationIdFromLocationName (locationName) {
-  var station = _.find(_STATIONS, function (value, key) {
+  var station = _.find(_LOCATIONS, function (value, key) {
     return _.values(value)[0] === locationName
   })
 

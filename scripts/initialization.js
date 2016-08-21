@@ -1,3 +1,4 @@
+/* global _ */
 // safari rotate bug fix
 ;(function (doc) {
   var addEvent = 'addEventListener'
@@ -30,7 +31,6 @@ var outerWidth = document.documentElement.clientWidth
 var outerHeight = document.documentElement.clientHeight - 83
 var startOfDayHour = 6 // used for fake data
 
-var _STATIONS = []
 
 var _DELIVERIES = []
 
@@ -84,7 +84,7 @@ var _VEHICLE_TYPE_TO_IMG = {
   'null': 'null'
 }
 
-var _pollRate = 2455000
+var _POLL_RATE = 2455000
 // var url = 'https://exelon-api.herokuapp.com/v1/'
 // var url = 'https://exelon-api-qa.herokuapp.com/v1/'
 // var url = 'https://exelon-api-production.herokuapp.com/v1/'
