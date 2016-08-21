@@ -2,17 +2,17 @@ var pocContacts = ['POC', 'Delta10']
 var inspectionLabels = ['Scheduled', 'Actual']
 
 function displayDetail (delivery) {
-  var currentDeliveryData = deliveriesAPIData[parseInt(delivery.key)]
-  delivery.status = currentDeliveryData.attributes.status
-  delivery.eta = currentDeliveryData.attributes.eta
-  delivery.arriveAt = utils.getNullOrDate(currentDeliveryData.attributes['arrive-at'])
-  var pocId = (currentDeliveryData['relationships']['primary-poc']['data'] || {}).id
+  var currentDeliveryRaw = _.find(_DELIVERIES, {id: delivery.key})
+  delivery.status = currentDeliveryRaw.attributes.status
+  delivery.eta = currentDeliveryRaw.attributes.eta
+  delivery.arriveAt = utils.getNullOrDate(currentDeliveryRaw.attributes['arrive-at'])
+  var pocId = (currentDeliveryRaw['relationships']['primary-poc']['data'] || {}).id
 
   delivery.primaryPocName = utils.getPocNameById(pocId)
 
   delivery.delay = utils.detailCalculateDelay(delivery)
 
-  delivery.companyName = currentDeliveryData.attributes['company-name'] || ''
+  delivery.companyName = currentDeliveryRaw.attributes['company-name'] || ''
   delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery)
 
   _isDetailDisplayed = true

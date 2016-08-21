@@ -76,20 +76,15 @@ function processApiData (workflowsData) {
 
   // update deliveries w/ data
   _.each(deliveriesData, function (delivery) {
-    var vehicleInfo = vehiclesAPIData[deliveriesAPIData[parseInt(delivery.key)].relationships.vehicle.data.id]
-    var deliveryStatus = deliveriesAPIData[parseInt(delivery.key)].attributes.status
+    var deliveryRaw = _.find(_DELIVERIES, {id: delivery.key})
+    var vehicleInfo = vehiclesAPIData[deliveryRaw.relationships.vehicle.data.id]
+    var deliveryStatus = deliveryRaw.attributes.status
 
     delivery.vehicleType = utils.getVehicleImageName(vehicleInfo, deliveryStatus)
-    delivery.currentLocation = deliveriesAPIData[parseInt(delivery.key)].attributes['current-location']
+    delivery.currentLocation = deliveryRaw.attributes['current-location']
   })
 
   deliveriesData = updateCurrentStationCalc(deliveriesData)
-
-  _.each(deliveriesData, function (delivery) {
-    _.each(delivery.values, function (workflow) {
-      workflow.station = delivery.currentStation
-    })
-  })
 
   stationCounts = stationCountCalc(deliveriesData); // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
   stationStackedCount = stationStackedCountCalc(stationCounts); // [7, 12, 17, 18, 22, 23, 24, 25]
@@ -116,7 +111,7 @@ function processApiData (workflowsData) {
       var tempDelivery = tempStation.values[j]
 
       _deliveryIndexInfo.push({
-        status: deliveriesAPIData[parseInt(tempDelivery.key)].attributes.status,
+        status: _.find(_DELIVERIES, {id: tempDelivery.key}).attributes.status,
         deliveryId: tempDelivery.key,
         yIndex: tempDelivery.yIndex
       })
@@ -146,29 +141,22 @@ function retrieveDeliveries () {
       'X-SITE-ID': siteId,
       'Authorization': 'Bearer ' + bearerToken
     },
-    success: function (deliveriesAPI) {
-      deliveries = deliveriesAPI
-
-      deliveriesAPIData = {}
-      var deliveriesArray = _.filter(deliveries.data, {type: 'deliveries'})
-      for (var i = 0; i < deliveriesArray.length; i++) {
-        var delivery = deliveriesArray[i]
-        deliveriesAPIData[delivery.id] = delivery
-      }
+    success: function (deliveryResults) {
+      _DELIVERIES = _.filter(deliveryResults.data, {type: 'deliveries'})
 
       _STATIONS = utils.cleanupStationsData(
-        _.filter(deliveries.included, {type: 'locations'})
+        _.filter(deliveryResults.included, {type: 'locations'})
       )
 
       vehiclesAPIData = {}
-      var vehiclesArray = _.filter(deliveries.included, {type: 'vehicles'})
+      var vehiclesArray = _.filter(deliveryResults.included, {type: 'vehicles'})
       for (var i = 0; i < vehiclesArray.length; i++) {
         var vehicle = vehiclesArray[i]
         vehiclesAPIData[vehicle.id] = vehicle.attributes
       }
 
       _pocsAPIData = {}
-      var pocs = _.filter(deliveries.included, {type: 'pocs'})
+      var pocs = _.filter(deliveryResults.included, {type: 'pocs'})
       _.each(pocs, poc => {
         _pocsAPIData[poc.id] = poc.attributes
       })
@@ -178,19 +166,20 @@ function retrieveDeliveries () {
       //   'contacts':[contactId1,contactId2] (now we know which order)
       // },
       // 'delivery2':
-      eventsReqAndRespByDeliveryAPIData = calculateEventsReqAndRespByDeliveryAPIData(deliveries)
+      eventsReqAndRespByDeliveryAPIData = calculateEventsReqAndRespByDeliveryAPIData(deliveryResults)
 
-      var apiWorkflows = _.filter(deliveries.included, {type: 'workflows'})
+      var apiWorkflows = _.filter(deliveryResults.included, {type: 'workflows'})
 
       apiWorkflows = apiWorkflows.map(function (workflow) {
-        var deliveryId = parseInt(workflow.relationships.delivery['data']['id'])
+        var deliveryId = workflow.relationships.delivery['data']['id']
+        var deliveryRaw = _.find(_DELIVERIES, {id: deliveryId})
         workflow.attributes.id = workflow['id']
-        workflow.attributes.deliveryId = deliveryId
+        workflow.attributes.deliveryId = parseInt(deliveryId)
         workflow.attributes['estimated-processing-time'] = workflow.attributes['estimated-processing-time'] || 15
         workflow.attributes['nonsearch-ept'] = workflow.attributes['nonsearch-ept'] || 15
         workflow.attributes['search-ept'] = workflow.attributes['search-ept'] || 15
         workflow.attributes['release-ept'] = workflow.attributes['release-ept'] || 15
-        workflow.attributes.locationOrder = _.map(deliveriesAPIData[deliveryId].relationships.locations.data, function (location) {
+        workflow.attributes.locationOrder = _.map(deliveryRaw.relationships.locations.data, function (location) {
           return parseInt(location.id)
         })
 
@@ -299,7 +288,7 @@ function updateCurrentStationCalc (deliveriesData) { // update every delivery w/
       var firstWorkflowOfDelivery = currentDelivery.values[0]
 
       if (!firstWorkflowOfDelivery['started-at']) {
-        currentStation = 0
+        currentStation = utils.getLocationIdFromLocationName('En Route')
       }
     }
 
@@ -324,8 +313,6 @@ function generateCurrentDeliveryDelayById (deliveriesData) {
     var delivery = deliveriesData[i]
     delayData[delivery.key] = utils.detailCalculateDelay(delivery)
   }
-
-  window.DELIVERIES = deliveriesData
 
   return delayData
 }

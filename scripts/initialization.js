@@ -32,9 +32,21 @@ var startOfDayHour = 6 // used for fake data
 
 var _STATIONS = []
 
+var _DELIVERIES = []
+
+var _LOCATIONS = []
 var _HAS_SUBSTEP_LOCATIONS = [
   'Sierra 1',
   'Sally Port'
+]
+var _LOCATION_ABBRS = [
+  { name: 'En Route',       abbr: 'ER' },
+  { name: 'Sierra 1',       abbr: 'S1' },
+  { name: 'Stinger Gate',   abbr: 'SG' },
+  { name: 'Sally Port',     abbr: 'SP' },
+  { name: 'Warehouse',      abbr: 'WH' },
+  { name: 'Protected Area', abbr: 'PA' },
+  { name: 'Exit',           abbr: 'EX' }
 ]
 
 var stations = {
@@ -118,7 +130,6 @@ var _deliveryIndexInfo = []
 var startingX
 var duration, variation, variationMinutes
 var yDeliveryScale
-var deliveriesAPIData; // big one.  has all the details for every delivery by id
 var _currentDeliveryDelayById = {}
 var _pocsAPIData
 var previousYTranslation = 0
@@ -126,7 +137,6 @@ var vehiclesAPIData
 var eventsReqAndRespByDeliveryAPIData
 var detailStartingX
 var detailDeliveryRectY
-var deliveries = {}
 
 var panBounds
 

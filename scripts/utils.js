@@ -105,6 +105,14 @@ function _getExitStationId (stations) {
   return _getStationId('Exit', stations)
 }
 
+function _getLocationIdFromLocationName (locationName) {
+  var station = _.find(_STATIONS, function (value, key) {
+    return _.values(value)[0] === locationName
+  })
+
+  return parseInt(_.keys(station)[0] || -1)
+}
+
 function _getStationId (stationName, stations) {
   var station = _.find(stations, function (value, key) {
     return _.values(value)[0] === stationName
@@ -294,4 +302,5 @@ var utils = {
   getCurrentWorkflow: _getCurrentWorkflow,
   calcCurrentSubStep: _calcCurrentSubStep,
   inSubstepLocation: _inSubstepLocation,
+  getLocationIdFromLocationName: _getLocationIdFromLocationName,
 }
