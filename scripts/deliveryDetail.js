@@ -104,12 +104,10 @@ function displayDetail (delivery) {
       .attr('transform', function (d) {return 'translate(' + 0 + ',' + detailDeliveryRectY + ')'})
   }
 
-  // Location title on top left
-  var stationIndex = utils.getStaionIndexInStations(delivery.currentStation, _LOCATIONS)
   var detailDeliveryStationLabel = detailSvg.append('text')
     .attr('x', 10)
     .attr('y', detailDeliveryRectY - 10)
-    .text(stations[stationIndex])
+    .text(utils.getLocationNameFromRawDelivery(delivery))
     .attr('class', 'detailName')
     .attr('font-size', stationTextHeight + 'px')
 
@@ -594,21 +592,23 @@ function displayDetail (delivery) {
 }
 
 function calculateInfoboxCurrStation (delivery) {
-  var currentWF = utils.getCurrentWorkflow(delivery.values)
+  var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
 
-  var s1StationId = utils.getStationId('Sierra 1', _LOCATIONS)
-  var spStationId = utils.getStationId('Sally Port', _LOCATIONS)
-  var erStationId = utils.getStationId('En Route', _LOCATIONS)
-  var exitStationId = utils.getStationId('Exit', _LOCATIONS)
+  var erLocationId = utils.getLocationId('En Route', _LOCATIONS)
+  var exitLocationId = utils.getLocationId('Exit', _LOCATIONS)
+  var locationName = utils.getLocationNameFromWorkflow(currentWorkflow)
 
-  if (delivery.currentStation === s1StationId || delivery.currentStation === spStationId) {
-    var currentSubStep = utils.calcCurrentSubStep(currentWF)
-    return '(' + _stationAcronyms[currentWF.station] + ' ' + currentSubStep + '/3)'
-  } else if (delivery.currentStation === erStationId || delivery.currentStation === exitStationId) {
+  if (utils.inSubstepLocation(currentWorkflow)) {
+    var currentSubstep = utils.getCurrentSubstep(currentWorkflow)
+
+    return '(' + locationName + ' ' + currentSubstep + '/3)'
+  } 
+
+  if (delivery.currentStation === erLocationId || delivery.currentStation === exitLocationId) {
     return ''
-  } else {
-    return '(' + _stationAcronyms[currentWF.station] + ')'
   }
+
+  return '(' + locationName + ')'
 }
 
 function dismissDeliveryDetail () {

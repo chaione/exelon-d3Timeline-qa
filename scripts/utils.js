@@ -1,3 +1,15 @@
+function _getLocationNameFromRawDelivery (delivery) {
+  var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
+  return utils.getLocationNameFromWorkflow(currentWorkflow)
+}
+
+function _getLocationNameFromWorkflow (workflow) {
+  var locationId = workflow.locationOrder[workflow.step - 1]
+  return _.find(_LOCATIONS, function (value) {
+    return value[locationId]
+  })[locationId]
+}
+
 function _getCurrentSubstep (workflow) {
   if (!workflow['nonsearch-end']) {
     return 1
@@ -11,10 +23,7 @@ function _getCurrentSubstep (workflow) {
 }
 
 function _inSubstepLocation (workflow) {
-  var locationId = workflow.locationOrder[workflow.step - 1]
-  var locationName = _.find(_LOCATIONS, function (value) {
-    return value[locationId]
-  })[locationId]
+  var locationName = utils.getLocationNameFromWorkflow(workflow)
 
   return _.includes(_HAS_SUBSTEP_LOCATIONS, locationName)
 }
@@ -34,7 +43,7 @@ function _getCurrentWorkflow (workflows) {
 }
 
 function _detailCalculateDelay (delivery) {
-  if (delivery.currentStation === utils.getStationId('En Route', _LOCATIONS)) {
+  if (delivery.currentStation === utils.getLocationId('En Route', _LOCATIONS)) {
     if (delivery.eta && delivery.eta < _now) {
       return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
     }
@@ -43,7 +52,7 @@ function _detailCalculateDelay (delivery) {
   }
 
   // Exited
-  if (delivery.currentStation === utils.getExitStationId(_LOCATIONS)) {
+  if (delivery.currentStation === utils.getExitLocationId(_LOCATIONS)) {
     var currentWF = _.last(delivery.values)
 
     var a = currentWF.eta.getTime() + currentWF['estimated-processing-time'] * 60 * 1000
@@ -97,13 +106,13 @@ function _cleanupStationsData (receivedStations) {
     return rObj
   })
 
-  if (utils.getStationId('En Route', results) === -1) {
+  if (utils.getLocationId('En Route', results) === -1) {
     results.splice(0, 0, {
       0: 'En Route'
     })
   }
   _.each(stations, function(station, index) {
-    if (utils.getStationId(station, results) === -1) {
+    if (utils.getLocationId(station, results) === -1) {
       var temp = {}
       temp[parseInt(index) + 1] = station
       results.splice(index, 0, temp)
@@ -113,8 +122,8 @@ function _cleanupStationsData (receivedStations) {
   return results
 }
 
-function _getExitStationId (stations) {
-  return _getStationId('Exit', stations)
+function _getExitLocationId (stations) {
+  return _getLocationId('Exit', stations)
 }
 
 function _getLocationIdFromLocationName (locationName) {
@@ -125,9 +134,9 @@ function _getLocationIdFromLocationName (locationName) {
   return parseInt(_.keys(station)[0] || -1)
 }
 
-function _getStationId (stationName, stations) {
-  var station = _.find(stations, function (value, key) {
-    return _.values(value)[0] === stationName
+function _getLocationId (locationName, locations) {
+  var station = _.find(locations, function (value, key) {
+    return _.values(value)[0] === locationName
   })
 
   return parseInt(_.keys(station)[0] || -1)
@@ -145,16 +154,6 @@ function _getNullOrDate (dateString) {
   }
 
   return null
-}
-
-function _calcCurrentSubStep (workflow) {
-  if (workflow['nonsearch-end'] === null) {
-    return 1
-  } else if (workflow['search-end'] === null) {
-    return 2
-  } else {
-    return 3
-  }
 }
 
 function _getPocNameById (pocId) {
@@ -305,16 +304,17 @@ var utils = {
   getSubstepState: _getSubstepState,
   getVehicleImageName: _getVehicleImageName,
   calculateWorkflowETAs: _calculateWorkflowETAs,
-  getExitStationId: _getExitStationId,
-  getStationId: _getStationId,
+  getExitLocationId: _getExitLocationId,
+  getLocationId: _getLocationId,
   getStaionIndexInStations: _getStaionIndexInStations,
   cleanupStationsData: _cleanupStationsData,
   prepareSubStepEndTimes: _prepareSubStepEndTimes,
   calculateSubstepDelayStatus: _calculateSubstepDelayStatus,
   detailCalculateDelay: _detailCalculateDelay,
   getCurrentWorkflow: _getCurrentWorkflow,
-  calcCurrentSubStep: _calcCurrentSubStep,
   inSubstepLocation: _inSubstepLocation,
   getLocationIdFromLocationName: _getLocationIdFromLocationName,
   getCurrentSubstep: _getCurrentSubstep,
+  getLocationNameFromWorkflow: _getLocationNameFromWorkflow,
+  getLocationNameFromRawDelivery: _getLocationNameFromRawDelivery,
 }
