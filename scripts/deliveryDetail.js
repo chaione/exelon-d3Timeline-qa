@@ -329,11 +329,10 @@ function displayDetail (delivery) {
           })
           .attr('y', -3)
           .text(function (d, i) {
-            var realStationId = d.locationOrder[d.step - 1]
-            var stationIndex = utils.getStaionIndexInStations(realStationId, _LOCATIONS)
+            var locationName = utils.getLocationNameFromWorkflow(d)
 
             if (d['eta'] > _now) {
-              return _stationAcronyms[stationIndex] + '.' + 1
+              return utils.getLocationAbbrFromLocationName(locationName) + '.1'
             }
           })
           .attr('class', 'detailScheduledLabels')
@@ -355,7 +354,11 @@ function displayDetail (delivery) {
           .attr('font-size', 14 + 'px')
 
         workflow.append('text')
-          .attr('x', function (d) { return xScale(d['eta'].getTime() + nonsearchEPT * 60000 + (d['search-estimated-processing-time'] || 15) * 60000); })
+          .attr('x', function (d) { 
+            return xScale(
+              d['eta'].getTime() + nonsearchEPT * 60000 + searchEPT * 60000
+            )
+          })
           .attr('y', -3)
           .text(function (d, i) {
             if (d['eta'].getTime() + nonsearchEPT * 60000 + (d['search-estimated-processing-time'] || 15) * 60000 > _now) {
@@ -370,15 +373,14 @@ function displayDetail (delivery) {
             return xScale(d['eta'])
           })
           .attr('y', -3)
-          .text(function (d, i) {
+          .text(function (d) {
             if (d.step === 1 && !d['started-at']) {
-              var stationIndex = 0
+              var locationName = 'En Route'
             } else {
-              var realStationId = d.locationOrder[d.step - 1]
-              var stationIndex = utils.getStaionIndexInStations(realStationId, _LOCATIONS)
+              var locationName = utils.getLocationNameFromWorkflow(d)
             }
             if (d.eta > _now) {
-              return _stationAcronyms[stationIndex]
+              return utils.getLocationAbbrFromLocationName(locationName)
             }
           })
           .attr('class', 'detailScheduledLabels')

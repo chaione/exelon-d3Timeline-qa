@@ -1,3 +1,12 @@
+function _getLocationAbbrFromLocationName (locationName) {
+  return _.find(_LOCATION_ABBRS, {name: locationName}).abbr
+}
+
+function _getLocationAbbrFromWorkflow (workflow) {
+  var locationName = utils.getLocationNameFromWorkflow(workflow)
+  return utils.getLocationAbbrFromLocationName(locationName)
+}
+
 function _getLocationNameFromRawDelivery (delivery) {
   var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
   return utils.getLocationNameFromWorkflow(currentWorkflow)
@@ -317,4 +326,6 @@ var utils = {
   getCurrentSubstep: _getCurrentSubstep,
   getLocationNameFromWorkflow: _getLocationNameFromWorkflow,
   getLocationNameFromRawDelivery: _getLocationNameFromRawDelivery,
+  getLocationAbbrFromWorkflow: _getLocationAbbrFromWorkflow,
+  getLocationAbbrFromLocationName: _getLocationAbbrFromLocationName,
 }
