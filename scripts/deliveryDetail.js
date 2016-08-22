@@ -220,11 +220,11 @@ function displayDetail (delivery) {
       return 'translate(' + xScale(_now) + ',' + (30) + ')'
     })
 
-  // The first line group
   var detailDeliveryDataScheduledGroup = detailDeliveryDataGroup.append('g')
     .attr('class', 'detailScheduled')
     .attr('transform', 'translate(' + 0 + ',' + (detailPadding + eventHeight) + ')')
 
+  // Lines
   detailDeliveryDataScheduledGroup
     .selectAll('.detailScheduledLine')
     .data(delivery.values)
@@ -281,32 +281,76 @@ function displayDetail (delivery) {
           })
           .attr('y1', 0)
           .attr('x2', function (d, i) {
-            return xScale(
-              d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
-            )
+            if (d.step < delivery.values.length) {
+              var nextWorkflow = _.find(delivery.values, {step: d.step + 1})
+              return xScale(nextWorkflow.eta.getTime() - 60000)
+            } else {
+              return xScale(
+                d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
+              )
+            }
           })
           .attr('y2', 0)
           .attr('class', function (d) {
             return 'detailScheduledLine2'
           })
+
+        workflow.append('svg:path')
+          .attr('d', function (d) { return customShapes['lBook'](4);})
+          .attr('transform', function (d) {
+            return 'translate(' + xScale(d.eta) + ',' + 0 + ')'
+          })
+          .attr('fill', '#797F88')
+
+        workflow.append('svg:path')
+          .attr('d', function (d) { return customShapes['rBook'](4);})
+          .attr('transform', function (d) {
+            if (d.step < delivery.values.length) {
+              var nextWorkflow = _.find(delivery.values, {step: d.step + 1})
+              var endTime = nextWorkflow.eta.getTime() - 60000
+            } else {
+              var endTime = d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
+            }
+            return 'translate(' + xScale(endTime) + ',' + 0 + ')'
+          })
+          .attr('fill', '#797F88')
       } else {
         workflow.append('line')
           .attr('x1', function (d, i) {
-            return xScale(d['eta'])
+            return xScale(d.eta.getTime())
           })
           .attr('y1', 0)
           .attr('x2', function (d, i) {
             return xScale(
-              d['eta'].getTime() + d['estimated-processing-time'] * 60000 - 60000
+              d.eta.getTime() + EPT * 60000 - 60000
             )
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            return 'detailScheduledLine2 ' + d.step
+            if (d.eta > _now) {
+              return 'detailScheduledLine2 notReached'
+            }
+            return 'detailScheduledLine2'
           })
+
+        workflow.append('svg:path')
+          .attr('d', function (d) { return customShapes['lBook'](4);})
+          .attr('transform', function (d) {
+            return 'translate(' + xScale(d.eta) + ',' + 0 + ')'
+          })
+          .attr('fill', '#797F88')
+
+        workflow.append('svg:path')
+          .attr('d', function (d) { return customShapes['rBook'](4);})
+          .attr('transform', function (d) {
+            return 'translate(' + xScale(d.eta.getTime() + EPT * 60000 - 60000) + ',' + 0 + ')'
+          })
+          .attr('fill', '#797F88')
+
       }
     })
 
+  // Labels
   detailDeliveryDataScheduledGroup
     .selectAll('.detailScheduledLabels')
     .data(delivery.values)

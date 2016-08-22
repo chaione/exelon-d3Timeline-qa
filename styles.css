@@ -203,8 +203,10 @@ body {
     }
     .detailScheduledLine2 {
       stroke: #3B414A;
-      stroke-width:    1px;
-
+      stroke-width: 2px;
+    }
+    .detailScheduledLine2.notReached {
+      stroke: #363667;
     }
 
     .detailEventLine {
