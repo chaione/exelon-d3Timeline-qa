@@ -37,7 +37,7 @@ body {
     }
 
     .bookEnd {
-      fill:#BFFFEA;
+      fill: #BFFFEA;
     }
     .bookend.notReached {
       opacity:0;

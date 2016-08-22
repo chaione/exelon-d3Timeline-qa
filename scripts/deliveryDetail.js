@@ -442,8 +442,8 @@ function displayDetail (delivery) {
     .data(delivery.values)
     .enter()
     .append('g')
-    .each(function (d, i) {
-      if (d.station === 0) {
+    .each(function (workflow, i) {
+      if (utils.isDeliveryInLocation(delivery, 'En Route')) {
         return
       }
 

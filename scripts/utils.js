@@ -1,3 +1,12 @@
+function _isDeliveryInLocation (delivery, locationName) {
+  var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
+  if (currentWorkflow.step === 1 && !currentWorkflow['started-at']) {
+    return locationName === 'En Route'
+  }
+
+  return utils.getLocationNameFromRawDelivery(delivery) === locationName
+}
+
 function _getLocationAbbrFromLocationName (locationName) {
   return _.find(_LOCATION_ABBRS, {name: locationName}).abbr
 }
@@ -328,4 +337,5 @@ var utils = {
   getLocationNameFromRawDelivery: _getLocationNameFromRawDelivery,
   getLocationAbbrFromWorkflow: _getLocationAbbrFromWorkflow,
   getLocationAbbrFromLocationName: _getLocationAbbrFromLocationName,
+  isDeliveryInLocation: _isDeliveryInLocation,
 }
