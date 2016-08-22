@@ -306,7 +306,7 @@ function appendWorkflow (workflow, d) {
           )
         })
         .attr('y2', function (d, i) { return 0 })
-        .attr('class', 'workflow notReached 1-3-1 ' + d.deliveryId)
+        .attr('class', 'workflow nonsearch notReached 1-3-1 ' + d.deliveryId)
 
       workflow.append('line') // search notreached
         .attr('x1', function (d, i) {
@@ -321,7 +321,7 @@ function appendWorkflow (workflow, d) {
           )
         })
         .attr('y2', function (d, i) { return 0 })
-        .attr('class', 'workflow notReached 1-3-1 ' + d.deliveryId)
+        .attr('class', 'workflow search notReached 1-3-1 ' + d.deliveryId)
 
       workflow.append('line') // release notreached
         .attr('x1', function (d, i) {
@@ -336,7 +336,7 @@ function appendWorkflow (workflow, d) {
           )
         })
         .attr('y2', function (d, i) { return 0 })
-        .attr('class', 'workflow notReached 1-3-1 ' + d.deliveryId)
+        .attr('class', 'workflow release notReached 1-3-1 ' + d.deliveryId)
     } else if (startedAt !== null && endedAt === null) { // current workflow
       workflow = appendCurrentWorkflowWithSubsteps(workflow, d)
     } else if (startedAt !== null && endedAt !== null) { // completed workflow
@@ -669,7 +669,9 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
     var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
     var substep2State = utils.calculateSubstepDelayStatus(nonsearchEnd, searchEnd, searchEPT)
     currentWorkflow.append('line') // substep 1
-      .attr('x1', function (d, i) { return xScale(startedAt.getTime()) })
+      .attr('x1', function (d, i) { 
+        return xScale(startedAt.getTime()) 
+      })
       .attr('y1', function (d, i) { return 0 })
       .attr('x2', function (d, i) {
         return xScale(nonsearchEnd - 60000)

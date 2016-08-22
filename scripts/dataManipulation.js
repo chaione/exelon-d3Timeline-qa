@@ -1,4 +1,4 @@
-/* global _, d3 */
+/* global _, d3, utils */
 function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
   var result = {}
   var eventsArray = _.filter(deliveries.included, {type: 'events'})
@@ -194,18 +194,22 @@ function retrieveDeliveries () {
 }
 
 function stationCountCalc (deliveriesData) { // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  var stationCounts = _.fill(Array(_LOCATIONS.length), 0)
+  var locationCounts = _.fill(Array(_LOCATIONS.length), 0)
 
   _.each(deliveriesData, function (delivery) {
-    var stationIndex = utils.getStaionIndexInStations(delivery.currentStation, _LOCATIONS)
-    stationCounts[stationIndex]++
+    var locationName = utils.getLocationNameFromRawDelivery(delivery)
+    var locationIndex = _.findIndex(_LOCATIONS, function (location) {
+      return _.values(location)[0] === locationName
+    })
+
+    locationCounts[locationIndex]++
   })
 
-  for (var i = 0; i < stationCounts.length; i++) {
-    stationCounts[i] = stationCounts[i] || 1
+  for (var i = 0; i < locationCounts.length; i++) {
+    locationCounts[i] = locationCounts[i] || 1
   }
 
-  return stationCounts
+  return locationCounts
 }
 
 function stationStackedCountCalc (stationCounts) { // [7, 12, 17, 18, 22, 23, 24, 25]
