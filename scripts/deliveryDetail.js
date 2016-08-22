@@ -407,7 +407,7 @@ function displayDetail (delivery) {
           .attr('font-size', 14 + 'px')
 
         workflow.append('text')
-          .attr('x', function (d) { 
+          .attr('x', function (d) {
             return xScale(
               d['eta'].getTime() + nonsearchEPT * 60000 + searchEPT * 60000
             )
@@ -451,7 +451,7 @@ function displayDetail (delivery) {
     .data(delivery.values)
     .enter()
     .append('g')
-    .each(function (workflow, i) {
+    .each(function (d, i) {
       if (utils.isDeliveryInLocation(delivery, 'En Route')) {
         return
       }
@@ -661,7 +661,7 @@ function calculateInfoboxCurrStation (delivery) {
     var currentSubstep = utils.getCurrentSubstep(currentWorkflow)
 
     return '(' + locationName + ' ' + currentSubstep + '/3)'
-  } 
+  }
 
   return '(' + locationName + ')'
 }

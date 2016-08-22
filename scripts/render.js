@@ -671,7 +671,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
     currentWorkflow.append('line') // substep 1
       .attr('x1', function (d, i) { return xScale(startedAt.getTime()) })
       .attr('y1', function (d, i) { return 0 })
-      .attr('x2', function (d, i) { 
+      .attr('x2', function (d, i) {
         return xScale(nonsearchEnd - 60000)
       })
       .attr('y2', function (d, i) { return 0;})

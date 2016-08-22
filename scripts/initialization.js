@@ -84,13 +84,22 @@ var _VEHICLE_TYPE_TO_IMG = {
 
 var _POLL_RATE = 2455000
 // var url = 'https://exelon-api.herokuapp.com/v1/'
-// var url = 'https://exelon-api-qa.herokuapp.com/v1/'
 // var url = 'https://exelon-api-production.herokuapp.com/v1/'
-var url = 'https://exelon-api-staging.herokuapp.com/v1/'
 
-var siteId = 1 // limerick
-// QA Token
+// Staging
+// var url = 'https://exelon-api-staging.herokuapp.com/v1/'
+// var siteId = 1
+// var bearerToken = ''
+
+// QA
+var url = 'https://exelon-api-qa.herokuapp.com/v1/'
+var siteId = 1
 var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMyMDU5Nn0.CEuKdJVBDvoDOGksBmQWMxsnc7CtV5zp59H7IrxNGhc'
+
+// Production
+// var url = 'https://vsap-ccc-01v.exelonds.com/v1/'
+// var siteId = 10000
+// var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMxNzQ2MX0.86TwRbaqlfu7pv14NZ6ZF-RZKfUDLXtm9-5_2TGf4Mg'
 
 var _AHEAD_OR_BEHIND_PCT = .25 // if behind .25 estimated time its longer. if ahead by .25.. its faster
 var titleHeight = 83
