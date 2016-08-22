@@ -253,6 +253,9 @@ function displayDetail (delivery) {
           })
           .attr('y2', 0)
           .attr('class', function (d) {
+            if (d.eta > _now) {
+              return 'detailScheduledLine2 notReached'
+            }
             return 'detailScheduledLine2'
           })
 
@@ -270,6 +273,9 @@ function displayDetail (delivery) {
           })
           .attr('y2', 0)
           .attr('class', function (d) {
+            if (d.eta > _now) {
+              return 'detailScheduledLine2 notReached'
+            }
             return 'detailScheduledLine2'
           })
 
@@ -292,6 +298,9 @@ function displayDetail (delivery) {
           })
           .attr('y2', 0)
           .attr('class', function (d) {
+            if (d.eta > _now) {
+              return 'detailScheduledLine2 notReached'
+            }
             return 'detailScheduledLine2'
           })
 
@@ -644,15 +653,15 @@ function calculateInfoboxCurrStation (delivery) {
   var exitLocationId = utils.getLocationId('Exit', _LOCATIONS)
   var locationName = utils.getLocationNameFromWorkflow(currentWorkflow)
 
+  if (delivery.currentStation === erLocationId || delivery.currentStation === exitLocationId) {
+    return ''
+  }
+
   if (utils.inSubstepLocation(currentWorkflow)) {
     var currentSubstep = utils.getCurrentSubstep(currentWorkflow)
 
     return '(' + locationName + ' ' + currentSubstep + '/3)'
   } 
-
-  if (delivery.currentStation === erLocationId || delivery.currentStation === exitLocationId) {
-    return ''
-  }
 
   return '(' + locationName + ')'
 }
