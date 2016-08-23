@@ -301,7 +301,7 @@ function _calculateWorkflowETAs (workflows) {
           workflow.state = 'late'
         }
       } else if (workflow['started-at']) {
-        if ((workflow['started-at'].getTime() + estimated) < _now.getTime()) {
+        if (workflow['started-at'] > workflow.eta) {
           workflow.state = 'late'
         }
       } else {
