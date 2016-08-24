@@ -61,7 +61,8 @@ function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
 }
 
 function processApiData (workflowsData) {
-  var deliveriesData = d3.nest() // group by delivery
+  // group by delivery, and return an array
+  var deliveriesData = d3.nest()
     .key(function (d) { return d.deliveryId })
     .entries(workflowsData)
 
@@ -85,21 +86,20 @@ function processApiData (workflowsData) {
 
   _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
-  // groupByStation
-  stationData = d3.nest()
+  _LOCATION_WITH_DELIVERIES = d3.nest()
     .key(function (d) {
       return d.currentStation
     })
     .sortValues(function (a, b) {
-      return b.values[0].endTime - a.values[0].endTime
+      return b.values[0].eta - a.values[0].eta
     })
     .entries(deliveriesDataSorted)
 
-  stationData = stackDeliveriesCalc(stationStackedCount, stationData)
+  _LOCATION_WITH_DELIVERIES = stackDeliveriesCalc(stationStackedCount, _LOCATION_WITH_DELIVERIES)
 
   // create a dictionary of yindex and status / info.  Used for static information
-  for (var i = 0; i < stationData.length; i++) {
-    var tempStation = stationData[i]
+  for (var i = 0; i < _LOCATION_WITH_DELIVERIES.length; i++) {
+    var tempStation = _LOCATION_WITH_DELIVERIES[i]
     for (var j = 0; j < tempStation.values.length; j++) {
       var tempDelivery = tempStation.values[j]
 
@@ -111,7 +111,7 @@ function processApiData (workflowsData) {
     }
   }
 
-  render(stationData)
+  render(_LOCATION_WITH_DELIVERIES)
 }
 
 function getDeliveryyIndexAndData (element, index, array) {
@@ -119,11 +119,9 @@ function getDeliveryyIndexAndData (element, index, array) {
 }
 
 function resize () {
-  console.log('resize')
-
-  if (stationData) {
+  if (_LOCATION_WITH_DELIVERIES && _LOCATION_WITH_DELIVERIES.legnth > 0) {
     dismissDeliveryDetail()
-    render(stationData)
+    render(_LOCATION_WITH_DELIVERIES)
   }
 }
 
@@ -247,8 +245,8 @@ function stationStackedCalc (stationCounts, stationStackedCount, stations) {
 }
 
 // Calculate yIndex for every deliveries. Also allocate 1 unit for empty stations.
-function stackDeliveriesCalc (stationStackedCount, stationData) {
-  _.each(stationData, function (station, i) {
+function stackDeliveriesCalc (stationStackedCount, locationWithDeliveries) {
+  _.each(locationWithDeliveries, function (station, i) {
     _.each(station.values, function (delivery, j) {
       if (parseInt(station.key) === 0) {
         delivery.yIndex = j
@@ -260,7 +258,7 @@ function stackDeliveriesCalc (stationStackedCount, stationData) {
     })
   })
 
-  return stationData
+  return locationWithDeliveries
 }
 
 function updateCurrentStationCalc (deliveriesData) { // update every delivery w/ its current station

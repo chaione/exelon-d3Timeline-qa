@@ -32,6 +32,7 @@ var outerHeight = document.documentElement.clientHeight - 83
 var startOfDayHour = 6 // used for fake data
 
 var _DELIVERIES = [] // Raw Data of API Returned Delivery Data
+var _LOCATION_WITH_DELIVERIES = [] // Compound data, location with all the deliveries in that location
 var _LOCATIONS = []
 var _HAS_SUBSTEP_LOCATIONS = [
   'Sierra 1',
@@ -106,7 +107,7 @@ var siteId = 1
 var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMyMDU5Nn0.CEuKdJVBDvoDOGksBmQWMxsnc7CtV5zp59H7IrxNGhc'
 
 // Production
-// var url = 'https://vsap-ccc-01v.exelonds.com/v1/'
+// var url = 'https://vsap-ccc-02v.exelonds.com/v1/'
 // var siteId = 10000
 // var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMxNzQ2MX0.86TwRbaqlfu7pv14NZ6ZF-RZKfUDLXtm9-5_2TGf4Mg'
 
