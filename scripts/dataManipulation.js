@@ -70,8 +70,9 @@ function processApiData (workflowsData) {
     var deliveryRaw = _.find(_DELIVERIES, {id: delivery.key})
     var vehicleInfo = vehiclesAPIData[deliveryRaw.relationships.vehicle.data.id]
     var deliveryStatus = deliveryRaw.attributes.status
+    var locationName = utils.getLocationNameFromRawDelivery(delivery)
 
-    delivery.vehicleType = utils.getVehicleImageName(vehicleInfo, deliveryStatus)
+    delivery.vehicleType = utils.getVehicleImageName(vehicleInfo, deliveryStatus, locationName)
     delivery.currentLocation = deliveryRaw.attributes['current-location']
   })
 

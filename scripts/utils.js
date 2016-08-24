@@ -195,19 +195,25 @@ function isTimeBetweenTime (time, start, end) {
   return start <= time && time <= end
 }
 
-function _getVehicleImageName (vehicleInfo, deliveryStatus) {
+function _getVehicleIconSuffix (deliveryStatus, locationName) {
+  if (locationName === 'En Route') {
+    return 'enroute'
+  }
+
+  if (deliveryStatus === 'denied') {
+    return 'denied'
+  }
+
+  return 'arrived'
+}
+
+function _getVehicleImageName (vehicleInfo, deliveryStatus, locationName) {
   var vehicleImageName = 'icn-'
   // icn- + type + axles + status + priority
 
   // special cases first
   if (_VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'emergency') {
-    if (deliveryStatus === 'arrived') {
-      vehicleImageName += 'emergency-arrived'
-    } else if (deliveryStatus === 'denied') {
-      vehicleImageName += 'emergency-denied'
-    } else {
-      vehicleImageName += 'emergency-enroute'
-    }
+    vehicleImageName += utils.getVehicleIconSuffix(deliveryStatus, locationName)
 
     return vehicleImageName
   }
@@ -217,14 +223,7 @@ function _getVehicleImageName (vehicleInfo, deliveryStatus) {
     _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'passIMP'
   ) {
     vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-'
-
-    if (deliveryStatus === 'arrived') {
-      vehicleImageName += 'arrived'
-    } else if (deliveryStatus === 'denied') {
-      vehicleImageName += 'denied'
-    } else {
-      vehicleImageName += 'enroute'
-    }
+    vehicleImageName += utils.getVehicleIconSuffix(deliveryStatus, locationName)
 
     if (vehicleInfo.priority) {
       vehicleImageName += '-pri'
@@ -239,13 +238,7 @@ function _getVehicleImageName (vehicleInfo, deliveryStatus) {
     vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + 2 + 'w-'
   }
 
-  if (deliveryStatus === 'arrived') {
-    vehicleImageName += 'arrived'
-  } else if (deliveryStatus === 'denied') {
-    vehicleImageName += 'denied'
-  } else {
-    vehicleImageName += 'enroute'
-  }
+  vehicleImageName += utils.getVehicleIconSuffix(deliveryStatus, locationName)
 
   if (vehicleInfo.priority) {
     vehicleImageName += '-pri'
@@ -337,4 +330,5 @@ var utils = {
   getLocationAbbrFromWorkflow: _getLocationAbbrFromWorkflow,
   getLocationAbbrFromLocationName: _getLocationAbbrFromLocationName,
   isDeliveryInLocation: _isDeliveryInLocation,
+  getVehicleIconSuffix: _getVehicleIconSuffix,
 }

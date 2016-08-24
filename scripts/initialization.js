@@ -67,6 +67,15 @@ var _stationAcronyms = [
   'EX'
 ]
 
+var _POSTS = [
+  { fullName: 'POC',        abbr: 'poc'  },
+  { fullName: 'Delta 10',   abbr: 'd10'  },
+  { fullName: 'SAS',        abbr: 'sas'  },
+  { fullName: 'Delta 1',    abbr: 'd1'   },
+  { fullName: 'VVRO',       abbr: 'vvro' },
+  { fullName: 'Sally Port', abbr: 'sp'   }
+]
+
 var _VEHICLE_TYPE_TO_IMG = {
   'non_common_carrier': 'noncommon',
   'common_carrier': 'common',

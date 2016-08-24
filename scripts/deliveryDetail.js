@@ -20,11 +20,10 @@ function displayDetail (delivery) {
   detailYStart = 0
 
   var eventHeight = 30
-  var eventCount = 4 // how many rows of events
   var detailPadding = 30
   detailDeliveryRectY = yDeliveryScale(delivery.yIndex + 1) - detailPadding - (2 * eventHeight)
-  // debugger
-  var detailDeliveryRectHeight = ((eventCount + 1) * eventHeight) + (detailPadding * 2)
+  var detailDeliveryRectHeight = ((_POSTS.length + 1) * eventHeight) + (detailPadding * 2) + 50
+
   if (detailDeliveryRectY < 50) {
     detailDeliveryRectY = 50
   } else if (detailDeliveryRectY > innerHeight - _X_AXIS_HEIGHT - detailDeliveryRectHeight) {
@@ -578,7 +577,11 @@ function displayDetail (delivery) {
     .data(deliveryEvents)
     .enter()
     .append('line')
-    .attr('x1', function (d, i) {return xScale(d['timestamp']); })
+    .attr('x1', function (d) {
+      return xScale(
+        d.timestamp.getTime()
+      )
+    })
     .attr('y1', function (d, i) {return eventHeight * deliveryContacts.indexOf(d.role);})
     .attr('x2', function (d, i) {
       if (d['endTimestamp'] === null) {
@@ -636,12 +639,12 @@ function displayDetail (delivery) {
 
   detailCommunicationLabelsGroup
     .selectAll('.detailCommunicationLabel')
-    .data(deliveryContacts)
+    .data(_POSTS)
     .enter()
     .append('text')
     .attr('x', function (d, i) { return stationTextPadding.left;})
     .attr('y', function (d, i) { return eventHeight * (i + 1) + eventHeight * 3})
-    .text(function (d, i) {return d})
+    .text(function (d) {return d.fullName})
     .attr('class', 'detailCommunicationLabel name')
     .attr('font-size', 14 + 'px')
 }
