@@ -38,34 +38,15 @@ var _HAS_SUBSTEP_LOCATIONS = [
   'Sierra 1',
   'Sally Port'
 ]
-var _LOCATION_ABBRS = [
+
+var _LOCATION_META = [
   { name: 'En Route',       abbr: 'ER' },
   { name: 'Sierra 1',       abbr: 'S1' },
   { name: 'Stinger Gate',   abbr: 'SG' },
-  { name: 'Sally Port',     abbr: 'SP' },
   { name: 'Warehouse',      abbr: 'WH' },
+  { name: 'Sally Port',     abbr: 'SP' },
   { name: 'Protected Area', abbr: 'PA' },
   { name: 'Exit',           abbr: 'EX' }
-]
-
-var stations = {
-  0: 'En Route',
-  1: 'Sierra 1',
-  2: 'Stinger Gate',
-  3: 'Sally Port',
-  4: 'Warehouse',
-  5: 'Protected Area',
-  6: 'Exit'
-}
-
-var _stationAcronyms = [
-  'ER',
-  'S1',
-  'SG',
-  'SP',
-  'WH',
-  'PA',
-  'EX'
 ]
 
 var _POSTS = [
@@ -139,7 +120,7 @@ var vehicleShapeH = rowHeight - 10
 var svg, stationsGroup, delieveryStaticGroup, g, deliveriesGroup, xAxisGroup, yAxisGroup, xAxisMask
 
 var _locationHeight
-var stationCounts = []
+var _LOCATION_STATS = []
 var stationStackedCount = []
 var stationStacked = []
 var workflowsFakeData = []

@@ -79,12 +79,27 @@ function processApiData (workflowsData) {
 
   deliveriesData = updateCurrentStationCalc(deliveriesData)
 
-  stationCounts = stationCountCalc(deliveriesData) // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  stationStackedCount = stationStackedCountCalc(stationCounts) // [7, 12, 17, 18, 22, 23, 24, 25]
-  stationStacked = stationStackedCalc(stationCounts, stationStackedCount, stations) // [{name:EnRoute, y:7,y0:0},Object...]
-  var deliveriesDataSorted = _.sortBy(deliveriesData, 'currentStation') // is this necesary
+  _LOCATION_STATS = countLocationDeliveries(deliveriesData)
 
-  _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
+  // Calculate stacked count
+  _.each(_LOCATION_STATS, function (locationDeliveryCount, i) {
+    if (i === 0) {
+      locationDeliveryCount.stackedCount = locationDeliveryCount.deliveryCount
+    } else {
+      locationDeliveryCount.stackedCount = _LOCATION_STATS[i - 1].stackedCount + locationDeliveryCount.deliveryCount
+    }
+  })
+
+  _.each(_LOCATION_STATS, function (locationDeliveryCount, i) {
+    if (i === 0) {
+      locationDeliveryCount.y0 = 0
+    } else {
+      locationDeliveryCount.y0 = _LOCATION_STATS[i - 1].stackedCount
+    }
+  })
+
+  // Comment out for now, not seem to use it any where
+  // _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
   _LOCATION_WITH_DELIVERIES = d3.nest()
     .key(function (d) {
@@ -93,9 +108,19 @@ function processApiData (workflowsData) {
     .sortValues(function (a, b) {
       return b.values[0].eta - a.values[0].eta
     })
-    .entries(deliveriesDataSorted)
+    .entries(deliveriesData)
 
-  _LOCATION_WITH_DELIVERIES = stackDeliveriesCalc(stationStackedCount, _LOCATION_WITH_DELIVERIES)
+  _.each(_LOCATION_WITH_DELIVERIES, function (location, i) {
+    _.each(location.values, function (delivery, j) {
+      if (parseInt(location.key) === 0) {
+        delivery.yIndex = j
+      } else {
+        var locationIndex = _.findIndex(_LOCATION_STATS, {locationId: parseInt(location.key)})
+
+        delivery.yIndex = _LOCATION_STATS[locationIndex - 1].stackedCount + j
+      }
+    })
+  })
 
   // create a dictionary of yindex and status / info.  Used for static information
   for (var i = 0; i < _LOCATION_WITH_DELIVERIES.length; i++) {
@@ -119,10 +144,8 @@ function getDeliveryyIndexAndData (element, index, array) {
 }
 
 function resize () {
-  if (_LOCATION_WITH_DELIVERIES && _LOCATION_WITH_DELIVERIES.legnth > 0) {
-    dismissDeliveryDetail()
-    render(_LOCATION_WITH_DELIVERIES)
-  }
+  dismissDeliveryDetail()
+  render(_LOCATION_WITH_DELIVERIES)
 }
 
 function retrieveDeliveries () {
@@ -135,7 +158,7 @@ function retrieveDeliveries () {
     success: function (deliveryResults) {
       _DELIVERIES = _.filter(deliveryResults.data, {type: 'deliveries'})
 
-      _LOCATIONS = utils.cleanupStationsData(
+      _LOCATIONS = utils.cleanupLocationData(
         _.filter(deliveryResults.included, {type: 'locations'})
       )
 
@@ -192,73 +215,19 @@ function retrieveDeliveries () {
   })
 }
 
-function stationCountCalc (deliveriesData) { // [7, 5, 5, 1, 4, 1, 1, 1] Gets the number of deliveries for every station
-  var locationCounts = _.fill(Array(_LOCATIONS.length), 0)
-
-  _.each(deliveriesData, function (delivery) {
-    var locationName = utils.getLocationNameFromRawDelivery(delivery)
-    var locationIndex = _.findIndex(_LOCATIONS, function (location) {
-      return _.values(location)[0] === locationName
-    })
-
-    locationCounts[locationIndex]++
+function countLocationDeliveries (deliveriesData) {
+  var summary = _.countBy(deliveriesData, function (delivery) {
+    return utils.getLocationNameFromRawDelivery(delivery)
   })
 
-  for (var i = 0; i < locationCounts.length; i++) {
-    locationCounts[i] = locationCounts[i] || 1
-  }
-
-  return locationCounts
-}
-
-function stationStackedCountCalc (stationCounts) { // [7, 12, 17, 18, 22, 23, 24, 25]
-  var stationStackedCount = [0, 0, 0, 0, 0, 0, 0]
-
-  stationStackedCount[0] = stationCounts[0]
-  for (var i = 1; i < stationCounts.length; i++) {
-    stationStackedCount[i] = stationStackedCount[i - 1] + stationCounts[i]
-  }
-
-  return stationStackedCount
-}
-
-// stacks each station with its y0 index and height
-function stationStackedCalc (stationCounts, stationStackedCount, stations) {
-  var stationStacked = [] // [Object(name:EnRoute, y:7,y0:0),Object...]
-
-  stationStacked[0] = {
-    'y0': 0,
-    'deliveryCount': stationCounts[0],
-    'name': stations[0]
-  }
-
-  // this needs to factor in zooming, or add it to zoom section
-  for (var i = 1; i < stationStackedCount.length; i++) {
-    stationStacked[i] = {
-      'y0': stationStackedCount[i - 1],
-      'deliveryCount': stationCounts[i],
-      'name': stations[i]
+  return _.map(_LOCATIONS, function (location) {
+    return {
+      locationId: location.id,
+      locationName: location.name,
+      deliveryCount: summary[location.name] || 1,
+      abbr: _.find(_LOCATION_META, {name: location.name}).abbr
     }
-  }
-
-  return stationStacked
-}
-
-// Calculate yIndex for every deliveries. Also allocate 1 unit for empty stations.
-function stackDeliveriesCalc (stationStackedCount, locationWithDeliveries) {
-  _.each(locationWithDeliveries, function (station, i) {
-    _.each(station.values, function (delivery, j) {
-      if (parseInt(station.key) === 0) {
-        delivery.yIndex = j
-      } else {
-        var stationIndex = utils.getStaionIndexInStations(parseInt(station.key), _LOCATIONS)
-
-        delivery.yIndex = stationStackedCount[stationIndex - 1] + j
-      }
-    })
   })
-
-  return locationWithDeliveries
 }
 
 function updateCurrentStationCalc (deliveriesData) { // update every delivery w/ its current station

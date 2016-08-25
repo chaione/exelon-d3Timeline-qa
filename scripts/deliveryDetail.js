@@ -494,8 +494,8 @@ function displayDetail (delivery) {
             .attr('x1', xScale(startedAt))
             .attr('y', 14)
             .text(function (d, i) {
-              var stationIndex = utils.getStaionIndexInStations(d.step, _LOCATIONS)
-              return _stationAcronyms[stationIndex] + '.' + 1
+              var locationId = d.locationOrder[d.step - 1]
+              return _.find(_LOCATION_STATS, {locationId: locationId}).abbr
             })
             .attr('class', function (d) {
               if (substep1State === 1) {
@@ -652,8 +652,8 @@ function displayDetail (delivery) {
 function calculateInfoboxCurrStation (delivery) {
   var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
 
-  var erLocationId = utils.getLocationId('En Route', _LOCATIONS)
-  var exitLocationId = utils.getLocationId('Exit', _LOCATIONS)
+  var erLocationId = utils.getLocationIdFromLocationName('En Route', _LOCATIONS)
+  var exitLocationId = utils.getLocationIdFromLocationName('Exit', _LOCATIONS)
   var locationName = utils.getLocationNameFromWorkflow(currentWorkflow)
 
   if (delivery.currentStation === erLocationId || delivery.currentStation === exitLocationId) {

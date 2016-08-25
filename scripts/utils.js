@@ -4,7 +4,7 @@ function _isDeliveryInLocation (delivery, locationName) {
 }
 
 function _getLocationAbbrFromLocationName (locationName) {
-  return _.find(_LOCATION_ABBRS, {name: locationName}).abbr
+  return _.find(_LOCATION_META, {name: locationName}).abbr
 }
 
 function _getLocationAbbrFromWorkflow (workflow) {
@@ -22,9 +22,8 @@ function _getLocationNameFromRawDelivery (delivery) {
 
 function _getLocationNameFromWorkflow (workflow) {
   var locationId = workflow.locationOrder[workflow.step - 1]
-  return _.find(_LOCATIONS, function (value) {
-    return value[locationId]
-  })[locationId]
+
+  return _.find(_LOCATIONS, {id: locationId}).name
 }
 
 function _getCurrentSubstep (workflow) {
@@ -60,7 +59,7 @@ function _getCurrentWorkflow (workflows) {
 }
 
 function _detailCalculateDelay (delivery) {
-  if (delivery.currentStation === utils.getLocationId('En Route', _LOCATIONS)) {
+  if (delivery.currentStation === utils.getLocationIdFromLocationName('En Route', _LOCATIONS)) {
     if (delivery.eta && delivery.eta < _now) {
       return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
     }
@@ -78,12 +77,11 @@ function _detailCalculateDelay (delivery) {
     return Math.round(b / 1000 / 60)
   }
 
-  var stationId = _getStaionIndexInStations(delivery.currentStation, _LOCATIONS)
-  var currentWF = delivery.values[stationId]
+  var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
 
-  var minutesStartingLate = currentWF['started-at'] - currentWF['eta']
-  var currentDuration = _now - currentWF['started-at']
-  var estimatedDuration = currentWF['estimated-processing-time'] * 60 * 1000
+  var minutesStartingLate = currentWorkflow['started-at'] - currentWorkflow['eta']
+  var currentDuration = _now - currentWorkflow['started-at']
+  var estimatedDuration = currentWorkflow['estimated-processing-time'] * 60000
   var currentStationOverTime = currentDuration - estimatedDuration
 
   if (currentStationOverTime > 0) {
@@ -116,47 +114,37 @@ function _prepareSubStepEndTimes (workflow) {
   workflow['search-end'] = workflow['search-end'] || new Date(workflow['started-at'].getTime() + totalTime / 3 * 2)
 }
 
-function _cleanupStationsData (receivedStations) {
-  var results = receivedStations.map(function (obj) {
-    var rObj = {}
-    rObj[obj.id] = obj.attributes.name
-    return rObj
-  })
-
-  if (utils.getLocationId('En Route', results) === -1) {
-    results.splice(0, 0, {
-      0: 'En Route'
-    })
-  }
-  _.each(stations, function(station, index) {
-    if (utils.getLocationId(station, results) === -1) {
-      var temp = {}
-      temp[parseInt(index) + 1] = station
-      results.splice(index, 0, temp)
+function _cleanupLocationData (receivedLocations) {
+  var locations = receivedLocations.map(function (location) {
+    return {
+      id: parseInt(location.id),
+      name: location.attributes.name
     }
   })
 
-  return results
+  if (!_.find(locations, {name: 'En Route'})) {
+    locations.splice(0, 0, {
+      id: 0,
+      name: 'En Route'
+    })
+  }
+
+  return _.sortBy(locations, function (location) {
+    return _.findIndex(_LOCATION_META, {name: location.name})
+  })
 }
 
 function _getExitLocationId (stations) {
-  return _getLocationId('Exit', stations)
+  return utils.getLocationIdFromLocationName('Exit', stations)
 }
 
 function _getLocationIdFromLocationName (locationName) {
-  var station = _.find(_LOCATIONS, function (value, key) {
-    return _.values(value)[0] === locationName
-  })
+  var location = _.find(_LOCATIONS, {name: locationName})
+  if (location) {
+    return parseInt(location.id)
+  }
 
-  return parseInt(_.keys(station)[0] || -1)
-}
-
-function _getLocationId (locationName, locations) {
-  var station = _.find(locations, function (value, key) {
-    return _.values(value)[0] === locationName
-  })
-
-  return parseInt(_.keys(station)[0] || -1)
+  return -1
 }
 
 function _getStaionIndexInStations (realStationId, stations) {
@@ -315,9 +303,8 @@ var utils = {
   getVehicleImageName: _getVehicleImageName,
   calculateWorkflowETAs: _calculateWorkflowETAs,
   getExitLocationId: _getExitLocationId,
-  getLocationId: _getLocationId,
   getStaionIndexInStations: _getStaionIndexInStations,
-  cleanupStationsData: _cleanupStationsData,
+  cleanupLocationData: _cleanupLocationData,
   prepareSubStepEndTimes: _prepareSubStepEndTimes,
   calculateSubstepDelayStatus: _calculateSubstepDelayStatus,
   detailCalculateDelay: _detailCalculateDelay,

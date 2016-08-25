@@ -47,8 +47,8 @@ function render (data) {
   innerWidth = outerWidth - margin.left - margin.right
   innerHeight = outerHeight - margin.top - margin.bottom
 
-  _locationHeight = (stationStacked[stationStackedCount.length - 1].y0 * rowHeight) +
-    (stationStacked[stationStackedCount.length - 1].deliveryCount * rowHeight)
+  var lastLocation = _.last(_LOCATION_STATS)
+  _locationHeight = rowHeight * (lastLocation.y0 * + lastLocation.deliveryCount)
 
   panBounds = {
     top: 0,
@@ -62,7 +62,7 @@ function render (data) {
   setupSvgStructure()
 
   // Setup stations overlay and text
-  var stationsLabelSelectAll = stationsGroup.selectAll('.station').data(stationStacked)
+  var stationsLabelSelectAll = stationsGroup.selectAll('.station').data(_LOCATION_STATS)
   var stationsLabelSelectAllG = stationsLabelSelectAll.enter().append('g').attr('class', 'station') // stations should never exit
 
   stationsLabelSelectAllG.append('rect').attr('class', 'stationRect')
@@ -77,7 +77,7 @@ function render (data) {
   stationsLabelSelectAllG.append('text')
     .attr('x', function (d, i) { return stationTextPadding.left;})
     .attr('y', function (d, i) { return d.y0 * rowHeight + (rowHeight / 2) + stationTextHeight + stationTextPadding.top;})
-    .text(function (d, i) {return d.name})
+    .text(function (d, i) {return d.locationName})
     .attr('class', 'name')
     .attr('font-size', stationTextHeight + 'px')
 
