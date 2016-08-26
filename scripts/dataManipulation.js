@@ -74,7 +74,7 @@ function processApiData (workflowsData) {
     var locationName = utils.getLocationNameFromRawDelivery(delivery)
 
     delivery.vehicleType = utils.getVehicleImageName(vehicle, deliveryStatus, locationName)
-    delivery.vendorName = _.find(_VENDORS, {id: vehicle.vendorId}).name
+    delivery.vendorName = _.find(_DS.vendors, {id: vehicle.vendorId}).name
     delivery.currentLocation = deliveryRaw.attributes['current-location']
   })
 
@@ -153,7 +153,7 @@ function retrieveDeliveries () {
         _.filter(deliveryResults.included, {type: 'locations'})
       )
 
-      _VENDORS = _.map(_.filter(deliveryResults.included, {type: 'vendors'}), function (vendor) {
+      _DS.vendors = _.map(_.filter(deliveryResults.included, {type: 'vendors'}), function (vendor) {
         return {
           id: vendor.id,
           name: vendor.attributes.name

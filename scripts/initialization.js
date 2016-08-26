@@ -31,7 +31,6 @@ var outerWidth = document.documentElement.clientWidth
 var outerHeight = document.documentElement.clientHeight - 83
 var startOfDayHour = 6 // used for fake data
 
-var _VENDORS = []
 var _LOCATIONS = []
 var _HAS_SUBSTEP_LOCATIONS = [
   'Sierra 1',
