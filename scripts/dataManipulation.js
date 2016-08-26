@@ -68,7 +68,7 @@ function processApiData (workflowsData) {
 
   // update deliveries w/ data
   _.each(deliveriesData, function (delivery) {
-    var deliveryRaw = _.find(_DELIVERIES, {id: delivery.key})
+    var deliveryRaw = _.find(_DS.deliveries, {id: delivery.key})
     var vehicle = _.find(_VEHICLES, {id: deliveryRaw.relationships.vehicle.data.id})
     var deliveryStatus = deliveryRaw.attributes.status
     var locationName = utils.getLocationNameFromRawDelivery(delivery)
@@ -79,30 +79,24 @@ function processApiData (workflowsData) {
   })
 
   deliveriesData = calculateDeliveryLocation(deliveriesData)
-
   _DS.locations = countLocationDeliveries(deliveriesData)
 
   // Calculate stacked count
   _.each(_DS.locations, function (location, i) {
     if (i === 0) {
       location.stackedCount = location.deliveryCount
-    } else {
-      location.stackedCount = _DS.locations[i - 1].stackedCount + location.deliveryCount
-    }
-  })
-
-  _.each(_DS.locations, function (location, i) {
-    if (i === 0) {
       location.y0 = 0
     } else {
-      location.y0 = _DS.locations[i - 1].stackedCount
+      var lastLocation = _DS.locations[i - 1]
+      location.stackedCount = lastLocation.stackedCount + location.deliveryCount
+      location.y0 = lastLocation.stackedCount
     }
   })
 
   // Comment out for now, not seem to use it any where
   // _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
-  _LOCATION_WITH_DELIVERIES = d3.nest()
+  _DS.locationWithDeliveries = d3.nest()
     .key(function (d) {
       return d.currentLocation.id
     })
@@ -111,7 +105,7 @@ function processApiData (workflowsData) {
     })
     .entries(deliveriesData)
 
-  _.each(_LOCATION_WITH_DELIVERIES, function (location, i) {
+  _.each(_DS.locationWithDeliveries, function (location, i) {
     _.each(location.values, function (delivery, j) {
       if (parseInt(location.key) === 0) {
         delivery.yIndex = j
@@ -124,25 +118,25 @@ function processApiData (workflowsData) {
   })
 
   // create a dictionary of yindex and status / info.  Used for static information
-  for (var i = 0; i < _LOCATION_WITH_DELIVERIES.length; i++) {
-    var tempStation = _LOCATION_WITH_DELIVERIES[i]
+  for (var i = 0; i < _DS.locationWithDeliveries.length; i++) {
+    var tempStation = _DS.locationWithDeliveries[i]
     for (var j = 0; j < tempStation.values.length; j++) {
       var tempDelivery = tempStation.values[j]
 
       _deliveryIndexInfo.push({
-        status: _.find(_DELIVERIES, {id: tempDelivery.key}).attributes.status,
+        status: _.find(_DS.deliveries, {id: tempDelivery.key}).attributes.status,
         deliveryId: tempDelivery.key,
         yIndex: tempDelivery.yIndex
       })
     }
   }
 
-  render(_LOCATION_WITH_DELIVERIES)
+  render(_DS.locationWithDeliveries)
 }
 
 function resize () {
   dismissDeliveryDetail()
-  render(_LOCATION_WITH_DELIVERIES)
+  render(_DS.locationWithDeliveries)
 }
 
 function retrieveDeliveries () {
@@ -153,7 +147,7 @@ function retrieveDeliveries () {
       'Authorization': 'Bearer ' + bearerToken
     },
     success: function (deliveryResults) {
-      _DELIVERIES = _.filter(deliveryResults.data, {type: 'deliveries'})
+      _DS.deliveries = _.filter(deliveryResults.data, {type: 'deliveries'})
 
       _DS.locations = utils.cleanupLocationData(
         _.filter(deliveryResults.included, {type: 'locations'})
@@ -191,7 +185,7 @@ function retrieveDeliveries () {
 
       apiWorkflows = apiWorkflows.map(function (workflow) {
         var deliveryId = workflow.relationships.delivery['data']['id']
-        var deliveryRaw = _.find(_DELIVERIES, {id: deliveryId})
+        var deliveryRaw = _.find(_DS.deliveries, {id: deliveryId})
         workflow.attributes.id = workflow['id']
         workflow.attributes.deliveryId = parseInt(deliveryId)
         workflow.attributes['estimated-processing-time'] = workflow.attributes['estimated-processing-time'] || 15
@@ -233,7 +227,7 @@ function countLocationDeliveries (deliveriesData) {
   })
 }
 
-function calculateDeliveryLocation (deliveriesData) { // update every delivery w/ its current station
+function calculateDeliveryLocation (deliveriesData) { 
   _.each(deliveriesData, function (currentDelivery) {
     if (!currentDelivery.currentLocation) {
       var name = utils.getLocationNameFromRawDelivery(currentDelivery)

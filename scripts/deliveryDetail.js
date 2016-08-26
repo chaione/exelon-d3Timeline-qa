@@ -3,7 +3,7 @@ var pocContacts = ['POC', 'Delta10']
 var inspectionLabels = ['Scheduled', 'Actual']
 
 function displayDetail (delivery) {
-  var currentDeliveryRaw = _.find(_DELIVERIES, {id: delivery.key})
+  var currentDeliveryRaw = _.find(_DS.deliveries, {id: delivery.key})
   delivery.status = currentDeliveryRaw.attributes.status
   delivery.eta = currentDeliveryRaw.attributes.eta
   delivery.arriveAt = utils.getNullOrDate(currentDeliveryRaw.attributes['arrive-at'])

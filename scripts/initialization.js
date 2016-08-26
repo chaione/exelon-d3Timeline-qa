@@ -32,8 +32,6 @@ var outerHeight = document.documentElement.clientHeight - 83
 var startOfDayHour = 6 // used for fake data
 
 var _VENDORS = []
-var _DELIVERIES = [] // Raw Data of API Returned Delivery Data
-var _LOCATION_WITH_DELIVERIES = [] // Compound data, location with all the deliveries in that location
 var _LOCATIONS = []
 var _HAS_SUBSTEP_LOCATIONS = [
   'Sierra 1',
