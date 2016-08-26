@@ -79,7 +79,15 @@ function processApiData (workflowsData) {
   })
 
   deliveriesData = calculateDeliveryLocation(deliveriesData)
-  _DS.locations = countLocationDeliveries(deliveriesData)
+
+  // Count how many deliveries in a location
+  var sums = _.countBy(deliveriesData, function (delivery) {
+    return delivery.currentLocation.id
+  })
+
+  _.each(_DS.locations, function (location) {
+    location.deliveryCount = sums[location.id] || 1
+  })
 
   // Calculate stacked count
   _.each(_DS.locations, function (location, i) {
@@ -211,19 +219,6 @@ function retrieveDeliveries () {
       apiWorkflows = utils.calculateWorkflowETAs(apiWorkflows)
       processApiData(apiWorkflows)
     }
-  })
-}
-
-function countLocationDeliveries (deliveriesData) {
-  var summary = _.countBy(deliveriesData, function (delivery) {
-    return utils.getLocationNameFromRawDelivery(delivery)
-  })
-
-  return _.map(_DS.locations, function (location) {
-    return _.assign(location, {
-      deliveryCount: summary[location.name] || 1,
-      abbr: _.find(_DS.LOCATION_META, {name: location.name}).abbr
-    })
   })
 }
 

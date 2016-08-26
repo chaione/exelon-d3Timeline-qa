@@ -29,7 +29,6 @@ var stationTextPadding = {top: 10, right: 0, bottom: 0, left: 10}
 var margin = {top: 0, right: 0, bottom: 30, left: 0}
 var outerWidth = document.documentElement.clientWidth
 var outerHeight = document.documentElement.clientHeight - 83
-var startOfDayHour = 6 // used for fake data
 
 var _LOCATIONS = []
 var _HAS_SUBSTEP_LOCATIONS = [
@@ -114,8 +113,6 @@ var yesterday = new Date(_now)
 yesterday.setDate(yesterday.getDate() - 1)
 var tomorrow = new Date(_now)
 tomorrow.setDate(tomorrow.getDate() + 1)
-
-var _isDetailDisplayed = false
 
 var vehicleShapeH = rowHeight - 10
 var svg, stationsGroup, delieveryStaticGroup, g, deliveriesGroup, xAxisGroup, yAxisGroup, xAxisMask

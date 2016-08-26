@@ -123,14 +123,16 @@ function _cleanupLocationData (receivedLocations) {
   var locations = receivedLocations.map(function (location) {
     return {
       id: parseInt(location.id),
-      name: location.attributes.name
+      name: location.attributes.name,
+      abbr: _.find(_DS.LOCATION_META, {name: location.attributes.name}).abbr
     }
   })
 
   if (!_.find(locations, {name: 'En Route'})) {
     locations.splice(0, 0, {
       id: 0,
-      name: 'En Route'
+      name: 'En Route',
+      abbr: 'ER'
     })
   }
 
