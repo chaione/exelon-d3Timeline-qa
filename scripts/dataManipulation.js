@@ -171,7 +171,7 @@ function retrieveDeliveries () {
         _.each(vehicle.attributes, function (value, key) {
           result[key] = value
         })
-        return result 
+        return result
       })
 
       _pocsAPIData = {}

@@ -1,3 +1,8 @@
+function _getEPTFromWorkflow (workflow) {
+  var locationName = utils.getLocationNameFromWorkflow(workflow)
+  return _.find(_LOCATION_META, {name: locationName}).epts
+}
+
 function _isDeliveryInLocation (delivery, locationName) {
   var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
   return utils.getLocationNameFromRawDelivery(delivery) === locationName
@@ -244,7 +249,6 @@ function _calculateWorkflowETAs (workflows) {
     var orderedWorkflows = _.orderBy(subWorkflows, 'step')
 
     _.each(orderedWorkflows, function (workflow, index) {
-      var wEPT = 15 * 60000
 
       if (index === 0) {
         // This isn't necessary in real situation
@@ -255,19 +259,24 @@ function _calculateWorkflowETAs (workflows) {
       if (index !== 0) {
         if (!workflow.eta) {
           var lastWorkflow = orderedWorkflows[index - 1]
+          var epts = utils.getEPTFromWorkflow(lastWorkflow)
+          var totalEPT = 0
           if (utils.inSubstepLocation(lastWorkflow)) {
             var substep = utils.getCurrentSubstep(lastWorkflow)
-            wEPT = 15 * (3 - substep + 1)  * 60000
+            totalEPT = _.sum(_.slice(epts, substep - 1, epts.length))
+          } else {
+            totalEPT = epts[0]
           }
+          totalEPT = totalEPT * 60000
 
           if (lastWorkflow['started-at']) {
             if (lastWorkflow['ended-at']) {
               workflow.eta = lastWorkflow['ended-at']
             } else {
-              workflow.eta = _now.getTime() + wEPT
+              workflow.eta = _now.getTime() + totalEPT
             }
           } else {
-            workflow.eta = lastWorkflow.eta.getTime() + wEPT
+            workflow.eta = lastWorkflow.eta.getTime() + totalEPT
           }
         }
       }
@@ -320,4 +329,5 @@ var utils = {
   getLocationAbbrFromLocationName: _getLocationAbbrFromLocationName,
   isDeliveryInLocation: _isDeliveryInLocation,
   getVehicleIconSuffix: _getVehicleIconSuffix,
+  getEPTFromWorkflow: _getEPTFromWorkflow,
 }

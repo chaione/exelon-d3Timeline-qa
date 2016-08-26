@@ -31,6 +31,7 @@ var outerWidth = document.documentElement.clientWidth
 var outerHeight = document.documentElement.clientHeight - 83
 var startOfDayHour = 6 // used for fake data
 
+var _VENDORS = []
 var _DELIVERIES = [] // Raw Data of API Returned Delivery Data
 var _LOCATION_WITH_DELIVERIES = [] // Compound data, location with all the deliveries in that location
 var _LOCATIONS = []
@@ -40,13 +41,13 @@ var _HAS_SUBSTEP_LOCATIONS = [
 ]
 
 var _LOCATION_META = [
-  { name: 'En Route',       abbr: 'ER' },
-  { name: 'Sierra 1',       abbr: 'S1' },
-  { name: 'Stinger Gate',   abbr: 'SG' },
-  { name: 'Warehouse',      abbr: 'WH' },
-  { name: 'Sally Port',     abbr: 'SP' },
-  { name: 'Protected Area', abbr: 'PA' },
-  { name: 'Exit',           abbr: 'EX' }
+  { name: 'En Route',       abbr: 'ER', epts: [3] },
+  { name: 'Sierra 1',       abbr: 'S1', epts: [5, 6, 5] },
+  { name: 'Stinger Gate',   abbr: 'SG', epts: [35] },
+  { name: 'Warehouse',      abbr: 'WH', epts: [60] },
+  { name: 'Sally Port',     abbr: 'SP', epts: [5, 70, 15] },
+  { name: 'Protected Area', abbr: 'PA', epts: [60] },
+  { name: 'Exit',           abbr: 'EX', epts: [15] }
 ]
 
 var _POSTS = [
@@ -102,7 +103,7 @@ var _UNIX_MINUTE = 1000 * 60
 var vpStartHours = (outerWidth / 2) / (_X_AXIS_WIDTH / 48) // startHours is the time where the Viewport's (middle of screen) y axis naturally rests.  Its time in hours.
 var unixStartHours = unixHour * vpStartHours
 var _now = new Date(Date.now())
-var _WORKFLOW_OFFSET = 60000
+var _WORKFLOW_OFFSET = 3 * 60000
 
 var nowYear = _now.getFullYear()
 var nowMonth = _now.getMonth()

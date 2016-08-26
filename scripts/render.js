@@ -284,10 +284,11 @@ function appendWorkflow (workflow, d) {
   var searchEnd = d['search-end']
   var nonsearchEnd = d['nonsearch-end']
 
-  var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
-  var searchEPT = d['search-estimated-processing-time'] || 15
-  var releaseEPT = d['release-estimated-processing-time'] || 15
-  var EPT = d['estimated-processing-time'] || 15
+  var epts = utils.getEPTFromWorkflow(d)
+  var nonsearchEPT = epts[0]
+  var searchEPT = epts[1]
+  var releaseEPT = epts[2]
+  var EPT = epts[0]
 
   var oneMinute = 1000 * 60
 
@@ -518,10 +519,13 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
   var nonsearchEnd = d['nonsearch-end']
   var searchEnd = d['search-end']
   var endedAt = d['ended-at']
-  var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
-  var searchEPT = d['search-estimated-processing-time'] || 15
-  var releaseEPT = d['release-estimated-processing-time'] || 15
-  var EPT = d['estimated-processing-time']
+
+  var epts = utils.getEPTFromWorkflow(d)
+  var nonsearchEPT = epts[0]
+  var searchEPT = epts[1]
+  var releaseEPT = epts[2]
+  var EPT = epts[0]
+
   var oneMinute = 1000 * 60
 
   // left side of now
@@ -603,7 +607,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .attr('y1', 0)
       .attr('x2', function (d, i) {
         return xScale(
-          _now.getTime() + 45 * oneMinute - 60000
+          _now.getTime() + _.sum(epts) * oneMinute - 60000
         )
       })
       .attr('y2', 0.01)
