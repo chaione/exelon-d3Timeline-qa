@@ -69,11 +69,12 @@ function processApiData (workflowsData) {
   // update deliveries w/ data
   _.each(deliveriesData, function (delivery) {
     var deliveryRaw = _.find(_DELIVERIES, {id: delivery.key})
-    var vehicleInfo = vehiclesAPIData[deliveryRaw.relationships.vehicle.data.id]
+    var vehicle = _.find(_VEHICLES, {id: deliveryRaw.relationships.vehicle.data.id})
     var deliveryStatus = deliveryRaw.attributes.status
     var locationName = utils.getLocationNameFromRawDelivery(delivery)
 
-    delivery.vehicleType = utils.getVehicleImageName(vehicleInfo, deliveryStatus, locationName)
+    delivery.vehicleType = utils.getVehicleImageName(vehicle, deliveryStatus, locationName)
+    delivery.vendorName = _.find(_VENDORS, {id: vehicle.vendorId}).name
     delivery.currentLocation = deliveryRaw.attributes['current-location']
   })
 
@@ -139,10 +140,6 @@ function processApiData (workflowsData) {
   render(_LOCATION_WITH_DELIVERIES)
 }
 
-function getDeliveryyIndexAndData (element, index, array) {
-  console.log('a[' + index + '] = ' + element)
-}
-
 function resize () {
   dismissDeliveryDetail()
   render(_LOCATION_WITH_DELIVERIES)
@@ -162,12 +159,20 @@ function retrieveDeliveries () {
         _.filter(deliveryResults.included, {type: 'locations'})
       )
 
-      vehiclesAPIData = {}
-      var vehiclesArray = _.filter(deliveryResults.included, {type: 'vehicles'})
-      for (var i = 0; i < vehiclesArray.length; i++) {
-        var vehicle = vehiclesArray[i]
-        vehiclesAPIData[vehicle.id] = vehicle.attributes
-      }
+      _VENDORS = _.map(_.filter(deliveryResults.included, {type: 'vendors'}), function (vendor) {
+        return {
+          id: vendor.id,
+          name: vendor.attributes.name
+        }
+      })
+
+      _VEHICLES = _.map(_.filter(deliveryResults.included, {type: 'vehicles'}), function (vehicle) {
+        var result = {id: vehicle.id, vendorId: vehicle.relationships.vendor.data.id}
+        _.each(vehicle.attributes, function (value, key) {
+          result[key] = value
+        })
+        return result 
+      })
 
       _pocsAPIData = {}
       var pocs = _.filter(deliveryResults.included, {type: 'pocs'})

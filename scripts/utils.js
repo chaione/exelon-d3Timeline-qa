@@ -222,8 +222,10 @@ function _getVehicleImageName (vehicleInfo, deliveryStatus, locationName) {
 
   if (vehicleInfo.axles != null) {
     vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + vehicleInfo.axles + 'w-'
+  } else if (vehicleInfo['vehicle-type']) {
+    vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + 2 + 'w-' 
   } else {
-    vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + 2 + 'w-'
+    vehicleImageName += 'common-2w-'
   }
 
   vehicleImageName += utils.getVehicleIconSuffix(deliveryStatus, locationName)

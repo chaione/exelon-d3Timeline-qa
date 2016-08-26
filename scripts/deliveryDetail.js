@@ -13,7 +13,6 @@ function displayDetail (delivery) {
 
   delivery.delay = utils.detailCalculateDelay(delivery)
 
-  delivery.companyName = currentDeliveryRaw.attributes['company-name'] || ''
   delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery)
 
   _isDetailDisplayed = true
@@ -142,7 +141,7 @@ function displayDetail (delivery) {
   var detailDeliveryInfoCompanyName = detailDeliveryInfoGroup.append('text')
     .attr('x', 16)
     .attr('y', 46)
-    .text(delivery.companyName + delivery.infoBoxCurrStation)
+    .text(delivery.vendorName + ' ' + delivery.infoBoxCurrStation)
     .attr('class', 'detailInfoCompanyName')
     .attr('font-size', 16 + 'px')
 
