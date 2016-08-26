@@ -56,7 +56,7 @@ function _getCurrentWorkflow (workflows) {
     }
 
     if (index === (workflows.length - 1)) {
-      return workflow['ended-at']
+      return workflow['started-at']
     }
 
     return workflow['started-at'] && !workflow['ended-at']
