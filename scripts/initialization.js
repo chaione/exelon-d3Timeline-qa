@@ -40,7 +40,9 @@ var _HAS_SUBSTEP_LOCATIONS = [
   'Sally Port'
 ]
 
-var _LOCATION_META = [
+var _DS = {}
+
+_DS.LOCATION_META = [
   { name: 'En Route',       abbr: 'ER', epts: [3] },
   { name: 'Sierra 1',       abbr: 'S1', epts: [5, 6, 5] },
   { name: 'Stinger Gate',   abbr: 'SG', epts: [35] },

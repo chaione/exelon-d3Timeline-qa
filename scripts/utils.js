@@ -1,6 +1,6 @@
 function _getEPTFromWorkflow (workflow) {
   var locationName = utils.getLocationNameFromWorkflow(workflow)
-  return _.find(_LOCATION_META, {name: locationName}).epts
+  return _.find(_DS.LOCATION_META, {name: locationName}).epts
 }
 
 function _isDeliveryInLocation (delivery, locationName) {
@@ -9,7 +9,7 @@ function _isDeliveryInLocation (delivery, locationName) {
 }
 
 function _getLocationAbbrFromLocationName (locationName) {
-  return _.find(_LOCATION_META, {name: locationName}).abbr
+  return _.find(_DS.LOCATION_META, {name: locationName}).abbr
 }
 
 function _getLocationAbbrFromWorkflow (workflow) {
@@ -28,7 +28,7 @@ function _getLocationNameFromRawDelivery (delivery) {
 function _getLocationNameFromWorkflow (workflow) {
   var locationId = workflow.locationOrder[workflow.step - 1]
 
-  return _.find(_LOCATIONS, {id: locationId}).name
+  return _.find(_DS.locations, {id: locationId}).name
 }
 
 function _getCurrentSubstep (workflow) {
@@ -135,7 +135,7 @@ function _cleanupLocationData (receivedLocations) {
   }
 
   return _.sortBy(locations, function (location) {
-    return _.findIndex(_LOCATION_META, {name: location.name})
+    return _.findIndex(_DS.LOCATION_META, {name: location.name})
   })
 }
 
@@ -228,7 +228,7 @@ function _getVehicleImageName (vehicleInfo, deliveryStatus, locationName) {
   if (vehicleInfo.axles != null) {
     vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + vehicleInfo.axles + 'w-'
   } else if (vehicleInfo['vehicle-type']) {
-    vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + 2 + 'w-' 
+    vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + 2 + 'w-'
   } else {
     vehicleImageName += 'common-2w-'
   }

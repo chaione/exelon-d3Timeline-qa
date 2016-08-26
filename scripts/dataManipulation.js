@@ -1,4 +1,4 @@
-/* global _, d3, utils */
+/* global _, d3, utils, _DS */
 function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
   var result = {}
   var eventsArray = _.filter(deliveries.included, {type: 'events'})
@@ -78,24 +78,24 @@ function processApiData (workflowsData) {
     delivery.currentLocation = deliveryRaw.attributes['current-location']
   })
 
-  deliveriesData = updateCurrentStationCalc(deliveriesData)
+  deliveriesData = calculateDeliveryLocation(deliveriesData)
 
-  _LOCATION_STATS = countLocationDeliveries(deliveriesData)
+  _DS.locations = countLocationDeliveries(deliveriesData)
 
   // Calculate stacked count
-  _.each(_LOCATION_STATS, function (locationDeliveryCount, i) {
+  _.each(_DS.locations, function (location, i) {
     if (i === 0) {
-      locationDeliveryCount.stackedCount = locationDeliveryCount.deliveryCount
+      location.stackedCount = location.deliveryCount
     } else {
-      locationDeliveryCount.stackedCount = _LOCATION_STATS[i - 1].stackedCount + locationDeliveryCount.deliveryCount
+      location.stackedCount = _DS.locations[i - 1].stackedCount + location.deliveryCount
     }
   })
 
-  _.each(_LOCATION_STATS, function (locationDeliveryCount, i) {
+  _.each(_DS.locations, function (location, i) {
     if (i === 0) {
-      locationDeliveryCount.y0 = 0
+      location.y0 = 0
     } else {
-      locationDeliveryCount.y0 = _LOCATION_STATS[i - 1].stackedCount
+      location.y0 = _DS.locations[i - 1].stackedCount
     }
   })
 
@@ -104,7 +104,7 @@ function processApiData (workflowsData) {
 
   _LOCATION_WITH_DELIVERIES = d3.nest()
     .key(function (d) {
-      return d.currentStation
+      return d.currentLocation.id
     })
     .sortValues(function (a, b) {
       return b.values[0].eta - a.values[0].eta
@@ -116,9 +116,9 @@ function processApiData (workflowsData) {
       if (parseInt(location.key) === 0) {
         delivery.yIndex = j
       } else {
-        var locationIndex = _.findIndex(_LOCATION_STATS, {locationId: parseInt(location.key)})
+        var locationIndex = _.findIndex(_DS.locations, {id: parseInt(location.key)})
 
-        delivery.yIndex = _LOCATION_STATS[locationIndex - 1].stackedCount + j
+        delivery.yIndex = _DS.locations[locationIndex - 1].stackedCount + j
       }
     })
   })
@@ -155,7 +155,7 @@ function retrieveDeliveries () {
     success: function (deliveryResults) {
       _DELIVERIES = _.filter(deliveryResults.data, {type: 'deliveries'})
 
-      _LOCATIONS = utils.cleanupLocationData(
+      _DS.locations = utils.cleanupLocationData(
         _.filter(deliveryResults.included, {type: 'locations'})
       )
 
@@ -225,51 +225,36 @@ function countLocationDeliveries (deliveriesData) {
     return utils.getLocationNameFromRawDelivery(delivery)
   })
 
-  return _.map(_LOCATIONS, function (location) {
-    return {
-      locationId: location.id,
-      locationName: location.name,
+  return _.map(_DS.locations, function (location) {
+    return _.assign(location, {
       deliveryCount: summary[location.name] || 1,
-      abbr: _.find(_LOCATION_META, {name: location.name}).abbr
-    }
+      abbr: _.find(_DS.LOCATION_META, {name: location.name}).abbr
+    })
   })
 }
 
-function updateCurrentStationCalc (deliveriesData) { // update every delivery w/ its current station
+function calculateDeliveryLocation (deliveriesData) { // update every delivery w/ its current station
   _.each(deliveriesData, function (currentDelivery) {
-    var currentStation = 0
-    var isCurrentUpdated = false
+    if (!currentDelivery.currentLocation) {
+      var name = utils.getLocationNameFromRawDelivery(currentDelivery)
+      var id = _.find(_DS.locations, {name: name}).id
 
-    if (currentDelivery.currentLocation && currentDelivery.currentLocation.id) {
-      currentStation = currentDelivery.currentLocation.id
-    } else {
-      _.each(currentDelivery.values, (workflow) => {
-        if (!isCurrentUpdated) {
-          if (workflow['started-at'] !== null && workflow['ended-at'] === null) {
-            currentStation = workflow.station
-            isCurrentUpdated = true
-          }
-        }
-      })
+      currentDelivery.currentLocation = {
+        id: id,
+        name: name
+      }
     }
 
-    if (currentStation === 1) {
-      var firstWorkflowOfDelivery = currentDelivery.values[0]
+    if (currentDelivery.currentLocation.name === 'Sierra 1') {
+      var firstWorkflowOfDelivery = _.first(currentDelivery.values)
 
       if (!firstWorkflowOfDelivery['started-at']) {
-        currentStation = utils.getLocationIdFromLocationName('En Route')
+        currentDelivery.currentLocation = {
+          id: 0,
+          name: 'En Route'
+        }
       }
     }
-
-    if (currentStation === 0) {
-      var lastWorkflowEndTime = _.last(currentDelivery.values)['ended-at']
-
-      if (lastWorkflowEndTime && lastWorkflowEndTime < _now) {
-        currentStation = utils.getExitStationId(_LOCATIONS)
-      }
-    }
-
-    currentDelivery.currentStation = currentStation
   })
 
   return deliveriesData

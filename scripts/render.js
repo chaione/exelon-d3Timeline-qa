@@ -47,13 +47,13 @@ function render (data) {
   innerWidth = outerWidth - margin.left - margin.right
   innerHeight = outerHeight - margin.top - margin.bottom
 
-  var lastLocation = _.last(_LOCATION_STATS)
+  var lastLocation = _.last(_DS.locations)
   _locationHeight = rowHeight * (lastLocation.y0 * + lastLocation.deliveryCount)
 
   panBounds = {
     top: 0,
     right: 0,
-    bottom: (-1 * _locationHeight) + innerHeight - _X_AXIS_HEIGHT,
+    bottom: (-1 * _locationHeight * 2) + innerHeight - _X_AXIS_HEIGHT,
     left: (-1 * _X_AXIS_WIDTH) + outerWidth
   }
 
@@ -62,7 +62,7 @@ function render (data) {
   setupSvgStructure()
 
   // Setup stations overlay and text
-  var stationsLabelSelectAll = stationsGroup.selectAll('.station').data(_LOCATION_STATS)
+  var stationsLabelSelectAll = stationsGroup.selectAll('.station').data(_DS.locations)
   var stationsLabelSelectAllG = stationsLabelSelectAll.enter().append('g').attr('class', 'station') // stations should never exit
 
   stationsLabelSelectAllG.append('rect').attr('class', 'stationRect')
@@ -77,7 +77,7 @@ function render (data) {
   stationsLabelSelectAllG.append('text')
     .attr('x', function (d, i) { return stationTextPadding.left;})
     .attr('y', function (d, i) { return d.y0 * rowHeight + (rowHeight / 2) + stationTextHeight + stationTextPadding.top;})
-    .text(function (d, i) {return d.locationName})
+    .text(function (d) {return d.name})
     .attr('class', 'name')
     .attr('font-size', stationTextHeight + 'px')
 
@@ -673,8 +673,8 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
     var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
     var substep2State = utils.calculateSubstepDelayStatus(nonsearchEnd, searchEnd, searchEPT)
     currentWorkflow.append('line') // substep 1
-      .attr('x1', function (d, i) { 
-        return xScale(startedAt.getTime()) 
+      .attr('x1', function (d, i) {
+        return xScale(startedAt.getTime())
       })
       .attr('y1', function (d, i) { return 0 })
       .attr('x2', function (d, i) {

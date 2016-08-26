@@ -105,7 +105,9 @@ function displayDetail (delivery) {
   var detailDeliveryStationLabel = detailSvg.append('text')
     .attr('x', 10)
     .attr('y', detailDeliveryRectY - 10)
-    .text(utils.getLocationNameFromRawDelivery(delivery))
+    .text(function(d) {
+      return utils.getLocationNameFromRawDelivery(delivery)
+    })
     .attr('class', 'detailName')
     .attr('font-size', stationTextHeight + 'px')
 
@@ -493,8 +495,8 @@ function displayDetail (delivery) {
             .attr('x1', xScale(startedAt))
             .attr('y', 14)
             .text(function (d, i) {
-              var locationId = d.locationOrder[d.step - 1]
-              return _.find(_LOCATION_STATS, {locationId: locationId}).abbr
+              var id = d.locationOrder[d.step - 1]
+              return _.find(_DS.locations, {id: id}).abbr
             })
             .attr('class', function (d) {
               if (substep1State === 1) {
@@ -534,9 +536,9 @@ function displayDetail (delivery) {
           workflow.append('text')
             .attr('x', function (d) { return xScale(startedAt) })
             .attr('y', 14)
-            .text(function (d, i) {
-              var stationIndex = utils.getStaionIndexInStations(d.step, _LOCATIONS)
-              return _stationAcronyms[stationIndex]
+            .text(function (workflow, i) {
+              var locationName = utils.getLocationNameFromWorkflow(d)
+              return _.find(_DS.LOCATION_META, {name: locationName}).abbr
             })
             .attr('class', function (d) {
               if (d.state === 'late') {
