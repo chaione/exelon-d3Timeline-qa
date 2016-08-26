@@ -21,7 +21,7 @@ function moveXAxis (a, b) {
     xAxisTranslation.translate([eventxTranslation, eventyTranslation])
   }
 
-  if (_isDetailDisplayed) {
+  if (_DS.isDetailDisplayed) {
     eventyTranslation = previousYTranslation
   }
   previousYTranslation = eventyTranslation
@@ -33,7 +33,7 @@ function moveXAxis (a, b) {
   delieveryStaticGroup.attr('transform', 'translate(' + [0, eventyTranslation] + ')scale(1)')
 
   xAxisGroup.attr('transform', 'translate(' + [eventxTranslation, innerHeight] + ')scale(1)')
-  if (_isDetailDisplayed) {
+  if (_DS.isDetailDisplayed) {
     detailDeliveryDataGroup.attr('transform', 'translate(' + [eventxTranslation, detailDeliveryRectY] + ')scale(1)')
   }
 }

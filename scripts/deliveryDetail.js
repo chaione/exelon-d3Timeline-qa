@@ -15,7 +15,7 @@ function displayDetail (delivery) {
 
   delivery.infoBoxCurrStation = calculateInfoboxCurrStation(delivery)
 
-  _isDetailDisplayed = true
+  _DS.isDetailDisplayed = true
   detailYStart = 0
 
   var eventHeight = 30
@@ -652,12 +652,9 @@ function displayDetail (delivery) {
 
 function calculateInfoboxCurrStation (delivery) {
   var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
+  var locationName = delivery.currentLocation.name
 
-  var erLocationId = utils.getLocationIdFromLocationName('En Route', _LOCATIONS)
-  var exitLocationId = utils.getLocationIdFromLocationName('Exit', _LOCATIONS)
-  var locationName = utils.getLocationNameFromWorkflow(currentWorkflow)
-
-  if (delivery.currentStation === erLocationId || delivery.currentStation === exitLocationId) {
+  if (locationName === 'En Route' || locationName === 'EXit') {
     return ''
   }
 
@@ -671,6 +668,6 @@ function calculateInfoboxCurrStation (delivery) {
 }
 
 function dismissDeliveryDetail () {
-  _isDetailDisplayed = false
+  _DS.isDetailDisplayed = false
   d3.select('#detailSvg').style('opacity', 0.0).remove()
 }

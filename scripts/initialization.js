@@ -37,17 +37,18 @@ var _HAS_SUBSTEP_LOCATIONS = [
   'Sally Port'
 ]
 
-var _DS = {}
-
-_DS.LOCATION_META = [
-  { name: 'En Route',       abbr: 'ER', epts: [3] },
-  { name: 'Sierra 1',       abbr: 'S1', epts: [5, 6, 5] },
-  { name: 'Stinger Gate',   abbr: 'SG', epts: [35] },
-  { name: 'Warehouse',      abbr: 'WH', epts: [60] },
-  { name: 'Sally Port',     abbr: 'SP', epts: [5, 70, 15] },
-  { name: 'Protected Area', abbr: 'PA', epts: [60] },
-  { name: 'Exit',           abbr: 'EX', epts: [15] }
-]
+var _DS = {
+  isDetailDisplayed: false,
+  LOCATION_META: [
+    { name: 'En Route',       abbr: 'ER', epts: [3] },
+    { name: 'Sierra 1',       abbr: 'S1', epts: [5, 6, 5] },
+    { name: 'Stinger Gate',   abbr: 'SG', epts: [35] },
+    { name: 'Warehouse',      abbr: 'WH', epts: [60] },
+    { name: 'Sally Port',     abbr: 'SP', epts: [5, 70, 15] },
+    { name: 'Protected Area', abbr: 'PA', epts: [60] },
+    { name: 'Exit',           abbr: 'EX', epts: [15] }
+  ]
+}
 
 var _POSTS = [
   { fullName: 'POC',        abbr: 'poc'  },
