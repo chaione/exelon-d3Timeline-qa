@@ -232,10 +232,10 @@ function displayDetail (delivery) {
     .append('g')
     .each(function (d) {
       var workflow = d3.select(this)
-      var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
-      var searchEPT = d['search-estimated-processing-time'] || 15
-      var releaseEPT = d['release-estimated-processing-time'] || 15
-      var EPT = d['estimated-processing-time'] || 15
+      var nonsearchEPT = d.nonSearchEPT
+      var searchEPT = d.searchEPT
+      var releaseEPT = d.releaseEPT
+      var EPT = d.EPT
       var oneMinute = 1000 * 60
 
       if (utils.inSubstepLocation(d)) {
@@ -367,10 +367,10 @@ function displayDetail (delivery) {
     .append('g')
     .each(function (d) {
       var workflow = d3.select(this)
-      var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
-      var searchEPT = d['search-estimated-processing-time'] || 15
-      var releaseEPT = d['release-estimated-processing-time'] || 15
-      var EPT = d['estimated-processing-time'] || 15
+      var nonsearchEPT = d.nonSearchEPT
+      var searchEPT = d.searchEPT
+      var releaseEPT = d.releaseEPT
+      var EPT = d.EPT
       var oneMinute = 1000 * 60
 
       if (utils.inSubstepLocation(d)) {
@@ -480,10 +480,11 @@ function displayDetail (delivery) {
       var endedAt = d['ended-at']
       var searchEnd = d['search-end']
       var nonsearchEnd = d['nonsearch-end']
-      var nonsearchEPT = d['nonsearch-estimated-processing-time'] || 15
-      var searchEPT = d['search-estimated-processing-time'] || 15
-      var releaseEPT = d['release-estimated-processing-time'] || 15
-      var EPT = d['estimated-processing-time'] || 15
+
+      var nonsearchEPT = d.nonSearchEPT
+      var searchEPT = d.searchEPT
+      var releaseEPT = d.releaseEPT
+      var EPT = d.EPT
 
       if (startedAt & startedAt < _now) {
         if (utils.inSubstepLocation(d)) {
@@ -565,9 +566,8 @@ function displayDetail (delivery) {
     .attr('class', 'truckIconDiamond')
     .attr('transform', function (d) {return 'translate(' + xScale(_now) + ',' + (detailPadding + eventHeight + eventHeight) + ')'})
 
-  var currentDelivery  = eventsReqAndRespByDeliveryAPIData[delivery.key] || {}
-  var deliveryEvents   = currentDelivery.events || []
-  var deliveryContacts = currentDelivery.contacts || []
+  var deliveryEvents = _.filter(_DS.events, {deliveryId: delivery.key})
+  var deliveryContacts = []
 
   var detailDeliveryDataEventsGroup = detailDeliveryDataGroup.append('g')
     .attr('class', 'detailScheduled')
@@ -583,26 +583,31 @@ function displayDetail (delivery) {
         d.timestamp.getTime()
       )
     })
-    .attr('y1', function (d, i) {return eventHeight * deliveryContacts.indexOf(d.role);})
+    .attr('y1', function (d) {
+      return eventHeight * d.yIndex
+    })
     .attr('x2', function (d, i) {
-      if (d['endTimestamp'] === null) {
+      if (!d.endTimestamp) {
         return xScale(_now)
       } else {
-        return xScale(d['endTimestamp'])
+        return xScale(d.endTimestamp)
       }
     })
-    .attr('y2', function (d, i) {return eventHeight * deliveryContacts.indexOf(d.role);})
+    .attr('y2', function (d) {
+      return eventHeight * d.yIndex
+    })
     .attr('class', function (d) {
       return 'detailEventLine'
-    }).style('stroke-dasharray', ('1, 1'))
+    })
+    .style('stroke-dasharray', ('1, 1'))
 
   detailDeliveryDataEventsGroup
     .selectAll('.detailEventStart')
     .data(deliveryEvents)
     .enter()
     .append('circle')
-    .attr('cx', function (d, i) {return xScale(d['timestamp'])})
-    .attr('cy', function (d, i) {return eventHeight * deliveryContacts.indexOf(d.role);})
+    .attr('cx', function (d) {return xScale(d.timestamp)})
+    .attr('cy', function (d) {return eventHeight * d.yIndex})
     .attr('r', 3)
     .attr('class', 'detailEventStart')
 
@@ -615,8 +620,8 @@ function displayDetail (delivery) {
       var eventEnd = d3.select(this)
       if (d.endTimestamp !== null) {
         eventEnd
-          .attr('cx', function (d, i) {return xScale(d['endTimestamp'])})
-          .attr('cy', function (d, i) {return eventHeight * deliveryContacts.indexOf(d.role);})
+          .attr('cx', function (d) {return xScale(d.endTimestamp)})
+          .attr('cy', function (d) {return eventHeight * d.yIndex})
           .attr('r', 3)
           .attr('class', 'detailEventEnd')
       }

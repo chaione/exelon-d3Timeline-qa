@@ -212,28 +212,24 @@ function render (data) {
       displayDetail(delivery)
     })
 
-  var communicationSelectAll = deliveriesSelectAllG.selectAll('.communicationLine').data(function (d) {
-    if (d.key in eventsReqAndRespByDeliveryAPIData) { // no events for a delivery
-      return eventsReqAndRespByDeliveryAPIData[d.key].events
-    } else {
-      return []
-    }
-  })
+  var communicationSelectAll = deliveriesSelectAllG.selectAll('.communicationLine')
+    .data(function (d) {
+      return _.filter(_DS.events, {deliveryId: d.key})
+    })
 
-  var communicationGroup = communicationSelectAll.enter().append('line')
-  communicationGroup
-    .each(function (d) {
+  var communicationGroup = communicationSelectAll
+    .enter()
+    .append('line')
+    .each(function (event) {
       var eventItem = d3.select(this)
-      if (d.endTimestamp !== null) {
+      if (event.endTimestamp) {
         eventItem
-          .attr('x1', function (d, i) {return xScale(d['timestamp']); })
+          .attr('x1', function (event, i) {
+            return xScale(event.timestamp.getTime())
+          })
           .attr('y1', 10)
-          .attr('x2', function (d, i) {
-            if (d['endTimestamp'] === null) {
-              return xScale(_now)
-            } else {
-              return xScale(d['endTimestamp'])
-            }
+          .attr('x2', function (event, i) {
+            return xScale(event.endTimestamp.getTime())
           })
           .attr('y2', 10)
           .attr('class', 'communicationLine')

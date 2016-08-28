@@ -1,63 +1,46 @@
 /* global _, d3, utils, _DS */
-function calculateEventsReqAndRespByDeliveryAPIData (deliveries) {
-  var result = {}
-  var eventsArray = _.filter(deliveries.included, {type: 'events'})
+function pairEvents (apiResponse) {
+  var rawEvents = _.filter(apiResponse.included, {type: 'events'})
 
-  // organize all events to have their id as their key
-  var eventsAPIData = eventsArray.reduce(function (result, item, currIndex) {
-    item.attributes.deliveryId = parseInt(item.relationships.eventable.data.id)
-    item.attributes.timestamp = new Date(item.attributes['created-at'])
-    result[item.id] = item.attributes
+
+  // Inital setup and attributes assign
+  var events = _.map(rawEvents, function (event) {
+    var result = {
+      id: event.id,
+      deliveryId: event.relationships.eventable.data.id,
+      timestamp: new Date(event.attributes['created-at'])
+    }
+
+    _.each(event.attributes, function (value, key) {
+      result[_.camelCase(key)] = value
+    })
 
     return result
-  }, {})
+  })
 
-  // add the endTime
-  for (var key in eventsAPIData) {
-    var temp = eventsAPIData[key]
-    if (temp['is-request']) {
-      temp.endTimestamp = null
-      for (key in eventsAPIData) {
-        var temp2 = eventsAPIData[key]
-        if (temp.uuid === temp2.uuid && temp2['is-request'] === false) {
-          temp.endTimestamp = new Date(temp2['created-at'])
-          // console.log('FOUNDONE')
-          // console.log(temp.uuid)
-          // console.log(temp.timestamp)
-          // console.log(temp.endTimestamp)
-        }
+  // Pair with the response
+  _.each(events, function (event) {
+    if (event.isRequest) {
+      event.endTimestamp = null
+      var responseEvent = _.find(events, {uuid: event.uuid, isRequest: false})
+      if (responseEvent) {
+        event.endTimestamp = new Date(responseEvent.createdAt)
+      }
+      var posts = event.name.split('_')
+      event.requester = posts[0]
+      var responsers = _.map(_POSTS, 'abbr')
+      var postIndex = _.indexOf(responsers, posts[1])
+      if (postIndex !== -1) {
+        event.responser = posts[1]
+        event.yIndex = postIndex
       }
     }
-  }
+  })
 
-  // make final obj
-  // 'delivery1'{
-  //   'events':[event1,event2,...]
-  //   'contacts':[contactId1,contactId2] (now we know which order)
-  // },
-  // 'delivery2':
-  for (var key in eventsAPIData) {
-    var temp = eventsAPIData[key]
-    // i have all events for all the deliveries.  Im only storing the requests
-    if (temp['is-request']) {
-      if (temp.deliveryId in result) {
-        result[temp.deliveryId]['events'].push(temp)
-        // why -1?
-        if (result[temp.deliveryId]['contacts'].indexOf(temp.role) == -1) {
-          result[temp.deliveryId]['contacts'].push(temp.role)
-        }
-      } else {
-        result[temp.deliveryId] = {
-          events: [],
-          contacts: []
-        }
-        result[temp.deliveryId]['events'].push(temp)
-        result[temp.deliveryId]['contacts'].push(temp.role)
-      }
-    }
-  }
-
-  return result
+  // TODO: how to draw stuff like s1_search_completed
+  return _.filter(events, function (event) {
+    return event.isRequest && event.yIndex
+  })
 }
 
 function processApiData (workflowsData) {
@@ -154,21 +137,21 @@ function retrieveDeliveries () {
       'X-SITE-ID': siteId,
       'Authorization': 'Bearer ' + bearerToken
     },
-    success: function (deliveryResults) {
-      _DS.deliveries = _.filter(deliveryResults.data, {type: 'deliveries'})
+    success: function (apiResponse) {
+      _DS.deliveries = _.filter(apiResponse.data, {type: 'deliveries'})
 
       _DS.locations = utils.cleanupLocationData(
-        _.filter(deliveryResults.included, {type: 'locations'})
+        _.filter(apiResponse.included, {type: 'locations'})
       )
 
-      _DS.vendors = _.map(_.filter(deliveryResults.included, {type: 'vendors'}), function (vendor) {
+      _DS.vendors = _.map(_.filter(apiResponse.included, {type: 'vendors'}), function (vendor) {
         return {
           id: vendor.id,
           name: vendor.attributes.name
         }
       })
 
-      _VEHICLES = _.map(_.filter(deliveryResults.included, {type: 'vehicles'}), function (vehicle) {
+      _VEHICLES = _.map(_.filter(apiResponse.included, {type: 'vehicles'}), function (vehicle) {
         var result = {id: vehicle.id, vendorId: vehicle.relationships.vendor.data.id}
         _.each(vehicle.attributes, function (value, key) {
           result[key] = value
@@ -177,29 +160,21 @@ function retrieveDeliveries () {
       })
 
       _pocsAPIData = {}
-      var pocs = _.filter(deliveryResults.included, {type: 'pocs'})
+      var pocs = _.filter(apiResponse.included, {type: 'pocs'})
       _.each(pocs, poc => {
         _pocsAPIData[poc.id] = poc.attributes
       })
 
-      // 'delivery1'{
-      //   'events':[event1,event2,...]
-      //   'contacts':[contactId1,contactId2] (now we know which order)
-      // },
-      // 'delivery2':
-      eventsReqAndRespByDeliveryAPIData = calculateEventsReqAndRespByDeliveryAPIData(deliveryResults)
+      _DS.events = pairEvents(apiResponse)
 
-      var apiWorkflows = _.filter(deliveryResults.included, {type: 'workflows'})
+      var apiWorkflows = _.filter(apiResponse.included, {type: 'workflows'})
 
       apiWorkflows = apiWorkflows.map(function (workflow) {
         var deliveryId = workflow.relationships.delivery['data']['id']
         var deliveryRaw = _.find(_DS.deliveries, {id: deliveryId})
         workflow.attributes.id = workflow['id']
         workflow.attributes.deliveryId = parseInt(deliveryId)
-        workflow.attributes['estimated-processing-time'] = workflow.attributes['estimated-processing-time'] || 15
-        workflow.attributes['nonsearch-ept'] = workflow.attributes['nonsearch-ept'] || 15
-        workflow.attributes['search-ept'] = workflow.attributes['search-ept'] || 15
-        workflow.attributes['release-ept'] = workflow.attributes['release-ept'] || 15
+
         workflow.attributes.locationOrder = _.map(deliveryRaw.relationships.locations.data, function (location) {
           return parseInt(location.id)
         })
@@ -214,6 +189,14 @@ function retrieveDeliveries () {
         })
 
         return workflow.attributes
+      })
+
+      _.each(apiWorkflows, function (workflow) {
+        var epts = utils.getEPTFromWorkflow(workflow)
+        workflow.EPT = epts[0]
+        workflow.nonSearchEPT = epts[0]
+        workflow.searchEPT = epts[1]
+        workflow.releaseEPT = epts[2]
       })
 
       apiWorkflows = utils.calculateWorkflowETAs(apiWorkflows)
