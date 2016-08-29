@@ -63,8 +63,17 @@ function _getCurrentWorkflow (workflows) {
   })
 }
 
+function _calculateDelay (startTime, endTime, EPT) {
+  var difference = endTime - startTime
+  if (difference <= EPT * 60000) {
+    return 0
+  } else {
+    return difference - EPT
+  }
+}
+
 function _detailCalculateDelay (delivery) {
-  if (delivery.currentStation === utils.getLocationIdFromLocationName('En Route', _LOCATIONS)) {
+  if (delivery.currentLocation.name === 'En Route') {
     if (delivery.eta && delivery.eta < _now) {
       return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
     }
@@ -72,39 +81,63 @@ function _detailCalculateDelay (delivery) {
     return 0
   }
 
-  // Exited
-  if (delivery.currentStation === utils.getExitLocationId(_LOCATIONS)) {
-    var currentWF = _.last(delivery.values)
+  var totalDelay = _.reduce(delivery.values, function (sum, workflow, key) {
+    if (!workflow['started-at']) {
+      return sum
+    }
 
-    var a = currentWF.eta.getTime() + currentWF['estimated-processing-time'] * 60 * 1000
-    var b = currentWF['ended-at'] - a
+    if (utils.inSubstepLocation(workflow)) {
+      var subDelays = _.fill(Array(3), 0)
 
-    return Math.round(b / 1000 / 60)
-  }
+      if (workflow['ended-at']) {
+        subDelays[0] = utils.calculateDelay(workflow['started-at'], workflow['nonsearch-end'], workflow.nonSearchEPT)
+        subDelays[1] = utils.calculateDelay(workflow['nonsearch-end'], workflow['search-end'], workflow.searchEPT)
+        subDelays[2] = utils.calculateDelay(workflow['search-end'], workflow['ended-at'], workflow.releaseEPT)
+      } else {
+        var currentSubStep = utils.getCurrentSubstep(workflow)
+        if (currentSubStep === 1) {
+          subDelays[0] = utils.calculateDelay(workflow['started-at'], _now, workflow.nonSearchEPT)
+          subDelays[1] = 0
+          subDelays[2] = 0
+        } else if (currentSubStep === 2) {
+          subDelays[0] = utils.calculateDelay(workflow['started-at'], workflow['nonsearch-end'], workflow.nonSearchEPT)
+          subDelays[1] = utils.calculateDelay(workflow['nonsearch-end'], _now, workflow.searchEPT)
+          subDelays[2] = 0
+        } else {
+          subDelays[0] = utils.calculateDelay(workflow['started-at'], workflow['nonsearch-end'], workflow.nonSearchEPT)
+          subDelays[1] = utils.calculateDelay(workflow['nonsearche-end'], workflow['search-end'], workflow.searchEPT)
+          subDelays[2] = utils.calculateDelay(workflow['search-end'], _now, workflow.releaseEPT)
+        }
+      }
+      return sum + _.sum(subDelays)
+    } else {
+      if (workflow['ended-at']) {
+        var difference = workflow['ended-at'] - workflow['started-at']
+      } else {
+        var difference = _now - workflow['started-at']
+      }
 
-  var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
+      if (difference < workflow.EPT * 60000) {
+        return sum
+      } else {
+        return sum + difference - workflow.EPT * 60000
+      }
+    }
+  }, 0)
 
-  var minutesStartingLate = currentWorkflow['started-at'] - currentWorkflow['eta']
-  var currentDuration = _now - currentWorkflow['started-at']
-  var estimatedDuration = currentWorkflow['estimated-processing-time'] * 60000
-  var currentStationOverTime = currentDuration - estimatedDuration
-
-  if (currentStationOverTime > 0) {
-    minutesStartingLate += currentStationOverTime
-  }
-  return Math.round(minutesStartingLate / 1000 / 60)
+  return Math.round(totalDelay / 1000 / 60)
 }
 
-function _calculateSubstepDelayStatus (startTime, endTime, estimated) {
+function _calculateDelayState (startTime, endTime, estimated) {
   var difference = endTime - startTime
   estimated = estimated * 60000
 
-  if (difference > estimated * (1 + _AHEAD_OR_BEHIND_PCT)) {
-    return 1
-  } else if (difference < estimated * (1 - _AHEAD_OR_BEHIND_PCT)) {
-    return -1
+  if (difference > estimated * (1 + _DS.AHEAD_OR_BEHIND_PCT)) {
+    return 'late'
+  } else if (difference < estimated * (1 - _DS.AHEAD_OR_BEHIND_PCT)) {
+    return 'ahead'
   } else {
-    return 0
+    return 'onTime'
   }
 }
 
@@ -256,9 +289,7 @@ function _calculateWorkflowETAs (workflows) {
         // This isn't necessary in real situation
         // As first workflow should always have an ETA
         workflow.eta = workflow.eta || workflow['started-at'] || (_now.getTime() + _WORKFLOW_OFFSET)
-      }
-
-      if (index !== 0) {
+      } else {
         if (!workflow.eta) {
           var lastWorkflow = orderedWorkflows[index - 1]
           var epts = utils.getEPTFromWorkflow(lastWorkflow)
@@ -282,25 +313,48 @@ function _calculateWorkflowETAs (workflows) {
           }
         }
       }
-      workflow.state = 'ontime'
+      workflow.states= ['onTime']
       workflow.eta = new Date(workflow.eta)
 
-      if (utils.inSubstepLocation(workflow)) {
-        var substep = utils.getCurrentSubstep(workflow)
-        var estimated = 15 * (3 - substep + 1)  * 60000
+      // Original ETA 
+      if (index === 0) {
+        workflow.originalETA = new Date(workflow.eta) || _now
+      } else {
+        var previouseWorkflow = orderedWorkflows[index - 1]
+        if (utils.inSubstepLocation(previouseWorkflow)) {
+          workflow.originalETA = new Date(previouseWorkflow.originalETA.getTime() + (
+            previouseWorkflow.nonSearchEPT, previouseWorkflow.searchEPT, previouseWorkflow.releaseEPT
+          ) * 60000)
+        } else {
+          console.log('situation 2', previouseWorkflow.originalETA, previouseWorkflow.EPT)
+          workflow.originalETA = previouseWorkflow.originalETA.getTime() + previouseWorkflow.EPT * 60000
+        }
+
+        workflow.originalETA = new Date(workflow.originalETA)
       }
 
-      if (workflow['ended-at']) {
-        if (workflow['ended-at'].getTime() > (workflow['eta'].getTime() + estimated)) {
-          workflow.state = 'late'
-        }
-      } else if (workflow['started-at']) {
-        if (workflow['started-at'] > workflow.eta) {
-          workflow.state = 'late'
-        }
+      if (utils.inSubstepLocation(workflow)) {
+        // var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
+        // var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
+        // var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
       } else {
-        if ((workflow['eta'].getTime() + estimated) < _now.getTime()) {
-          workflow.state = 'late'
+        var elapsedTime = 0 
+        if (workflow['started-at']) {
+          if (workflow['ended-at']) {
+            elapsedTime = workflow['ended-at'] - workflow['started-at']
+          } else {
+            elapsedTime = _now - workflow['started-at']
+          }
+
+          if (elapsedTime > workflow.EPT * 60000 * (1 + _DS.AHEAD_OR_BEHIND_PCT)) {
+            workflow.states = ['late']
+          } else if (elapsedTime < workflow.EPT * 60000 * (1 - _DS.AHEAD_OR_BEHIND_PCT)) {
+            workflow.states = ['ahead']
+          }
+        } else {
+          if (workflow.ETA < _now) {
+            workflow.states['late']
+          } 
         }
       }
     })
@@ -319,7 +373,7 @@ var utils = {
   getStaionIndexInStations: _getStaionIndexInStations,
   cleanupLocationData: _cleanupLocationData,
   prepareSubStepEndTimes: _prepareSubStepEndTimes,
-  calculateSubstepDelayStatus: _calculateSubstepDelayStatus,
+  calculateDelayState: _calculateDelayState,
   detailCalculateDelay: _detailCalculateDelay,
   getCurrentWorkflow: _getCurrentWorkflow,
   inSubstepLocation: _inSubstepLocation,
@@ -332,4 +386,5 @@ var utils = {
   isDeliveryInLocation: _isDeliveryInLocation,
   getVehicleIconSuffix: _getVehicleIconSuffix,
   getEPTFromWorkflow: _getEPTFromWorkflow,
+  calculateDelay: _calculateDelay,
 }

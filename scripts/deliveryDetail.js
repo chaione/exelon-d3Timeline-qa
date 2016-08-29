@@ -242,18 +242,18 @@ function displayDetail (delivery) {
         workflow.append('line')
           .attr('x1', function (d, i) {
             return xScale(
-              d.eta
+              d.originalETA
             )
           })
           .attr('y1', 0)
           .attr('x2', function (d) {
             return xScale(
-              d.eta.getTime() + nonsearchEPT * oneMinute - 60000
+              d.originalETA.getTime() + nonsearchEPT * oneMinute - 60000
             )
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            if (d.eta > _now) {
+            if (d.originalETA > _now) {
               return 'detailScheduledLine2 notReached'
             }
             return 'detailScheduledLine2'
@@ -262,18 +262,18 @@ function displayDetail (delivery) {
         workflow.append('line')
           .attr('x1', function (d, i) {
             return xScale(
-              d.eta.getTime() + nonsearchEPT * oneMinute
+              d.originalETA.getTime() + nonsearchEPT * oneMinute
             )
           })
           .attr('y1', 0)
           .attr('x2', function (d) {
             return xScale(
-              d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000
+              d.originalETA.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000
             )
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            if (d.eta > _now) {
+            if (d.originalETA > _now) {
               return 'detailScheduledLine2 notReached'
             }
             return 'detailScheduledLine2'
@@ -282,23 +282,23 @@ function displayDetail (delivery) {
         workflow.append('line')
           .attr('x1', function (d, i) {
             return xScale(
-              d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute
+              d.originalETA.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute
             )
           })
           .attr('y1', 0)
           .attr('x2', function (d, i) {
             if (d.step < delivery.values.length) {
               var nextWorkflow = _.find(delivery.values, {step: d.step + 1})
-              return xScale(nextWorkflow.eta.getTime() - 60000)
+              return xScale(nextWorkflow.originalETA.getTime() - 60000)
             } else {
               return xScale(
-                d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
+                d.originalETA.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
               )
             }
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            if (d.eta > _now) {
+            if (d.originalETA > _now) {
               return 'detailScheduledLine2 notReached'
             }
             return 'detailScheduledLine2'
@@ -307,7 +307,7 @@ function displayDetail (delivery) {
         workflow.append('svg:path')
           .attr('d', function (d) { return customShapes['lBook'](4);})
           .attr('transform', function (d) {
-            return 'translate(' + xScale(d.eta) + ',' + 0 + ')'
+            return 'translate(' + xScale(d.originalETA) + ',' + 0 + ')'
           })
           .attr('fill', '#797F88')
 
@@ -316,9 +316,9 @@ function displayDetail (delivery) {
           .attr('transform', function (d) {
             if (d.step < delivery.values.length) {
               var nextWorkflow = _.find(delivery.values, {step: d.step + 1})
-              var endTime = nextWorkflow.eta.getTime() - 60000
+              var endTime = nextWorkflow.originalETA.getTime() - 60000
             } else {
-              var endTime = d.eta.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
+              var endTime = d.originalETA.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
             }
             return 'translate(' + xScale(endTime) + ',' + 0 + ')'
           })
@@ -326,17 +326,17 @@ function displayDetail (delivery) {
       } else {
         workflow.append('line')
           .attr('x1', function (d, i) {
-            return xScale(d.eta.getTime())
+            return xScale(d.originalETA)
           })
           .attr('y1', 0)
           .attr('x2', function (d, i) {
             return xScale(
-              d.eta.getTime() + EPT * 60000 - 60000
+              d.originalETA.getTime() + EPT * 60000 - 60000
             )
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            if (d.eta > _now) {
+            if (d.originalETA > _now) {
               return 'detailScheduledLine2 notReached'
             }
             return 'detailScheduledLine2'
@@ -345,17 +345,16 @@ function displayDetail (delivery) {
         workflow.append('svg:path')
           .attr('d', function (d) { return customShapes['lBook'](4);})
           .attr('transform', function (d) {
-            return 'translate(' + xScale(d.eta) + ',' + 0 + ')'
+            return 'translate(' + xScale(d.originalETA) + ',' + 0 + ')'
           })
           .attr('fill', '#797F88')
 
         workflow.append('svg:path')
           .attr('d', function (d) { return customShapes['rBook'](4);})
           .attr('transform', function (d) {
-            return 'translate(' + xScale(d.eta.getTime() + EPT * 60000 - 60000) + ',' + 0 + ')'
+            return 'translate(' + xScale(d.originalETA.getTime() + EPT * 60000 - 60000) + ',' + 0 + ')'
           })
           .attr('fill', '#797F88')
-
       }
     })
 
@@ -377,16 +376,13 @@ function displayDetail (delivery) {
         workflow.append('text')
           .attr('x', function (d) {
             return xScale(
-              d.eta
+              d.originalETA
             )
           })
           .attr('y', -3)
           .text(function (d, i) {
             var locationName = utils.getLocationNameFromWorkflow(d)
-
-            if (d['eta'] > _now) {
-              return utils.getLocationAbbrFromLocationName(locationName) + '.1'
-            }
+            return utils.getLocationAbbrFromLocationName(locationName) + '.1'
           })
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
@@ -394,14 +390,12 @@ function displayDetail (delivery) {
         workflow.append('text')
           .attr('x', function (d) {
             return xScale(
-              d.eta.getTime() + nonsearchEPT * 60000
+              d.originalETA.getTime() + nonsearchEPT * 60000
             )
           })
           .attr('y', -3)
           .text(function (d, i) {
-            if (d.eta.getTime() + nonsearchEPT * 60000 > _now) {
-              return 2
-            }
+            return 2
           })
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
@@ -409,21 +403,19 @@ function displayDetail (delivery) {
         workflow.append('text')
           .attr('x', function (d) {
             return xScale(
-              d['eta'].getTime() + nonsearchEPT * 60000 + searchEPT * 60000
+              d.originalETA.getTime() + nonsearchEPT * 60000 + searchEPT * 60000
             )
           })
           .attr('y', -3)
           .text(function (d, i) {
-            if (d['eta'].getTime() + nonsearchEPT * 60000 + (d['search-estimated-processing-time'] || 15) * 60000 > _now) {
-              return 3
-            }
+            return 3
           })
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
       } else {
         workflow.append('text')
           .attr('x', function (d) {
-            return xScale(d['eta'])
+            return xScale(d.originalETA)
           })
           .attr('y', -3)
           .text(function (d) {
@@ -432,9 +424,8 @@ function displayDetail (delivery) {
             } else {
               var locationName = utils.getLocationNameFromWorkflow(d)
             }
-            if (d.eta > _now) {
-              return utils.getLocationAbbrFromLocationName(locationName)
-            }
+
+            return utils.getLocationAbbrFromLocationName(locationName)
           })
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', 14 + 'px')
@@ -488,9 +479,9 @@ function displayDetail (delivery) {
 
       if (startedAt & startedAt < _now) {
         if (utils.inSubstepLocation(d)) {
-          var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
-          var substep2State = utils.calculateSubstepDelayStatus(nonsearchEnd, searchEnd, searchEPT)
-          var substep3State = utils.calculateSubstepDelayStatus(searchEnd, endedAt, releaseEPT)
+          var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
+          var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
+          var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
 
           workflow.append('text')
             .attr('x1', xScale(startedAt))
@@ -500,13 +491,7 @@ function displayDetail (delivery) {
               return _.find(_DS.locations, {id: id}).abbr
             })
             .attr('class', function (d) {
-              if (substep1State === 1) {
-                return 'detailActualLabels late'
-              } else if (substep1State === -1) {
-                return 'detailActualLabels ahead'
-              } else {
-                return 'detailActualLabels'
-              }
+              return 'detailActualLabels ' + substep1State
             })
             .attr('font-size', 14 + 'px')
 
@@ -516,8 +501,7 @@ function displayDetail (delivery) {
               .attr('y', 14)
               .text(2)
               .attr('class', function (d) {
-                if (substep2State === 1) {return 'detailActualLabels late';}
-                else if (substep2State === -1) {return 'detailActualLabels ahead';}else {return 'detailActualLabels';}
+                return 'detailActualLabels ' + substep2State
               })
               .attr('font-size', 14 + 'px')
           }
@@ -528,8 +512,7 @@ function displayDetail (delivery) {
               .attr('y', 14)
               .text(3)
               .attr('class', function (d) {
-                if (substep3State === 1) {return 'detailActualLabels late';}
-                else if (substep3State === -1) {return 'detailActualLabels ahead';}else {return 'detailActualLabels';}
+                return 'detailActualLabels ' + substep3State
               })
               .attr('font-size', 14 + 'px')
           }
@@ -542,13 +525,7 @@ function displayDetail (delivery) {
               return _.find(_DS.LOCATION_META, {name: locationName}).abbr
             })
             .attr('class', function (d) {
-              if (d.state === 'late') {
-                return 'detailActualLabels late'
-              }else if (d.state === 'early') {
-                return 'detailActualLabels ahead'
-              }else {
-                return 'detailActualLabels'
-              }
+              return 'detailActualLabels ' + d.states[0]
             })
             .attr('font-size', 14 + 'px')
         }

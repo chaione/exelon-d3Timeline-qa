@@ -37,6 +37,7 @@ var _HAS_SUBSTEP_LOCATIONS = [
 ]
 
 var _DS = {
+  AHEAD_OR_BEHIND_PCT: 0.5,
   isDetailDisplayed: false,
   LOCATION_META: [
     { name: 'En Route',       abbr: 'ER', epts: [3] },
@@ -92,7 +93,6 @@ var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlh
 // var siteId = 10000
 // var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMxNzQ2MX0.86TwRbaqlfu7pv14NZ6ZF-RZKfUDLXtm9-5_2TGf4Mg'
 
-var _AHEAD_OR_BEHIND_PCT = .25 // if behind .25 estimated time its longer. if ahead by .25.. its faster
 var titleHeight = 83
 // Calculated Variables
 var innerWidth = outerWidth - margin.left - margin.right

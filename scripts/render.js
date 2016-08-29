@@ -341,9 +341,9 @@ function appendWorkflow (workflow, d) {
       searchEnd = d['search-end']
       nonsearchEnd = d['nonsearch-end']
 
-      var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
-      var substep2State = utils.calculateSubstepDelayStatus(nonsearchEnd, searchEnd, searchEPT)
-      var substep3State = utils.calculateSubstepDelayStatus(searchEnd, endedAt, releaseEPT)
+      var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
+      var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
+      var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
 
       workflow.append('line')
         .attr('x1', function (d, i) {
@@ -353,7 +353,7 @@ function appendWorkflow (workflow, d) {
         .attr('x2', function (d, i) { return xScale(nonsearchEnd - 60000) })
         .attr('y2', function (d, i) { return 0 })
         .attr('class', function (d) {
-          return utils.getSubstepState(substep1State)
+          return 'workflow ' + substep1State
         })
 
       workflow.append('line') // substep 2
@@ -362,7 +362,7 @@ function appendWorkflow (workflow, d) {
         .attr('x2', function (d, i) { return xScale(searchEnd - 60000) })
         .attr('y2', function (d, i) { return 0 })
         .attr('class', function (d) {
-          return utils.getSubstepState(substep2State)
+          return 'workflow ' + substep2State
         })
 
       workflow.append('line')
@@ -371,7 +371,7 @@ function appendWorkflow (workflow, d) {
         .attr('x2', function (d, i) { return xScale(endedAt) })
         .attr('y2', function (d, i) { return 0 })
         .attr('class', function (d) {
-          return utils.getSubstepState(substep3State)
+          return 'workflow ' + substep3State
         })
 
       workflow.append('svg:path')
@@ -536,13 +536,8 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .attr('x2', function (d, i) { return xScale(_now.getTime()) })
       .attr('y2', function (d, i) { return .001 })
       .attr('class', function (d) {
-        if (d.state === 'late') {
-          return 'workflow late'
-        } else if (d.state === 'early') {
-          return 'workflow ahead'
-        } else {
-          return 'workflow'
-        }
+        var state = utils.calculateDelayState(d['started-at'], _now, d.nonSearchEPT)
+        return 'workflow ' + state
       })
 
     // on right side of now
@@ -560,13 +555,8 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .style('stroke-dasharray', ('2, 2'))
       .style('stroke-width', 4)
       .attr('class', function (d) {
-        if (d.state === 'late') {
-          return 'workflow lateGradient'
-        } else if (d.state === 'early') {
-          return 'workflow aheadGradient'
-        } else {
-          return 'workflow onTimeGradient'
-        }
+        var state = utils.calculateDelayState(d['started-at'], _now, d.nonSearchEPT)
+        return 'workflow ' + state + 'Gradient'
       })
 
     currentWorkflow.append('line') // search notreached
@@ -585,10 +575,9 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .style('stroke-dasharray', ('2, 2'))
       .style('stroke-width', 4)
       .attr('class', function (d) {
-        if (d.state === 'late') {
+        var estimated = d['started-at'].getTime() + (nonsearchEPT + searchEPT) * 60000
+        if (estimated < _now) {
           return 'workflow lateGradient'
-        } else if (d.state === 'early') {
-          return 'workflow aheadGradient'
         } else {
           return 'workflow onTimeGradient'
         }
@@ -610,24 +599,22 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .style('stroke-dasharray', ('2, 2'))
       .style('stroke-width', 4)
       .attr('class', function (d) {
-        if (d.state === 'late') {
+        var estimated = d['started-at'].getTime() + (nonsearchEPT + searchEPT + releaseEPT) * 60000
+        if (estimated < _now) {
           return 'workflow lateGradient'
-        } else if (d.state === 'early') {
-          return 'workflow aheadGradient'
         } else {
           return 'workflow onTimeGradient'
         }
       })
   } else if (currentSubStep === 2) {
-    var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
+    var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
     currentWorkflow.append('line') // substep 1 complted
       .attr('x1', function (d, i) { return xScale(startedAt); })
       .attr('y1', function (d, i) { return 0;})
       .attr('x2', function (d, i) { return xScale(nonsearchEnd - 60000); })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', function (d) {
-        if (substep1State === 1) {return 'workflow late';}
-        else if (substep1State === -1) {return 'workflow ahead';}else {return 'workflow';}
+        return 'workflow ' + substep1State
       })
 
     currentWorkflow.append('line') // part of substep 2 (that was is being completed)
@@ -636,38 +623,54 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .attr('x2', function (d, i) { return xScale(_now); })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', function (d) {
-        return 'workflow'
+        var estimated = nonsearchEnd.getTime() + searchEPT * 60000
+        if (estimated < _now) {
+          return 'workflow late'
+        } else {
+          return 'workflow onTime'
+        }
       })
 
     // on right side of now
     currentWorkflow.append('line') // future end of substep 2
-      .attr('x1', function (d, i) { return xScale(_now); })
+      .attr('x1', function (d, i) { 
+        return xScale(_now)
+      })
       .attr('y1', function (d, i) { return 0;})
-      .attr('x2', function (d, i) { return xScale(new Date(new Date(startedAt)).getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute)})
+      .attr('x2', function (d, i) { 
+        return xScale(
+          _now.getTime() + searchEPT * oneMinute - 60000
+        )
+      })
       .attr('y2', function (d, i) { return .001;}) // IMPORTANT  if its flat its not displayed
       .style('stroke-dasharray', ('2, 2'))
       .style('stroke-width', 4)
       .attr('class', function (d) {
-        if (d.state === 'late') {
+        var estimated = d['started-at'].getTime() + (nonsearchEPT + searchEPT) * 60000
+        if (estimated < _now) {
           return 'workflow lateGradient'
-        } else if (d.state === 'early') {
-          return 'workflow aheadGradient'
         } else {
           return 'workflow onTimeGradient'
         }
       })
 
     currentWorkflow.append('line') // release notreached
-      .attr('x1', function (d, i) { return xScale(new Date(d.eta).getTime() +
-          nonsearchEPT * oneMinute +
-          searchEPT * oneMinute -
-          60000); })
-      .attr('x2', function (d, i) { return xScale(new Date(d.eta).getTime() + EPT * oneMinute - 60000); }) // remove a minute so a gap appears
+      .attr('x1', function (d, i) { 
+        return xScale(
+          _now.getTime() + searchEPT * oneMinute
+        )
+      })
+      .attr('x2', function (d, i) { 
+        return xScale(
+          _now.getTime() + (searchEPT + releaseEPT) * oneMinute - 60000
+        )
+      })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', 'workflow notReached')
+
   } else if (currentSubStep === 3) {
-    var substep1State = utils.calculateSubstepDelayStatus(startedAt, nonsearchEnd, nonsearchEPT)
-    var substep2State = utils.calculateSubstepDelayStatus(nonsearchEnd, searchEnd, searchEPT)
+    var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
+    var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
     currentWorkflow.append('line') // substep 1
       .attr('x1', function (d, i) {
         return xScale(startedAt.getTime())
@@ -678,8 +681,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', function (d) {
-        if (substep1State === 1) {return 'workflow late';}
-        else if (substep1State === -1) {return 'workflow ahead';}else {return 'workflow';}
+        return 'workflow ' + substep1State
       })
 
     currentWorkflow.append('line') // substep 2
@@ -688,8 +690,7 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .attr('x2', function (d, i) { return xScale(searchEnd - 60000); })
       .attr('y2', function (d, i) { return 0;})
       .attr('class', function (d) {
-        if (substep2State === 1) {return 'workflow late';}
-        else if (substep2State === -1) {return 'workflow ahead';}else {return 'workflow';}
+        return 'workflow ' + substep2State
       })
 
     currentWorkflow.append('line') // part of step 3 done
@@ -698,7 +699,12 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .attr('x2', function (d, i) { return xScale(_now); })
       .attr('y2', function (d, i) { return 0 })
       .attr('class', function (d) {
-        return 'workflow'
+        var estimated = d['search-end'].getTime() + releaseEPT * 60000
+        if (estimated < _now) {
+          return 'workflow late'
+        } else {
+          return 'workflow onTime'
+        }
       })
 
     // on right side of now
@@ -712,10 +718,9 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
       .style('stroke-dasharray', ('2, 2'))
       .style('stroke-width', 4)
       .attr('class', function (d) {
-        if (d.state === 'late') {
+        var estimated = d['search-end'].getTime() + releaseEPT * 60000
+        if (estimated < _now) {
           return 'workflow lateGradient'
-        } else if (d.state === 'early') {
-          return 'workflow aheadGradient'
         } else {
           return 'workflow onTimeGradient'
         }
@@ -737,4 +742,3 @@ function appendCurrentWorkflowWithSubsteps (currentWorkflow, d) {
 
   return currentWorkflow
 }
-
