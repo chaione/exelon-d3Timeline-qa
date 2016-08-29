@@ -95,6 +95,7 @@ function _detailCalculateDelay (delivery) {
         subDelays[2] = utils.calculateDelay(workflow['search-end'], workflow['ended-at'], workflow.releaseEPT)
       } else {
         var currentSubStep = utils.getCurrentSubstep(workflow)
+        console.log(currentSubStep)
         if (currentSubStep === 1) {
           subDelays[0] = utils.calculateDelay(workflow['started-at'], _now, workflow.nonSearchEPT)
           subDelays[1] = 0
@@ -105,7 +106,7 @@ function _detailCalculateDelay (delivery) {
           subDelays[2] = 0
         } else {
           subDelays[0] = utils.calculateDelay(workflow['started-at'], workflow['nonsearch-end'], workflow.nonSearchEPT)
-          subDelays[1] = utils.calculateDelay(workflow['nonsearche-end'], workflow['search-end'], workflow.searchEPT)
+          subDelays[1] = utils.calculateDelay(workflow['nonsearch-end'], workflow['search-end'], workflow.searchEPT)
           subDelays[2] = utils.calculateDelay(workflow['search-end'], _now, workflow.releaseEPT)
         }
       }
@@ -316,7 +317,7 @@ function _calculateWorkflowETAs (workflows) {
       workflow.states= ['onTime']
       workflow.eta = new Date(workflow.eta)
 
-      // Original ETA 
+      // Original ETA
       if (index === 0) {
         workflow.originalETA = new Date(workflow.eta) || _now
       } else {
@@ -326,7 +327,6 @@ function _calculateWorkflowETAs (workflows) {
             previouseWorkflow.nonSearchEPT, previouseWorkflow.searchEPT, previouseWorkflow.releaseEPT
           ) * 60000)
         } else {
-          console.log('situation 2', previouseWorkflow.originalETA, previouseWorkflow.EPT)
           workflow.originalETA = previouseWorkflow.originalETA.getTime() + previouseWorkflow.EPT * 60000
         }
 
@@ -338,7 +338,7 @@ function _calculateWorkflowETAs (workflows) {
         // var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
         // var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
       } else {
-        var elapsedTime = 0 
+        var elapsedTime = 0
         if (workflow['started-at']) {
           if (workflow['ended-at']) {
             elapsedTime = workflow['ended-at'] - workflow['started-at']
@@ -354,7 +354,7 @@ function _calculateWorkflowETAs (workflows) {
         } else {
           if (workflow.ETA < _now) {
             workflow.states['late']
-          } 
+          }
         }
       }
     })
