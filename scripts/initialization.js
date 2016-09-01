@@ -48,6 +48,48 @@ var _DS = {
     { name: 'Sally Port',     abbr: 'SP', epts: [5, 70, 15] },
     { name: 'Protected Area', abbr: 'PA', epts: [60] },
     { name: 'Exit',           abbr: 'EX', epts: [15] }
+  ],
+  EVENTS_META: [
+    { name: 's1_sas_arrived',                  to: ['sas'],                responsible: false },
+    { name: 's1_poc_arrived',                  to: ['poc'],                responsible: true },
+    { name: 's1_d10_cover',                    to: ['d10'],                responsible: true },
+    { name: 's1_last_step_completed',          to: ['d10'],                responsible: true },
+    { name: 's1_abort',                        to: ['s1'],                 responsible: true },
+    { name: 's1_search_abort',                 to: ['d10', 'poc', 'sas'],  responsible: false },
+    { name: 's1_search_completed',             to: ['d10'],                responsible: true },
+    { name: 's1_deny_entry',                   to: ['d10', 'poc', 'sas'],  responsible: false },
+    { name: 's1_seach_completed',              to: ['d10'],                responsible: false },
+    { name: 's1_poc_release_vehicle',          to: ['poc'],                responsible: true },
+    { name: 's1_sp_release_vehicle',           to: ['sp'],                 responsible: true },
+    { name: 's1_sas_release_vehicle',          to: ['sas'],                responsible: true },
+    { name: 's1_d10_release_vehicle',          to: ['d10'],                responsible: true },
+    { name: 's1_d1_release_vehicle',           to: ['d1'],                 responsible: true },
+    { name: 's1_vvro_release_vehicle',         to: ['vvro'],               responsible: true },
+    { name: 's1_release_vehicle',              to: ['vvro'],               responsible: true },
+    { name: 'si_release_confirmed',            to: ['vvro'],               responsible: false},
+    { name: 'vvro_d10_release_vehicle',        to: ['d10'],                responsible: true },
+    { name: 'vvro_d1_release_vehicle',         to: ['d1'],                 responsible: true },
+    { name: 'vvro_poc_release_vehicle',        to: ['poc'],                responsible: true },
+    { name: 'vvro_sp_release_vehicle',         to: ['sp'],                 responsible: true },
+    { name: 'vvro_sas_release_vehicle',        to: ['sas'],                responsible: true },
+    { name: 'vvro_s1_release_vehicle_exiting', to: ['s1'],                 responsible: true },
+    { name: 'sp_vvro_release_vehicle_exiting', to: ['vvro'],               responsible: true },
+    { name: 'sp_sas_release_vehicle_exiting',  to: ['sas'],                responsible: true },
+    { name: 'sp_start_search',                 to: ['sas'],                responsible: true },
+    { name: 'sp_search_completed',             to: ['sas'],                responsible: true },
+    { name: 'sp_search_abort',                 to: ['sas', 'poc'],         responsible: false },
+    { name: 'sp_deny_entry',                   to: ['sas', 'poc'],         responsible: false },
+    { name: 'sp_arrived',                      to: [],                     responsible: false },
+    { name: 'sp_poc_arrived',                  to: ['poc'],                responsible: true },
+    { name: 'sp_sas_release_vehicle',          to: ['sas'],                responsible: false },
+    { name: 'sp_poc_release_vehicle',          to: ['poc'],                responsible: true },
+    { name: 'sp_release_confirmed',            to: ['poc'],                responsible: false },
+    { name: 'sp_release_confirmed_exiting',    to: ['vvro'],               responsible: false },
+    { name: 'sp_sas_arrived',                  to: ['sas'],                responsible: false },
+    { name: 'sp_sas_cover',                    to: ['sas'],                responsible: true },
+    { name: 'sp_sas_release_vehicle',          to: ['sas'],                responsible: true },
+    { name: 'sp_sas_release_vehicle_exiting',  to: ['sas'],                responsible: true },
+    { name: 'driver_enroute_Limerick',         to: ['sas'],                responsible: false },
   ]
 }
 
@@ -59,6 +101,7 @@ var _POSTS = [
   { fullName: 'VVRO',       abbr: 'vvro' },
   { fullName: 'Sally Port', abbr: 'sp'   }
 ]
+
 
 var _VEHICLE_TYPE_TO_IMG = {
   'non_common_carrier': 'noncommon',
