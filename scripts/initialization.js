@@ -90,6 +90,9 @@ var _DS = {
     { name: 'sp_sas_release_vehicle',          to: ['sas'],                responsible: true },
     { name: 'sp_sas_release_vehicle_exiting',  to: ['sas'],                responsible: true },
     { name: 'driver_enroute_Limerick',         to: ['sas'],                responsible: false },
+    { name: 'vvro_driver_approaching_sg',      to: ['poc'],                responsible: false },
+    { name: 'vvro_release_confirmed',          to: ['sp'],                 responsible: false },
+    { name: 'vvro_release_confirmed_exiting',  to: [],                     responsible: false },
   ]
 }
 
@@ -153,10 +156,6 @@ var nowMonth = _now.getMonth()
 var nowDay = _now.getDate()
 var nowHours = _now.getHours()
 var nowMinutes = _now.getMinutes()
-var yesterday = new Date(_now)
-yesterday.setDate(yesterday.getDate() - 1)
-var tomorrow = new Date(_now)
-tomorrow.setDate(tomorrow.getDate() + 1)
 
 var vehicleShapeH = rowHeight - 10
 var svg, stationsGroup, delieveryStaticGroup, g, deliveriesGroup, xAxisGroup, yAxisGroup, xAxisMask
@@ -197,10 +196,13 @@ var customShapes = {
   }
 }
 
+var yesterdayMidDay = moment().subtract(1, 'days').startOf('day').set('hour', 12)
+var tomorrowMidDay = moment().add(1, 'days').startOf('day').set('hour', 12)
+
 var xScale = d3.time.scale.utc()
   .domain(
-    [+new Date(nowYear, nowMonth, yesterday.getDate(), 12),
-     +new Date(tomorrow.getFullYear(), tomorrow.getMonth() , tomorrow.getDate(), 12)]
+    [yesterdayMidDay.unix() * 1000,
+     tomorrowMidDay.unix() * 1000]
   )
   .range(
     [0, _X_AXIS_WIDTH]
@@ -212,8 +214,8 @@ var yDeliveryScale = d3.scale.linear()
 
 var viewportScale = d3.time.scale.utc()
   .domain(
-    [+new Date(nowYear, nowMonth, yesterday.getDate(), 12) + unixStartHours,
-     +new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 12) - unixStartHours]
+    [yesterdayMidDay.unix() * 1000 + unixStartHours,
+     tomorrowMidDay.unix() * 1000 - unixStartHours]
   )
   .range([0, -1 * _X_AXIS_WIDTH + outerWidth])
 
