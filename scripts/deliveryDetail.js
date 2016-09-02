@@ -259,10 +259,10 @@ function displayDetail (delivery) {
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            if (d.originalETA > _now) {
+            // if (d.originalETA > _now) {
               return 'detailScheduledLine2 notReached'
-            }
-            return 'detailScheduledLine2'
+            // }
+            // return 'detailScheduledLine2'
           })
 
         workflow.append('line')
@@ -279,10 +279,10 @@ function displayDetail (delivery) {
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            if (d.originalETA > _now) {
+            // if (d.originalETA > _now) {
               return 'detailScheduledLine2 notReached'
-            }
-            return 'detailScheduledLine2'
+            // }
+            // return 'detailScheduledLine2'
           })
 
         workflow.append('line')
@@ -304,10 +304,10 @@ function displayDetail (delivery) {
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            if (d.originalETA > _now) {
+            // if (d.originalETA > _now) {
               return 'detailScheduledLine2 notReached'
-            }
-            return 'detailScheduledLine2'
+            // }
+            // return 'detailScheduledLine2'
           })
 
         workflow.append('svg:path')
@@ -342,10 +342,10 @@ function displayDetail (delivery) {
           })
           .attr('y2', 0)
           .attr('class', function (d) {
-            if (d.originalETA > _now) {
+            // if (d.originalETA > _now) {
               return 'detailScheduledLine2 notReached'
-            }
-            return 'detailScheduledLine2'
+            // }
+            // return 'detailScheduledLine2'
           })
 
         workflow.append('svg:path')
