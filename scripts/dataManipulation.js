@@ -193,19 +193,22 @@ function retrieveDeliveries () {
         _.each(importantDates, function (item) {
           workflow.attributes[item] = utils.getNullOrDate(workflow.attributes[item])
         })
-
-        workflow.attributes.locationOrder = utils.getLocationOrderForDelivery(workflow.attributes.deliveryId, apiWorkflows)
+        var unusedAttributes = ['nonsearch-ept', 'search-ept', 'release-ept', 'estimated-processing-time']
+        workflow.attributes = _.omit(workflow.attributes, unusedAttributes)
 
         return workflow.attributes
       })
 
       _.each(cleandWorkflows, function (workflow) {
+        workflow.locationOrder = utils.getLocationOrderForDelivery(workflow.deliveryId, apiWorkflows)
         var epts = utils.getEPTFromWorkflow(workflow)
         workflow.EPT = epts[0]
         workflow.nonSearchEPT = epts[0]
         workflow.searchEPT = epts[1]
         workflow.releaseEPT = epts[2]
       })
+
+      console.table(_.filter(cleandWorkflows, {deliveryId: 585}))
 
       cleandWorkflows = utils.calculateWorkflowETAs(cleandWorkflows)
       processApiData(cleandWorkflows)

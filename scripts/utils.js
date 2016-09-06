@@ -11,7 +11,7 @@ function _getLocationOrderForDelivery (deliveryId, workflows) {
 function _prepareEventsForRendering (events) {
   // take fully detailed events
   // expand to multiple POSTS
-  // and get rid of unnecessary attribuets
+  // and get rid of unnecessary attributes
   // we only care about {timestamp, endtimestamp, responsible, yIndex}
 
   var responders = _.map(_POSTS, 'abbr')
