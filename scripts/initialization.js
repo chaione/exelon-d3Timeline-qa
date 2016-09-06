@@ -129,7 +129,7 @@ var _POLL_RATE = 2455000
 // Staging
 // var url = 'https://exelon-api-staging.herokuapp.com/v1/'
 // var siteId = 1
-// var bearerToken = ''
+// var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImV4cCI6MTQ3MzIwNTc4MiwiaWF0IjoxNDczMTc2OTgyfQ.fAL2tGdrLdnAGcf_Yf-V1kX1QjirY6btJFQLOoTqMVE'
 
 // QA
 var url = 'https://exelon-api-qa.herokuapp.com/v1/'

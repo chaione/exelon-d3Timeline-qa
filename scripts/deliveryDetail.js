@@ -525,7 +525,7 @@ function displayDetail (delivery) {
           .attr('y', yPos)
           .text(function (d, i) {
             var id = d.locationOrder[d.step - 1]
-            return _.find(_DS.locations, {id: id}).abbr
+            return _.find(_DS.locations, {id: id}).abbr + '.1'
           })
           .attr('class', function (d) {
             return 'detailActualLabels step1 ' // + substep1State
@@ -545,7 +545,22 @@ function displayDetail (delivery) {
 
             return xScale(xPos)
           })
-          .attr('y', yPos)
+          .attr('y', function (d, i) {
+            var current = d3.select(this).attr('x')
+            var previous
+            if (currentSubStep === 0) {
+              previous = d.eta
+            } else {
+              previous = d['started-at']
+            }
+            previous = xScale(previous)
+            var distance = current - previous
+            if (distance < 24) {
+              return 13
+            } else {
+              return -3
+            }
+          })
           .text(2)
           .attr('class', function (d) {
             return 'detailActualLabels step2 ' // + substep2State
@@ -555,13 +570,12 @@ function displayDetail (delivery) {
         workflow.append('text')
           .attr('x', function (d) { 
             var xPos = null
-            console.log('which sitaution???', currentSubStep, d['nonsearch-end'], d['search-ept'], d)
             if (currentSubStep === -1) {
               xPos = d['search-end']
             } else if (currentSubStep === 0) {
               xPos = d.eta.getTime() + (d.nonSearchEPT + d.searchEPT) * 60000
             } else if (currentSubStep === 1) {
-              xPos = d['started-at'].getTime() + (d.nonSearchEPT + d.searchEPT).getTime() * 60000
+              xPos = d['started-at'].getTime() + (d.nonSearchEPT + d.searchEPT) * 60000
             } else if (currentSubStep === 2) {
               // Because step 2 is still in progress, step 2's ETA would be now + searchEPT
               xPos = _now.getTime() + d.searchEPT * 60000
@@ -571,7 +585,42 @@ function displayDetail (delivery) {
 
             return xScale(xPos)
           })
-          .attr('y', yPos)
+          .attr('y', function (d, i) {
+            var step3x = d3.select(this).attr('x')
+            var step1x
+            if (currentSubStep === 0) {
+              step1x = d.eta
+            } else {
+              step1x = d['started-at']
+            }
+            var step2x
+            if (currentSubStep === 0) {
+              step2x = d.eta.getTime() + d.nonSearchEPT * 60000
+            } else if (currentSubStep === 1) {
+              step2x = d['started-at'].getTime() + d.nonSearchEPT * 60000
+            } else {
+              step2x = d['nonsearch-end'].getTime()
+            }
+            step1x = xScale(step1x)
+            step2x = xScale(step2x)
+
+            var distance2 = step2x - step1x
+            if (distance2 >= 24) {
+              var distance32 = step3x - step2x
+              if (distance32 > 10) {
+                return -3
+              } else {
+                return 13
+              }
+            } else {
+              var distance31 = step3x - step1x
+              if (distance31 >= 24) {
+                return -3
+              } else {
+                return 13
+              }
+            }
+          })
           .text(3)
           .attr('class', function (d) {
             return 'detailActualLabels step3 ' // + substep3State
