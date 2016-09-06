@@ -22,7 +22,7 @@
 // User Defined Variables
 var rowHeight = 45
 var _X_AXIS_HEIGHT = 30
-var _X_AXIS_WIDTH = 5760 // 1 min = 2 px, 48 hours = 2880 mins = 5760 px
+var _X_AXIS_WIDTH = 8640 // 1 min = 2 px, 48 hours = 2880 mins = 8640 px
 
 var stationTextHeight = 20
 var stationTextPadding = {top: 10, right: 0, bottom: 0, left: 10}

@@ -646,6 +646,7 @@ function displayDetail (delivery) {
     .attr('transform', 'translate(' + stationTextPadding.left + ',' + (detailDeliveryRectY - 50 + detailPadding + eventHeight * 2 - 7) + ')')
     .attr('class', 'detailCommunicationLabelsGroup')
 
+  // The schedule and actual labels
   detailCommunicationLabelsGroup
     .selectAll('.detailCommunicationDefaultLabel')
     .data(inspectionLabels)
@@ -658,6 +659,7 @@ function displayDetail (delivery) {
     .attr('class', 'detailCommunicationDefaultLabel name')
     .attr('font-size', 14 + 'px')
 
+  // all the event labels
   detailCommunicationLabelsGroup
     .selectAll('.detailCommunicationLabel')
     .data(_POSTS)
