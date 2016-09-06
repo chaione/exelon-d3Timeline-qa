@@ -41,6 +41,13 @@ var _DS = {
   TIMELINE_PORT_LABEL_SIZE: '12px',
   AHEAD_OR_BEHIND_PCT: 0.5,
   isDetailDisplayed: false,
+
+  routes: [
+    {name: 'warehouse',         order: ['S1', 'SG', 'WH', 'SG', 'EX'] },
+    {name: 'pa',                order: ['S1', 'SG', 'SP', 'PA', 'SP', 'SG', 'EX'] },
+    {name: 'warehouse_and_pa',  order: ['S1', 'SG', 'WH', 'SP', 'PA', 'SP', 'SG', 'EX'] },
+  ],
+
   LOCATION_META: [
     { name: 'En Route',       abbr: 'ER', epts: [3] },
     { name: 'Sierra 1',       abbr: 'S1', epts: [5, 6, 5] },
@@ -48,8 +55,10 @@ var _DS = {
     { name: 'Warehouse',      abbr: 'WH', epts: [60] },
     { name: 'Sally Port',     abbr: 'SP', epts: [5, 70, 15] },
     { name: 'Protected Area', abbr: 'PA', epts: [60] },
-    { name: 'Exit',           abbr: 'EX', epts: [15] }
+    { name: 'Exit',           abbr: 'EX', epts: [15] },
+    { name: 'SP Exit',        abbr: 'SPE', epts: [20] }
   ],
+
   EVENTS_META: [
     { name: 's1_sas_arrived',                  to: ['sas'],                responsible: false },
     { name: 's1_poc_arrived',                  to: ['poc'],                responsible: true },
@@ -82,7 +91,6 @@ var _DS = {
     { name: 'sp_deny_entry',                   to: ['sas', 'poc'],         responsible: false },
     { name: 'sp_arrived',                      to: [],                     responsible: false },
     { name: 'sp_poc_arrived',                  to: ['poc'],                responsible: true },
-    { name: 'sp_sas_release_vehicle',          to: ['sas'],                responsible: false },
     { name: 'sp_poc_release_vehicle',          to: ['poc'],                responsible: true },
     { name: 'sp_release_confirmed',            to: ['poc'],                responsible: false },
     { name: 'sp_release_confirmed_exiting',    to: ['vvro'],               responsible: false },

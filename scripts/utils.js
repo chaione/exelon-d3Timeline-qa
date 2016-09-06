@@ -32,6 +32,15 @@ function _prepareEventsForRendering (events) {
 
 function _getEPTFromWorkflow (workflow) {
   var locationName = utils.getLocationNameFromWorkflow(workflow)
+  if (locationName === 'Sally Port') {
+    var locationId = _.find(_DS.locations, {name: locationName}).id
+    var subLocations = _.slice(workflow.locationOrder, 0, workflow.step - 1)
+
+    if (_.includes(subLocations, locationId)) {
+      return _.find(_DS.LOCATION_META, {name: 'SP Exit'}).epts
+    }
+  } 
+
   return _.find(_DS.LOCATION_META, {name: locationName}).epts
 }
 
@@ -86,7 +95,14 @@ function _getCurrentSubstep (workflow) {
 function _inSubstepLocation (workflow) {
   var locationName = utils.getLocationNameFromWorkflow(workflow)
 
-  return _.includes(_HAS_SUBSTEP_LOCATIONS, locationName)
+  if (locationName === 'Sally Port') {
+    var locationId = _.find(_DS.locations, {name: locationName}).id
+    var subLocations = _.slice(workflow.locationOrder, 0, workflow.step - 1)
+
+    return !_.includes(subLocations, locationId)
+  }
+
+  return _.includes(_HAS_SUBSTEP_LOCATIONS, locationName) 
 }
 
 function _getCurrentWorkflow (workflows) {

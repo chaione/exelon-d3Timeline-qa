@@ -177,11 +177,22 @@ function retrieveDeliveries () {
 
       _DS.events = pairEvents(apiResponse)
 
-      var apiWorkflows = _.filter(apiResponse.included, {type: 'workflows'})
+      var deliveryIDs = _.map(_DS.deliveries, 'id') // For edge cases where workflows have deliveries that are not included in the deliveries all endpoint
+      var apiWorkflows = _.filter(apiResponse.included, function (workflow) {
+        return workflow.type === 'workflows' && _.includes(deliveryIDs, workflow.relationships.delivery.data.id)
+      })
 
       var cleandWorkflows = apiWorkflows.map(function (workflow) {
         var deliveryId = workflow.relationships.delivery['data']['id']
         var deliveryRaw = _.find(_DS.deliveries, {id: deliveryId})
+        var boaID = deliveryRaw.relationships.boa.data.id
+        var destinationName = _.find(apiResponse.included, {type: 'boas', id: boaID}).attributes.boa['destination.name']
+        var route = _.find(_DS.routes, {name: destinationName})
+
+        workflow.attributes.locationOrder = _.map(route.order, function (portName) {
+          return _.find(_DS.locations, {abbr: portName}).id
+        })
+
         workflow.attributes.id = workflow['id']
         workflow.attributes.deliveryId = parseInt(deliveryId)
 
@@ -200,15 +211,12 @@ function retrieveDeliveries () {
       })
 
       _.each(cleandWorkflows, function (workflow) {
-        workflow.locationOrder = utils.getLocationOrderForDelivery(workflow.deliveryId, apiWorkflows)
         var epts = utils.getEPTFromWorkflow(workflow)
         workflow.EPT = epts[0]
         workflow.nonSearchEPT = epts[0]
         workflow.searchEPT = epts[1]
         workflow.releaseEPT = epts[2]
       })
-
-      console.table(_.filter(cleandWorkflows, {deliveryId: 585}))
 
       cleandWorkflows = utils.calculateWorkflowETAs(cleandWorkflows)
       processApiData(cleandWorkflows)
