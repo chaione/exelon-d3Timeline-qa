@@ -335,9 +335,14 @@ function _calculateWorkflowETAs (workflows) {
           var lastWorkflow = orderedWorkflows[index - 1]
           var epts = utils.getEPTFromWorkflow(lastWorkflow)
           var totalEPT = 0
+
           if (utils.inSubstepLocation(lastWorkflow)) {
             var substep = utils.getCurrentSubstep(lastWorkflow)
-            totalEPT = _.sum(_.slice(epts, substep - 1, epts.length))
+            if (substep === 0) {
+              totalEPT = _.sum(epts)
+            } else {
+              totalEPT = _.sum(_.slice(epts, substep - 1, epts.length))
+            }
           } else {
             totalEPT = epts[0]
           }

@@ -489,33 +489,37 @@ function displayDetail (delivery) {
       prevData = d
     })
 
-  detailDeliveryDataActualGroup
-    .selectAll('.detailActualLabels')
-    .data(delivery.values)
-    .enter()
-    .append('g')
-    .each(function (d) {
-      var workflow = d3.select(this)
+  // Actual line port lables
+  var firstWorkflow = _.first(delivery.values)
+  var lastWorkflow = _.last(delivery.values)
+  if (firstWorkflow['started-at'] && !lastWorkflow['ended-at']) {
+    detailDeliveryDataActualGroup
+      .selectAll('.detailActualLabels')
+      .data(delivery.values)
+      .enter()
+      .append('g')
+      .each(function (d) {
+        var workflow = d3.select(this)
 
-      var startedAt = d['started-at']
-      var endedAt = d['ended-at']
-      var searchEnd = d['search-end']
-      var nonsearchEnd = d['nonsearch-end']
+        var startedAt = d['started-at']
+        var endedAt = d['ended-at']
+        var searchEnd = d['search-end']
+        var nonsearchEnd = d['nonsearch-end']
 
-      var nonsearchEPT = d.nonSearchEPT
-      var searchEPT = d.searchEPT
-      var releaseEPT = d.releaseEPT
-      var EPT = d.EPT
+        var nonsearchEPT = d.nonSearchEPT
+        var searchEPT = d.searchEPT
+        var releaseEPT = d.releaseEPT
+        var EPT = d.EPT
 
-      var yPos = -3
-      if (utils.inSubstepLocation(d)) {
-        var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
-        var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
-        var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
+        var yPos = -3
+        if (utils.inSubstepLocation(d)) {
+          var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
+          var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
+          var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
 
-        var currentSubStep = utils.getCurrentSubstep(d)
+          var currentSubStep = utils.getCurrentSubstep(d)
 
-        workflow.append('text')
+          workflow.append('text')
           .attr('x', function (d) {
             if (currentSubStep === 0) {
               return xScale(d.eta)
@@ -528,11 +532,11 @@ function displayDetail (delivery) {
             return _.find(_DS.locations, {id: id}).abbr + '.1'
           })
           .attr('class', function (d) {
-            return 'detailActualLabels step1 ' // + substep1State
-          })
+              return 'detailActualLabels step1 ' // + substep1State
+            })
           .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
-        workflow.append('text')
+          workflow.append('text')
           .attr('x', function (d) { 
             var xPos = null
             if (currentSubStep === 0) {
@@ -563,11 +567,11 @@ function displayDetail (delivery) {
           })
           .text(2)
           .attr('class', function (d) {
-            return 'detailActualLabels step2 ' // + substep2State
-          })
+              return 'detailActualLabels step2 ' // + substep2State
+            })
           .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
-        workflow.append('text')
+          workflow.append('text')
           .attr('x', function (d) { 
             var xPos = null
             if (currentSubStep === -1) {
@@ -577,14 +581,14 @@ function displayDetail (delivery) {
             } else if (currentSubStep === 1) {
               xPos = d['started-at'].getTime() + (d.nonSearchEPT + d.searchEPT) * 60000
             } else if (currentSubStep === 2) {
-              // Because step 2 is still in progress, step 2's ETA would be now + searchEPT
-              xPos = _now.getTime() + d.searchEPT * 60000
-            } else if (currentSubStep === 3) {
-              xPos = d['search-end']
-            }
+                // Because step 2 is still in progress, step 2's ETA would be now + searchEPT
+                xPos = _now.getTime() + d.searchEPT * 60000
+              } else if (currentSubStep === 3) {
+                xPos = d['search-end']
+              }
 
-            return xScale(xPos)
-          })
+              return xScale(xPos)
+            })
           .attr('y', function (d, i) {
             var step3x = d3.select(this).attr('x')
             var step1x
@@ -623,26 +627,27 @@ function displayDetail (delivery) {
           })
           .text(3)
           .attr('class', function (d) {
-            return 'detailActualLabels step3 ' // + substep3State
-          })
+              return 'detailActualLabels step3 ' // + substep3State
+            })
           .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
-      } else {
-        workflow.append('text')
-        .attr('x', function (d) {
-          return xScale(startedAt || d.eta)
-        })
-        .attr('y', yPos)
-        .text(function (workflow, i) {
-          var locationName = utils.getLocationNameFromWorkflow(d)
-          return _.find(_DS.LOCATION_META, {name: locationName}).abbr
-        })
-        .attr('class', function (d) {
-          return 'detailActualLabels ' // + d.states[0]
-        })
-        .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
-      }
-    })
+        } else {
+          workflow.append('text')
+          .attr('x', function (d) {
+            return xScale(startedAt || d.eta)
+          })
+          .attr('y', yPos)
+          .text(function (workflow, i) {
+            var locationName = utils.getLocationNameFromWorkflow(d)
+            return _.find(_DS.LOCATION_META, {name: locationName}).abbr
+          })
+          .attr('class', function (d) {
+            return 'detailActualLabels ' // + d.states[0]
+          })
+          .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
+        }
+      })
+  }
 
   detailDeliveryDataGroup.append('image')
     .attr('xlink:href', function (i) {
