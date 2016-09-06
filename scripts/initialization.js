@@ -22,7 +22,7 @@
 // User Defined Variables
 var rowHeight = 45
 var _X_AXIS_HEIGHT = 30
-var _X_AXIS_WIDTH = 8640 // 1 min = 2 px, 48 hours = 2880 mins = 8640 px
+var _X_AXIS_WIDTH = 2880 * 2 // 1 min = 2 px, 48 hours = 2880 mins = 8640 px
 
 var stationTextHeight = 20
 var stationTextPadding = {top: 10, right: 0, bottom: 0, left: 10}
@@ -38,6 +38,7 @@ var _HAS_SUBSTEP_LOCATIONS = [
 ]
 
 var _DS = {
+  TIMELINE_PORT_LABEL_SIZE: '12px',
   AHEAD_OR_BEHIND_PCT: 0.5,
   isDetailDisplayed: false,
   LOCATION_META: [

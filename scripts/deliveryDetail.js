@@ -364,7 +364,7 @@ function displayDetail (delivery) {
       }
     })
 
-  // Labels
+  // Scheduled Line Port Lables
   detailDeliveryDataScheduledGroup
     .selectAll('.detailScheduledLabels')
     .data(delivery.values)
@@ -391,7 +391,7 @@ function displayDetail (delivery) {
             return utils.getLocationAbbrFromLocationName(locationName) + '.1'
           })
           .attr('class', 'detailScheduledLabels')
-          .attr('font-size', 14 + 'px')
+          .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
         workflow.append('text')
           .attr('x', function (d) {
@@ -411,7 +411,7 @@ function displayDetail (delivery) {
             return 2
           })
           .attr('class', 'detailScheduledLabels')
-          .attr('font-size', 14 + 'px')
+          .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
         workflow.append('text')
           .attr('x', function (d) {
@@ -441,7 +441,7 @@ function displayDetail (delivery) {
             return 3
           })
           .attr('class', 'detailScheduledLabels')
-          .attr('font-size', 14 + 'px')
+          .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
       } else {
         workflow.append('text')
           .attr('x', function (d) {
@@ -458,7 +458,7 @@ function displayDetail (delivery) {
             return utils.getLocationAbbrFromLocationName(locationName)
           })
           .attr('class', 'detailScheduledLabels')
-          .attr('font-size', 14 + 'px')
+          .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
       }
     })
 
@@ -507,59 +507,91 @@ function displayDetail (delivery) {
       var releaseEPT = d.releaseEPT
       var EPT = d.EPT
 
-      if (startedAt & startedAt < _now) {
-        var yPos = -3
-        if (utils.inSubstepLocation(d)) {
-          var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
-          var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
-          var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
+      var yPos = -3
+      if (utils.inSubstepLocation(d)) {
+        var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
+        var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
+        var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
 
-          workflow.append('text')
-            .attr('x1', xScale(startedAt))
-            .attr('y', yPos)
-            .text(function (d, i) {
-              var id = d.locationOrder[d.step - 1]
-              return _.find(_DS.locations, {id: id}).abbr
-            })
-            .attr('class', function (d) {
-              return 'detailActualLabels ' + substep1State
-            })
-            .attr('font-size', 14 + 'px')
+        var currentSubStep = utils.getCurrentSubstep(d)
 
-          if (nonsearchEnd & nonsearchEnd < _now) {
-            workflow.append('text')
-              .attr('x', function (d) { return xScale(nonsearchEnd)})
-              .attr('y', yPos)
-              .text(2)
-              .attr('class', function (d) {
-                return 'detailActualLabels ' + substep2State
-              })
-              .attr('font-size', 14 + 'px')
-          }
+        workflow.append('text')
+          .attr('x', function (d) {
+            if (currentSubStep === 0) {
+              return xScale(d.eta)
+            }
+            return xScale(d['started-at'])
+          })
+          .attr('y', yPos)
+          .text(function (d, i) {
+            var id = d.locationOrder[d.step - 1]
+            return _.find(_DS.locations, {id: id}).abbr
+          })
+          .attr('class', function (d) {
+            return 'detailActualLabels step1 ' // + substep1State
+          })
+          .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
-          if (searchEnd & searchEnd < _now) {
-            workflow.append('text')
-              .attr('x', function (d) { return xScale(searchEnd & searchEnd) })
-              .attr('y', yPos)
-              .text(3)
-              .attr('class', function (d) {
-                return 'detailActualLabels ' + substep3State
-              })
-              .attr('font-size', 14 + 'px')
-          }
-        } else {
-          workflow.append('text')
-            .attr('x', function (d) { return xScale(startedAt) })
-            .attr('y', yPos)
-            .text(function (workflow, i) {
-              var locationName = utils.getLocationNameFromWorkflow(d)
-              return _.find(_DS.LOCATION_META, {name: locationName}).abbr
-            })
-            .attr('class', function (d) {
-              return 'detailActualLabels ' + d.states[0]
-            })
-            .attr('font-size', 14 + 'px')
-        }
+        workflow.append('text')
+          .attr('x', function (d) { 
+            var xPos = null
+            if (currentSubStep === 0) {
+              xPos = d.eta.getTime() + d.nonSearchEPT * 60000
+            } else if (currentSubStep === 1) {
+              xPos = d['started-at'].getTime() + d.nonSearchEPT * 60000
+            } else {
+              xPos = d['nonsearch-end'].getTime()
+            }
+
+            return xScale(xPos)
+          })
+          .attr('y', yPos)
+          .text(2)
+          .attr('class', function (d) {
+            return 'detailActualLabels step2 ' // + substep2State
+          })
+          .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
+
+        workflow.append('text')
+          .attr('x', function (d) { 
+            var xPos = null
+            console.log('which sitaution???', currentSubStep, d['nonsearch-end'], d['search-ept'], d)
+            if (currentSubStep === -1) {
+              xPos = d['search-end']
+            } else if (currentSubStep === 0) {
+              xPos = d.eta.getTime() + (d.nonSearchEPT + d.searchEPT) * 60000
+            } else if (currentSubStep === 1) {
+              xPos = d['started-at'].getTime() + (d.nonSearchEPT + d.searchEPT).getTime() * 60000
+            } else if (currentSubStep === 2) {
+              // Because step 2 is still in progress, step 2's ETA would be now + searchEPT
+              xPos = _now.getTime() + d.searchEPT * 60000
+            } else if (currentSubStep === 3) {
+              xPos = d['search-end']
+            }
+
+            return xScale(xPos)
+          })
+          .attr('y', yPos)
+          .text(3)
+          .attr('class', function (d) {
+            return 'detailActualLabels step3 ' // + substep3State
+          })
+          .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
+
+      } else {
+        workflow.append('text')
+        .attr('x', function (d) {
+          return xScale(startedAt || d.eta)
+        })
+        .attr('y', yPos)
+        .text(function (workflow, i) {
+          var locationName = utils.getLocationNameFromWorkflow(d)
+          return _.find(_DS.LOCATION_META, {name: locationName}).abbr
+        })
+        .attr('class', function (d) {
+          return 'detailActualLabels ' // + d.states[0]
+        })
+        .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
       }
     })
 

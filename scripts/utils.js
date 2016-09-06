@@ -64,6 +64,14 @@ function _getLocationNameFromWorkflow (workflow) {
 }
 
 function _getCurrentSubstep (workflow) {
+  if (workflow['ended-at']) {
+    return -1
+  }
+  
+  if (!workflow['started-at']) {
+    return 0
+  }
+
   if (!workflow['nonsearch-end']) {
     return 1
   }
