@@ -147,7 +147,7 @@ var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlh
 // Production
 // var url = 'https://vsap-ccc-02v.exelonds.com/v1/'
 // var siteId = 10000
-// var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MzM1NzA0Nn0.8XCjgICDbXWkjzqGXUwyxLQ3k73gxBNybrQ5IpIfsHA'
+// var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3Mzg2MjM2Mn0.HhyVOggZ6CoEM7D9x2tWGJtl1a6Onb9StghSONhVjHA'
 
 var titleHeight = 83
 // Calculated variables
