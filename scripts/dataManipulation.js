@@ -187,7 +187,16 @@ function retrieveDeliveries () {
         var deliveryRaw = _.find(_DS.deliveries, {id: deliveryId})
         var boaID = deliveryRaw.relationships.boa.data.id
         var destinationName = _.find(apiResponse.included, {type: 'boas', id: boaID}).attributes.boa['destination.name']
-        var route = _.find(_DS.routes, {name: destinationName})
+        var route
+        if (!destinationName) {
+          route = _.find(_DS.routes, function (route) {
+            return route.order.length === _.filter(apiWorkflows, function (wf) {
+              return wf.relationships.delivery['data']['id'] === deliveryId
+            }).length
+          })
+        } else {
+          route = _.find(_DS.routes, {name: destinationName})
+        }
 
         workflow.attributes.locationOrder = _.map(route.order, function (portName) {
           return _.find(_DS.locations, {abbr: portName}).id

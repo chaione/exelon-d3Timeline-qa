@@ -38,6 +38,7 @@ var _HAS_SUBSTEP_LOCATIONS = [
 ]
 
 var _DS = {
+  POLL_RATE: 60000,
   TIMELINE_PORT_LABEL_SIZE: '12px',
   AHEAD_OR_BEHIND_PCT: 0.5,
   isDetailDisplayed: false,
@@ -130,7 +131,6 @@ var _VEHICLE_TYPE_TO_IMG = {
   'null': 'null'
 }
 
-var _POLL_RATE = 2455000
 // var url = 'https://exelon-api.herokuapp.com/v1/'
 // var url = 'https://exelon-api-production.herokuapp.com/v1/'
 
