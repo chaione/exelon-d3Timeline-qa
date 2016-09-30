@@ -140,6 +140,11 @@ function resize () {
   render(_DS.locationWithDeliveries)
 }
 
+function stopRefreshing () {
+  $('#refresh-button').removeClass('active')
+  _DS.IS_REFRESHING = false
+}
+
 function retrieveDeliveries () {
   $.ajax({
     url: url + 'deliveries?filter=all',
@@ -148,6 +153,7 @@ function retrieveDeliveries () {
       'Authorization': 'Bearer ' + bearerToken
     },
     success: function (apiResponse) {
+      stopRefreshing()
       _DS.deliveries = _.filter(apiResponse.data, {type: 'deliveries'})
 
       _DS.locations = utils.cleanupLocationData(

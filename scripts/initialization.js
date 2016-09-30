@@ -39,6 +39,7 @@ var _HAS_SUBSTEP_LOCATIONS = [
 
 var _DS = {
   POLL_RATE: 60000,
+  IS_REFRESHING: false,
   TIMELINE_PORT_LABEL_SIZE: '12px',
   AHEAD_OR_BEHIND_PCT: 0.5,
   isDetailDisplayed: false,
