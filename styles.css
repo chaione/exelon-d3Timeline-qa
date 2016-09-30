@@ -27,7 +27,7 @@ body {
   height: 50px;
   width: 50px;
   cursor: pointer;
-  content:url("/img/btn-refresh-norm.png");
+  content:url("./img/btn-refresh-norm.png");
 }
 
 @keyframes rotate36000 {
@@ -42,7 +42,7 @@ body {
   height: 50px;
   width: 50px;
   cursor: not-allowed;
-  content:url("/img/btn-refresh-active.png");
+  content:url("./img/btn-refresh-active.png");
   transform: rotate(90deg);
   animation: 200s rotate36000 infinite linear;
 }
