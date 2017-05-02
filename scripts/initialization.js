@@ -105,6 +105,8 @@ var _DS = {
     { name: 'vvro_driver_approaching_sg',      to: ['poc'],                responsible: false },
     { name: 'vvro_release_confirmed',          to: ['sp'],                 responsible: false },
     { name: 'vvro_release_confirmed_exiting',  to: [],                     responsible: false },
+    { name: 's1_d10_release_vehicle',          to: ['d10'],                responsible: true  },
+    { name: 's1_d10_stop_cover',               to: ['d10'],                responsible: true  },
   ]
 }
 
