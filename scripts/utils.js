@@ -210,11 +210,11 @@ function _prepareSubStepEndTimes (workflow) {
 }
 
 function _cleanupLocationData (receivedLocations) {
-  var locations = receivedLocations.map(function (location) {
+  var locations = receivedLocations.map(function (mappedLocation) {
     return {
-      id: parseInt(location.id),
-      name: location.attributes.name,
-      abbr: _.find(_DS.LOCATION_META, {name: location.attributes.name}).abbr
+      id: parseInt(mappedLocation.id),
+      name: mappedLocation.attributes.name,
+      abbr: _.find(_DS.LOCATION_META, {name: mappedLocation.attributes.name}).abbr
     }
   })
 

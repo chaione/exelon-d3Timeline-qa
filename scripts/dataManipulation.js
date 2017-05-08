@@ -97,12 +97,12 @@ function processApiData (workflowsData) {
     })
     .entries(deliveriesData)
 
-  _.each(_DS.locationWithDeliveries, function (location, i) {
-    _.each(location.values, function (delivery, j) {
-      if (parseInt(location.key) === 0) {
+  _.each(_DS.locationWithDeliveries, function (locationX, i) {
+    _.each(locationX.values, function (delivery, j) {
+      if (parseInt(locationX.key) === 0) {
         delivery.yIndex = j
       } else {
-        var locationIndex = _.findIndex(_DS.locations, {id: parseInt(location.key)})
+        var locationIndex = _.findIndex(_DS.locations, {id: parseInt(locationX.key)})
 
         delivery.yIndex = _DS.locations[locationIndex - 1].stackedCount + j
       }
@@ -146,97 +146,109 @@ function stopRefreshing () {
 }
 
 function retrieveDeliveries () {
-  $.ajax({
-    url: url + 'deliveries?filter=all',
-    headers: {
-      'X-SITE-ID': siteId,
-      'Authorization': 'Bearer ' + bearerToken
-    },
-    success: function (apiResponse) {
-      stopRefreshing()
-      _DS.deliveries = _.filter(apiResponse.data, {type: 'deliveries'})
+	$.ajax({
+		url: url + 'locations',
+	    headers: {
+	      'X-SITE-ID': siteId,
+	      'Authorization': 'Bearer ' + bearerToken
+	    },
+		success: function(apiReponse ){
+			_DS.locations = utils.cleanupLocationData(apiReponse.data)
 
-      _DS.locations = utils.cleanupLocationData(
-        _.filter(apiResponse.included, {type: 'locations'})
-      )
+		  $.ajax({
+		    url: url + 'deliveries?filter=all',
+		    headers: {
+		      'X-SITE-ID': siteId,
+		      'Authorization': 'Bearer ' + bearerToken
+		    },
+		    success: function (apiResponse) {
+			  apiResponse = fakeRealAPIDeliveries
+		      stopRefreshing()
+		      _DS.deliveries = _.filter(apiResponse.data, {type: 'deliveries'})
 
-      _DS.vendors = _.map(_.filter(apiResponse.included, {type: 'vendors'}), function (vendor) {
-        return {
-          id: vendor.id,
-          name: vendor.attributes.name
-        }
-      })
+		      // _DS.locations = utils.cleanupLocationData(
+		      //   _.filter(apiResponse.included, {type: 'locations'})
+		      // )
 
-      _VEHICLES = _.map(_.filter(apiResponse.included, {type: 'vehicles'}), function (vehicle) {
-        var result = {id: vehicle.id, vendorId: vehicle.relationships.vendor.data.id}
-        _.each(vehicle.attributes, function (value, key) {
-          result[key] = value
-        })
-        return result
-      })
+		      _DS.vendors = _.map(_.filter(apiResponse.included, {type: 'vendors'}), function (vendor) {
+		        return {
+		          id: vendor.id,
+		          name: vendor.attributes.name
+		        }
+		      })
 
-      _pocsAPIData = {}
-      var pocs = _.filter(apiResponse.included, {type: 'pocs'})
-      _.each(pocs, function (poc) {
-        _pocsAPIData[poc.id] = poc.attributes
-      })
+		      _VEHICLES = _.map(_.filter(apiResponse.included, {type: 'vehicles'}), function (vehicle) {
+		        var result = {id: vehicle.id, vendorId: vehicle.relationships.vendor.data.id}
+		        _.each(vehicle.attributes, function (value, key) {
+		          result[key] = value
+		        })
+		        return result
+		      })
 
-      _DS.events = pairEvents(apiResponse)
+		      _pocsAPIData = {}
+		      var pocs = _.filter(apiResponse.included, {type: 'pocs'})
+		      _.each(pocs, function (poc) {
+		        _pocsAPIData[poc.id] = poc.attributes
+		      })
 
-      var deliveryIDs = _.map(_DS.deliveries, 'id') // For edge cases where workflows have deliveries that are not included in the deliveries all endpoint
-      var apiWorkflows = _.filter(apiResponse.included, function (workflow) {
-        return workflow.type === 'workflows' && _.includes(deliveryIDs, workflow.relationships.delivery.data.id)
-      })
+		      _DS.events = pairEvents(apiResponse)
 
-      var cleandWorkflows = apiWorkflows.map(function (workflow) {
-        var deliveryId = workflow.relationships.delivery['data']['id']
-        var deliveryRaw = _.find(_DS.deliveries, {id: deliveryId})
-        var boaID = deliveryRaw.relationships.boa.data.id
-        var destinationName = _.find(apiResponse.included, {type: 'boas', id: boaID}).attributes.boa['destination.name']
-        var route
-        if (!destinationName) {
-          route = _.find(_DS.routes, function (route) {
-            return route.order.length === _.filter(apiWorkflows, function (wf) {
-              return wf.relationships.delivery['data']['id'] === deliveryId
-            }).length
-          })
-        } else {
-          route = _.find(_DS.routes, {name: destinationName})
-        }
+		      var deliveryIDs = _.map(_DS.deliveries, 'id') // For edge cases where workflows have deliveries that are not included in the deliveries all endpoint
+		      var apiWorkflows = _.filter(apiResponse.included, function (workflow) {
+		        return workflow.type === 'workflows' && _.includes(deliveryIDs, workflow.relationships.delivery.data.id)
+		      })
 
-        workflow.attributes.locationOrder = _.map(route.order, function (portName) {
-          return _.find(_DS.locations, {abbr: portName}).id
-        })
+		      var cleandWorkflows = apiWorkflows.map(function (workflow) {
+		        var deliveryId = workflow.relationships.delivery['data']['id']
+		        var deliveryRaw = _.find(_DS.deliveries, {id: deliveryId})
+		        var boaID = deliveryRaw.relationships.boa.data.id
+		        var destinationName = _.find(apiResponse.included, {type: 'boas', id: boaID}).attributes.boa['destination.name']
+		        var route
+		        // if (!destinationName) {
+		        //   route = _.find(LOCATION_ORDER, function (route) {
+		        //     return route.length === _.filter(apiWorkflows, function (wf) {
+		        //       return wf.relationships.delivery['data']['id'] === deliveryId
+		        //     }).length
+		        //   })
+		        // } else {
+		          route = _.find(_DS.routes, {name: destinationName})
+				//}
 
-        workflow.attributes.id = workflow['id']
-        workflow.attributes.deliveryId = parseInt(deliveryId)
+		        workflow.attributes.locationOrder = _.map(_DS.LOCATION_ORDER, function (portName) {
+		          return _.find(_DS.locations, {abbr: portName}).id
+		        })
 
-        var importantDates = [
-          'started-at',
-          'arrived-at', 'ended-at',
-          'nonsearch-end', 'search-end'
-        ]
-        _.each(importantDates, function (item) {
-          workflow.attributes[item] = utils.getNullOrDate(workflow.attributes[item])
-        })
-        var unusedAttributes = ['nonsearch-ept', 'search-ept', 'release-ept', 'estimated-processing-time']
-        workflow.attributes = _.omit(workflow.attributes, unusedAttributes)
+		        workflow.attributes.id = workflow['id']
+		        workflow.attributes.deliveryId = parseInt(deliveryId)
 
-        return workflow.attributes
-      })
+		        var importantDates = [
+		          'started-at',
+		          'arrived-at', 'ended-at',
+		          'nonsearch-end', 'search-end'
+		        ]
+		        _.each(importantDates, function (item) {
+		          workflow.attributes[item] = utils.getNullOrDate(workflow.attributes[item])
+		        })
+		        var unusedAttributes = ['nonsearch-ept', 'search-ept', 'release-ept', 'estimated-processing-time']
+		        workflow.attributes = _.omit(workflow.attributes, unusedAttributes)
 
-      _.each(cleandWorkflows, function (workflow) {
-        var epts = utils.getEPTFromWorkflow(workflow)
-        workflow.EPT = epts[0]
-        workflow.nonSearchEPT = epts[0]
-        workflow.searchEPT = epts[1]
-        workflow.releaseEPT = epts[2]
-      })
+		        return workflow.attributes
+		      })
 
-      cleandWorkflows = utils.calculateWorkflowETAs(cleandWorkflows)
-      processApiData(cleandWorkflows)
-    }
-  })
+		      _.each(cleandWorkflows, function (workflow) {
+		        var epts = utils.getEPTFromWorkflow(workflow)
+		        workflow.EPT = epts[0]
+		        workflow.nonSearchEPT = epts[0]
+		        workflow.searchEPT = epts[1]
+		        workflow.releaseEPT = epts[2]
+		      })
+
+		      cleandWorkflows = utils.calculateWorkflowETAs(cleandWorkflows)
+		      processApiData(cleandWorkflows)
+		    }
+		  })
+		}
+	});		  
 }
 
 function calculateDeliveryLocation (deliveriesData) {

@@ -50,7 +50,9 @@ var _DS = {
     { name: 'pa',               order: ['S1', 'SG', 'SP', 'PA', 'SP', 'SG', 'EX'] },
     { name: 'warehouse_and_pa', order: ['S1', 'SG', 'WH', 'SP', 'PA', 'SP', 'SG', 'EX'] },
   ],
-
+  
+  LOCATION_ORDER: ['S1', 'SG', 'WH', 'SP', 'PA', 'SP', 'SG', 'EX'],
+  
   LOCATION_META: [
     { name: 'En Route',       abbr: 'ER', epts: [3] },
     { name: 'Sierra 1',       abbr: 'S1', epts: [5, 6, 5] },
