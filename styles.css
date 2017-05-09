@@ -335,5 +335,6 @@ cursor: hand;
   }
 
   svg#timeline {
-    background-color: #0C0C1A
-  }
+    background-color: #0C0C1A;
+    overflow:hidden;
+}
