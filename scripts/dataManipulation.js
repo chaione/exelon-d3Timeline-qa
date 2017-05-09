@@ -162,7 +162,6 @@ function retrieveDeliveries () {
 		      'Authorization': 'Bearer ' + bearerToken
 		    },
 		    success: function (apiResponse) {
-			  apiResponse = fakeRealAPIDeliveries
 		      stopRefreshing()
 		      _DS.deliveries = _.filter(apiResponse.data, {type: 'deliveries'})
 
