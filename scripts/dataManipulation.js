@@ -156,7 +156,7 @@ function retrieveDeliveries () {
 			_DS.locations = utils.cleanupLocationData(apiReponse.data)
 
 		  $.ajax({
-		    url: url + 'deliveries?filter=all',
+		    url: url + 'deliveries',
 		    headers: {
 		      'X-SITE-ID': siteId,
 		      'Authorization': 'Bearer ' + bearerToken

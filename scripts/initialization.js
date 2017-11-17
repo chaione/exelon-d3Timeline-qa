@@ -109,6 +109,8 @@ var _DS = {
     { name: 'vvro_release_confirmed_exiting',  to: [],                     responsible: false },
     { name: 's1_d10_release_vehicle',          to: ['d10'],                responsible: true  },
     { name: 's1_d10_stop_cover',               to: ['d10'],                responsible: true  },
+    { name: 'manifest_request_approval',       to: ['sas'],                responsible: true  },
+    { name: 's1_d10_arrived',                  to: ['d10'],                responsible: true }
   ]
 }
 
