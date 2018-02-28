@@ -152,7 +152,7 @@ function displayDetail(delivery) {
     .attr('x', 10)
     .attr('y', detailDeliveryRectY - 10)
     .text(function(d) {
-      return utils.getLocationNameFromRawDelivery(delivery)
+      return delivery.currentLocation.name
     })
     .attr('class', 'detailName')
     .attr('font-size', stationTextHeight + 'px')

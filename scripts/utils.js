@@ -1,22 +1,22 @@
-function _getLocationOrderForDelivery (deliveryId, workflows) {
-  var deliveryWorkflows = _.filter(workflows, function (workflow) {
+function _getLocationOrderForDelivery(deliveryId, workflows) {
+  var deliveryWorkflows = _.filter(workflows, function(workflow) {
     return workflow.attributes.deliveryId === deliveryId
   })
 
-  return _.map(deliveryWorkflows, function (workflow) {
+  return _.map(deliveryWorkflows, function(workflow) {
     return parseInt(workflow.relationships.location.data.id)
   })
 }
 
-function _prepareEventsForRendering (events) {
+function _prepareEventsForRendering(events) {
   // take fully detailed events
   // expand to multiple POSTS
   // and get rid of unnecessary attributes
   // we only care about {timestamp, endtimestamp, responsible, yIndex}
 
   var responders = _.map(_POSTS, 'abbr')
-  var simplifiedEvents = _.map(events, function (event) {
-    return _.map(event.to, function (responder) {
+  var simplifiedEvents = _.map(events, function(event) {
+    return _.map(event.to, function(responder) {
       return {
         timestamp: event.timestamp,
         endTimestamp: event.endTimestamp,
@@ -30,35 +30,35 @@ function _prepareEventsForRendering (events) {
   return _.flatten(simplifiedEvents)
 }
 
-function _getEPTFromWorkflow (workflow) {
+function _getEPTFromWorkflow(workflow) {
   var locationName = utils.getLocationNameFromWorkflow(workflow)
   if (locationName === 'Sally Port') {
-    var locationId = _.find(_DS.locations, {name: locationName}).id
+    var locationId = _.find(_DS.locations, { name: locationName }).id
     var subLocations = _.slice(workflow.locationOrder, 0, workflow.step - 1)
 
     if (_.includes(subLocations, locationId)) {
-      return _.find(_DS.LOCATION_META, {name: 'SP Exit'}).epts
+      return _.find(_DS.LOCATION_META, { name: 'SP Exit' }).epts
     }
-  } 
+  }
 
-  return _.find(_DS.LOCATION_META, {name: locationName}).epts
+  return _.find(_DS.LOCATION_META, { name: locationName }).epts
 }
 
-function _isDeliveryInLocation (delivery, locationName) {
+function _isDeliveryInLocation(delivery, locationName) {
   var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
   return utils.getLocationNameFromRawDelivery(delivery) === locationName
 }
 
-function _getLocationAbbrFromLocationName (locationName) {
-  return _.find(_DS.LOCATION_META, {name: locationName}).abbr
+function _getLocationAbbrFromLocationName(locationName) {
+  return _.find(_DS.LOCATION_META, { name: locationName }).abbr
 }
 
-function _getLocationAbbrFromWorkflow (workflow) {
+function _getLocationAbbrFromWorkflow(workflow) {
   var locationName = utils.getLocationNameFromWorkflow(workflow)
   return utils.getLocationAbbrFromLocationName(locationName)
 }
 
-function _getLocationNameFromRawDelivery (delivery) {
+function _getLocationNameFromRawDelivery(delivery) {
   var currentWorkflow = utils.getCurrentWorkflow(delivery.values)
   if (currentWorkflow.step === 1 && !currentWorkflow['started-at']) {
     return 'En Route'
@@ -66,17 +66,17 @@ function _getLocationNameFromRawDelivery (delivery) {
   return utils.getLocationNameFromWorkflow(currentWorkflow)
 }
 
-function _getLocationNameFromWorkflow (workflow) {
+function _getLocationNameFromWorkflow(workflow) {
   var locationId = workflow.locationOrder[workflow.step - 1]
 
-  return _.find(_DS.locations, {id: locationId}).name
+  return _.find(_DS.locations, { id: locationId }).name
 }
 
-function _getCurrentSubstep (workflow) {
+function _getCurrentSubstep(workflow) {
   if (workflow['ended-at']) {
     return -1
   }
-  
+
   if (!workflow['started-at']) {
     return 0
   }
@@ -92,21 +92,21 @@ function _getCurrentSubstep (workflow) {
   return 3
 }
 
-function _inSubstepLocation (workflow) {
+function _inSubstepLocation(workflow) {
   var locationName = utils.getLocationNameFromWorkflow(workflow)
 
   if (locationName === 'Sally Port') {
-    var locationId = _.find(_DS.locations, {name: locationName}).id
+    var locationId = _.find(_DS.locations, { name: locationName }).id
     var subLocations = _.slice(workflow.locationOrder, 0, workflow.step - 1)
 
     return !_.includes(subLocations, locationId)
   }
 
-  return _.includes(_HAS_SUBSTEP_LOCATIONS, locationName) 
+  return _.includes(_HAS_SUBSTEP_LOCATIONS, locationName)
 }
 
-function _getCurrentWorkflow (workflows) {
-  return _.find(workflows, function (workflow, index) {
+function _getCurrentWorkflow(workflows) {
+  return _.find(workflows, function(workflow, index) {
     if (index === 0) {
       return !workflow['ended-at']
     }
@@ -119,7 +119,7 @@ function _getCurrentWorkflow (workflows) {
   })
 }
 
-function _calculateDelay (startTime, endTime, EPT) {
+function _calculateDelay(startTime, endTime, EPT) {
   var difference = endTime - startTime
   if (difference <= EPT * 60000) {
     return 0
@@ -128,7 +128,7 @@ function _calculateDelay (startTime, endTime, EPT) {
   }
 }
 
-function _detailCalculateDelay (delivery) {
+function _detailCalculateDelay(delivery) {
   if (delivery.currentLocation.name === 'En Route') {
     if (delivery.eta && delivery.eta < _now) {
       return Math.round((_now.getTime() - currentWF.eta.getTime()) / 60000)
@@ -137,7 +137,7 @@ function _detailCalculateDelay (delivery) {
     return 0
   }
 
-  var totalDelay = _.reduce(delivery.values, function (sum, workflow, key) {
+  var totalDelay = _.reduce(delivery.values, function(sum, workflow, key) {
     if (!workflow['started-at']) {
       return sum
     }
@@ -185,7 +185,7 @@ function _detailCalculateDelay (delivery) {
   return Math.round(totalDelay / 1000 / 60)
 }
 
-function _calculateDelayState (startTime, endTime, estimated) {
+function _calculateDelayState(startTime, endTime, estimated) {
   var difference = endTime - startTime
   estimated = estimated * 60000
 
@@ -198,7 +198,7 @@ function _calculateDelayState (startTime, endTime, estimated) {
   }
 }
 
-function _prepareSubStepEndTimes (workflow) {
+function _prepareSubStepEndTimes(workflow) {
   if (workflow['nonsearch-end'] && workflow['search-end']) {
     return
   }
@@ -209,16 +209,16 @@ function _prepareSubStepEndTimes (workflow) {
   workflow['search-end'] = workflow['search-end'] || new Date(workflow['started-at'].getTime() + totalTime / 3 * 2)
 }
 
-function _cleanupLocationData (receivedLocations) {
-  var locations = receivedLocations.map(function (mappedLocation) {
+function _cleanupLocationData(receivedLocations) {
+  var locations = receivedLocations.map(function(mappedLocation) {
     return {
       id: parseInt(mappedLocation.id),
       name: mappedLocation.attributes.name,
-      abbr: _.find(_DS.LOCATION_META, {name: mappedLocation.attributes.name}).abbr
+      abbr: _.find(_DS.LOCATION_META, { name: mappedLocation.attributes.name }).abbr
     }
   })
 
-  if (!_.find(locations, {name: 'En Route'})) {
+  if (!_.find(locations, { name: 'En Route' })) {
     locations.splice(0, 0, {
       id: 0,
       name: 'En Route',
@@ -226,17 +226,17 @@ function _cleanupLocationData (receivedLocations) {
     })
   }
 
-  return _.sortBy(locations, function (location) {
-    return _.findIndex(_DS.LOCATION_META, {name: location.name})
+  return _.sortBy(locations, function(location) {
+    return _.findIndex(_DS.LOCATION_META, { name: location.name })
   })
 }
 
-function _getExitLocationId (stations) {
+function _getExitLocationId(stations) {
   return utils.getLocationIdFromLocationName('Exit', stations)
 }
 
-function _getLocationIdFromLocationName (locationName) {
-  var location = _.find(_LOCATIONS, {name: locationName})
+function _getLocationIdFromLocationName(locationName) {
+  var location = _.find(_LOCATIONS, { name: locationName })
   if (location) {
     return parseInt(location.id)
   }
@@ -244,13 +244,13 @@ function _getLocationIdFromLocationName (locationName) {
   return -1
 }
 
-function _getStaionIndexInStations (realStationId, stations) {
-  return _.findIndex(stations, function (station) {
+function _getStaionIndexInStations(realStationId, stations) {
+  return _.findIndex(stations, function(station) {
     return parseInt(_.keys(station)[0]) === parseInt(realStationId)
   })
 }
 
-function _getNullOrDate (dateString) {
+function _getNullOrDate(dateString) {
   if (dateString) {
     return new Date(dateString)
   }
@@ -258,13 +258,13 @@ function _getNullOrDate (dateString) {
   return null
 }
 
-function _getPocNameById (pocId) {
+function _getPocNameById(pocId) {
   var poc = _pocsAPIData[pocId] || {}
 
   return 'POC ' + (poc['first-name'] || '') + ' ' + (poc['last-name'] || '')
 }
 
-function _getSubstepState (substep) {
+function _getSubstepState(substep) {
   if (substep === 1) {
     return 'workflow late'
   }
@@ -276,11 +276,11 @@ function _getSubstepState (substep) {
   return 'workflow'
 }
 
-function isTimeBetweenTime (time, start, end) {
+function isTimeBetweenTime(time, start, end) {
   return start <= time && time <= end
 }
 
-function _getVehicleIconSuffix (deliveryStatus, locationName) {
+function _getVehicleIconSuffix(deliveryStatus, locationName) {
   if (locationName === 'En Route') {
     return 'enroute'
   }
@@ -292,9 +292,9 @@ function _getVehicleIconSuffix (deliveryStatus, locationName) {
   return 'arrived'
 }
 
-function _getVehicleImageName (vehicleInfo, deliveryStatus, locationName) {
+function _getVehicleImageName(vehicleInfo, deliveryStatus, locationName) {
   var vehicleImageName = 'icn-'
-  // icn- + type + axles + status + priority
+    // icn- + type + axles + status + priority
 
   // special cases first
   if (_VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'emergency') {
@@ -334,13 +334,13 @@ function _getVehicleImageName (vehicleInfo, deliveryStatus, locationName) {
   return vehicleImageName
 }
 
-function _calculateWorkflowETAs (workflows) {
+function _calculateWorkflowETAs(workflows) {
   var groupedWorkflows = _.groupBy(workflows, 'deliveryId')
 
-  _.each(groupedWorkflows, function (subWorkflows, deliveryId) {
+  _.each(groupedWorkflows, function(subWorkflows, deliveryId) {
     var orderedWorkflows = _.orderBy(subWorkflows, 'step')
 
-    _.each(orderedWorkflows, function (workflow, index) {
+    _.each(orderedWorkflows, function(workflow, index) {
 
       if (index === 0) {
         // This isn't necessary in real situation
@@ -375,7 +375,7 @@ function _calculateWorkflowETAs (workflows) {
           }
         }
       }
-      workflow.states= ['onTime']
+      workflow.states = ['onTime']
       workflow.eta = new Date(workflow.eta)
 
       // Original ETA
