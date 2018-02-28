@@ -111,7 +111,7 @@ function _getCurrentWorkflow(workflows) {
       return !workflow['ended-at']
     }
 
-    if (index === (workflows.length - 1)) {
+    if (index === workflows.length - 1) {
       return workflow['started-at']
     }
 
@@ -137,50 +137,90 @@ function _detailCalculateDelay(delivery) {
     return 0
   }
 
-  var totalDelay = _.reduce(delivery.values, function(sum, workflow, key) {
-    if (!workflow['started-at']) {
-      return sum
-    }
+  var totalDelay = _.reduce(
+    delivery.values,
+    function(sum, workflow, key) {
+      if (!workflow['started-at']) {
+        return sum
+      }
 
-    if (utils.inSubstepLocation(workflow)) {
-      var subDelays = _.fill(Array(3), 0)
+      if (utils.inSubstepLocation(workflow)) {
+        var subDelays = _.fill(Array(3), 0)
 
-      if (workflow['ended-at']) {
-        subDelays[0] = utils.calculateDelay(workflow['started-at'], workflow['nonsearch-end'], workflow.nonSearchEPT)
-        subDelays[1] = utils.calculateDelay(workflow['nonsearch-end'], workflow['search-end'], workflow.searchEPT)
-        subDelays[2] = utils.calculateDelay(workflow['search-end'], workflow['ended-at'], workflow.releaseEPT)
-      } else {
-        var currentSubStep = utils.getCurrentSubstep(workflow)
-        console.log(currentSubStep)
-        if (currentSubStep === 1) {
-          subDelays[0] = utils.calculateDelay(workflow['started-at'], _now, workflow.nonSearchEPT)
-          subDelays[1] = 0
-          subDelays[2] = 0
-        } else if (currentSubStep === 2) {
-          subDelays[0] = utils.calculateDelay(workflow['started-at'], workflow['nonsearch-end'], workflow.nonSearchEPT)
-          subDelays[1] = utils.calculateDelay(workflow['nonsearch-end'], _now, workflow.searchEPT)
-          subDelays[2] = 0
+        if (workflow['ended-at']) {
+          subDelays[0] = utils.calculateDelay(
+            workflow['started-at'],
+            workflow['nonsearch-end'],
+            workflow.nonSearchEPT
+          )
+          subDelays[1] = utils.calculateDelay(
+            workflow['nonsearch-end'],
+            workflow['search-end'],
+            workflow.searchEPT
+          )
+          subDelays[2] = utils.calculateDelay(
+            workflow['search-end'],
+            workflow['ended-at'],
+            workflow.releaseEPT
+          )
         } else {
-          subDelays[0] = utils.calculateDelay(workflow['started-at'], workflow['nonsearch-end'], workflow.nonSearchEPT)
-          subDelays[1] = utils.calculateDelay(workflow['nonsearch-end'], workflow['search-end'], workflow.searchEPT)
-          subDelays[2] = utils.calculateDelay(workflow['search-end'], _now, workflow.releaseEPT)
+          var currentSubStep = utils.getCurrentSubstep(workflow)
+          console.log(currentSubStep)
+          if (currentSubStep === 1) {
+            subDelays[0] = utils.calculateDelay(
+              workflow['started-at'],
+              _now,
+              workflow.nonSearchEPT
+            )
+            subDelays[1] = 0
+            subDelays[2] = 0
+          } else if (currentSubStep === 2) {
+            subDelays[0] = utils.calculateDelay(
+              workflow['started-at'],
+              workflow['nonsearch-end'],
+              workflow.nonSearchEPT
+            )
+            subDelays[1] = utils.calculateDelay(
+              workflow['nonsearch-end'],
+              _now,
+              workflow.searchEPT
+            )
+            subDelays[2] = 0
+          } else {
+            subDelays[0] = utils.calculateDelay(
+              workflow['started-at'],
+              workflow['nonsearch-end'],
+              workflow.nonSearchEPT
+            )
+            subDelays[1] = utils.calculateDelay(
+              workflow['nonsearch-end'],
+              workflow['search-end'],
+              workflow.searchEPT
+            )
+            subDelays[2] = utils.calculateDelay(
+              workflow['search-end'],
+              _now,
+              workflow.releaseEPT
+            )
+          }
+        }
+        return sum + _.sum(subDelays)
+      } else {
+        if (workflow['ended-at']) {
+          var difference = workflow['ended-at'] - workflow['started-at']
+        } else {
+          var difference = _now - workflow['started-at']
+        }
+
+        if (difference < workflow.EPT * 60000) {
+          return sum
+        } else {
+          return sum + difference - workflow.EPT * 60000
         }
       }
-      return sum + _.sum(subDelays)
-    } else {
-      if (workflow['ended-at']) {
-        var difference = workflow['ended-at'] - workflow['started-at']
-      } else {
-        var difference = _now - workflow['started-at']
-      }
-
-      if (difference < workflow.EPT * 60000) {
-        return sum
-      } else {
-        return sum + difference - workflow.EPT * 60000
-      }
-    }
-  }, 0)
+    },
+    0
+  )
 
   return Math.round(totalDelay / 1000 / 60)
 }
@@ -203,10 +243,15 @@ function _prepareSubStepEndTimes(workflow) {
     return
   }
 
-  var totalTime = workflow['ended-at'].getTime() - workflow['started-at'].getTime()
+  var totalTime =
+    workflow['ended-at'].getTime() - workflow['started-at'].getTime()
 
-  workflow['nonsearch-end'] = workflow['nonsearch-end'] || new Date(workflow['started-at'].getTime() + totalTime / 3)
-  workflow['search-end'] = workflow['search-end'] || new Date(workflow['started-at'].getTime() + totalTime / 3 * 2)
+  workflow['nonsearch-end'] =
+    workflow['nonsearch-end'] ||
+    new Date(workflow['started-at'].getTime() + totalTime / 3)
+  workflow['search-end'] =
+    workflow['search-end'] ||
+    new Date(workflow['started-at'].getTime() + totalTime / 3 * 2)
 }
 
 function _cleanupLocationData(receivedLocations) {
@@ -214,7 +259,8 @@ function _cleanupLocationData(receivedLocations) {
     return {
       id: parseInt(mappedLocation.id),
       name: mappedLocation.attributes.name,
-      abbr: _.find(_DS.LOCATION_META, { name: mappedLocation.attributes.name }).abbr
+      abbr: _.find(_DS.LOCATION_META, { name: mappedLocation.attributes.name })
+        .abbr
     }
   })
 
@@ -294,7 +340,7 @@ function _getVehicleIconSuffix(deliveryStatus, locationName) {
 
 function _getVehicleImageName(vehicleInfo, deliveryStatus, locationName) {
   var vehicleImageName = 'icn-'
-    // icn- + type + axles + status + priority
+  // icn- + type + axles + status + priority
 
   // special cases first
   if (_VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'emergency') {
@@ -303,7 +349,8 @@ function _getVehicleImageName(vehicleInfo, deliveryStatus, locationName) {
     return vehicleImageName
   }
 
-  if (_VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'construction' ||
+  if (
+    _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'construction' ||
     _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'passnonIMP' ||
     _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] === 'passIMP'
   ) {
@@ -318,9 +365,14 @@ function _getVehicleImageName(vehicleInfo, deliveryStatus, locationName) {
   }
 
   if (vehicleInfo.axles != null) {
-    vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + vehicleInfo.axles + 'w-'
+    vehicleImageName +=
+      _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] +
+      '-' +
+      vehicleInfo.axles +
+      'w-'
   } else if (vehicleInfo['vehicle-type']) {
-    vehicleImageName += _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + 2 + 'w-'
+    vehicleImageName +=
+      _VEHICLE_TYPE_TO_IMG[vehicleInfo['vehicle-type']] + '-' + 2 + 'w-'
   } else {
     vehicleImageName += 'common-2w-'
   }
@@ -341,11 +393,13 @@ function _calculateWorkflowETAs(workflows) {
     var orderedWorkflows = _.orderBy(subWorkflows, 'step')
 
     _.each(orderedWorkflows, function(workflow, index) {
-
       if (index === 0) {
         // This isn't necessary in real situation
         // As first workflow should always have an ETA
-        workflow.eta = workflow.eta || workflow['started-at'] || (_now.getTime() + _WORKFLOW_OFFSET)
+        workflow.eta =
+          workflow.eta ||
+          workflow['started-at'] ||
+          _now.getTime() + _WORKFLOW_OFFSET
       } else {
         if (!workflow.eta) {
           var lastWorkflow = orderedWorkflows[index - 1]
@@ -384,11 +438,17 @@ function _calculateWorkflowETAs(workflows) {
       } else {
         var previouseWorkflow = orderedWorkflows[index - 1]
         if (utils.inSubstepLocation(previouseWorkflow)) {
-          workflow.originalETA = new Date(previouseWorkflow.originalETA.getTime() + (
-            previouseWorkflow.nonSearchEPT + previouseWorkflow.searchEPT + previouseWorkflow.releaseEPT
-          ) * 60000)
+          workflow.originalETA = new Date(
+            previouseWorkflow.originalETA.getTime() +
+              (previouseWorkflow.nonSearchEPT +
+                previouseWorkflow.searchEPT +
+                previouseWorkflow.releaseEPT) *
+                60000
+          )
         } else {
-          workflow.originalETA = previouseWorkflow.originalETA.getTime() + previouseWorkflow.EPT * 60000
+          workflow.originalETA =
+            previouseWorkflow.originalETA.getTime() +
+            previouseWorkflow.EPT * 60000
         }
 
         workflow.originalETA = new Date(workflow.originalETA)
@@ -407,9 +467,15 @@ function _calculateWorkflowETAs(workflows) {
             elapsedTime = _now - workflow['started-at']
           }
 
-          if (elapsedTime > workflow.EPT * 60000 * (1 + _DS.AHEAD_OR_BEHIND_PCT)) {
+          if (
+            elapsedTime >
+            workflow.EPT * 60000 * (1 + _DS.AHEAD_OR_BEHIND_PCT)
+          ) {
             workflow.states = ['late']
-          } else if (elapsedTime < workflow.EPT * 60000 * (1 - _DS.AHEAD_OR_BEHIND_PCT)) {
+          } else if (
+            elapsedTime <
+            workflow.EPT * 60000 * (1 - _DS.AHEAD_OR_BEHIND_PCT)
+          ) {
             workflow.states = ['ahead']
           }
         } else {
@@ -449,5 +515,5 @@ var utils = {
   getEPTFromWorkflow: _getEPTFromWorkflow,
   calculateDelay: _calculateDelay,
   prepareEventsForRendering: _prepareEventsForRendering,
-  getLocationOrderForDelivery: _getLocationOrderForDelivery,
+  getLocationOrderForDelivery: _getLocationOrderForDelivery
 }

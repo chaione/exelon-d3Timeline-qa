@@ -3,7 +3,7 @@ var pocContacts = ['POC', 'Delta10']
 var inspectionLabels = ['Scheduled', 'Actual']
 
 function detectIE() {
-  var ua = window.navigator.userAgent;
+  var ua = window.navigator.userAgent
 
   // Test values; Uncomment to check result …
 
@@ -19,35 +19,38 @@ function detectIE() {
   // Edge 13
   // ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586';
 
-  var msie = ua.indexOf('MSIE ');
+  var msie = ua.indexOf('MSIE ')
   if (msie > 0) {
     // IE 10 or older => return version number
-    return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+    return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10)
   }
 
-  var trident = ua.indexOf('Trident/');
+  var trident = ua.indexOf('Trident/')
   if (trident > 0) {
     // IE 11 => return version number
-    var rv = ua.indexOf('rv:');
-    return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+    var rv = ua.indexOf('rv:')
+    return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10)
   }
 
-  var edge = ua.indexOf('Edge/');
+  var edge = ua.indexOf('Edge/')
   if (edge > 0) {
     // Edge (IE 12+) => return version number
-    return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+    return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10)
   }
 
   // other browser
-  return false;
+  return false
 }
 
 function displayDetail(delivery) {
   var currentDeliveryRaw = _.find(_DS.deliveries, { id: delivery.key })
   delivery.status = currentDeliveryRaw.attributes.status
   delivery.eta = currentDeliveryRaw.attributes.eta
-  delivery.arriveAt = utils.getNullOrDate(currentDeliveryRaw.attributes['arrive-at'])
-  var pocId = (currentDeliveryRaw['relationships']['primary-poc']['data'] || {}).id
+  delivery.arriveAt = utils.getNullOrDate(
+    currentDeliveryRaw.attributes['arrive-at']
+  )
+  var pocId = (currentDeliveryRaw['relationships']['primary-poc']['data'] || {})
+    .id
 
   delivery.primaryPocName = utils.getPocNameById(pocId)
 
@@ -60,13 +63,19 @@ function displayDetail(delivery) {
 
   var eventHeight = 30
   var detailPadding = 30
-  detailDeliveryRectY = yDeliveryScale(delivery.yIndex + 1) - detailPadding - (2 * eventHeight)
-  var detailDeliveryRectHeight = ((_POSTS.length + 1) * eventHeight) + (detailPadding * 2) + 50
+  detailDeliveryRectY =
+    yDeliveryScale(delivery.yIndex + 1) - detailPadding - 2 * eventHeight
+  var detailDeliveryRectHeight =
+    (_POSTS.length + 1) * eventHeight + detailPadding * 2 + 50
 
   if (detailDeliveryRectY < 50) {
     detailDeliveryRectY = 50
-  } else if (detailDeliveryRectY > innerHeight - _X_AXIS_HEIGHT - detailDeliveryRectHeight) {
-    detailDeliveryRectY = innerHeight - _X_AXIS_HEIGHT - detailDeliveryRectHeight
+  } else if (
+    detailDeliveryRectY >
+    innerHeight - _X_AXIS_HEIGHT - detailDeliveryRectHeight
+  ) {
+    detailDeliveryRectY =
+      innerHeight - _X_AXIS_HEIGHT - detailDeliveryRectHeight
   }
   // detailDeliveryRectY = detailDeliveryRectY+100
   // detailSvg
@@ -88,15 +97,18 @@ function displayDetail(delivery) {
   //         detailDeliveryInfoCompanyName
 
   // setup the popup
-  detailSvg = d3.select('body').append('svg')
+  detailSvg = d3
+    .select('body')
+    .append('svg')
     .attr('width', outerWidth)
     .attr('height', outerHeight - _X_AXIS_HEIGHT)
     .attr('id', 'detailSvg')
-    .style('opacity', .97)
+    .style('opacity', 0.97)
     .call(xAxisTranslation)
 
   // setup click to close
-  var detailDeliveryCloseRect = detailSvg.append('rect')
+  var detailDeliveryCloseRect = detailSvg
+    .append('rect')
     .attr('x', 0)
     .attr('y', 0)
     .attr('width', outerWidth)
@@ -108,7 +120,8 @@ function displayDetail(delivery) {
     })
 
   // setup the text box on the top roght corner
-  var detailDeliveryRect = detailSvg.append('rect')
+  var detailDeliveryRect = detailSvg
+    .append('rect')
     .attr('x', 0)
     .attr('y', detailDeliveryRectY)
     .attr('width', outerWidth)
@@ -120,13 +133,16 @@ function displayDetail(delivery) {
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
   var deniedEvents = _.filter(_DS.events, function(event) {
-    return event.deliveryId === delivery.id &&
+    return (
+      event.deliveryId === delivery.id &&
       (event.name === 's1_deny_entry' || event.name === 'sp_deny_entry')
+    )
   })
 
   var status = _.find(_deliveryIndexInfo, { deliveryId: delivery.key }).status
   if (status === 'denied') {
-    var detailDeliveryStatusText = detailSvg.append('text')
+    var detailDeliveryStatusText = detailSvg
+      .append('text')
       .attr('x', outerWidth - 20)
       .attr('y', detailDeliveryRectY + detailDeliveryRectHeight - 20)
       .text('!! DENYING ENTRY !!')
@@ -134,7 +150,8 @@ function displayDetail(delivery) {
       .attr('text-anchor', 'end')
       .attr('font-size', stationTextHeight + 'px')
 
-    detailSvg.append('image')
+    detailSvg
+      .append('image')
       .attr('xlink:href', function(i) {
         return 'img/icn-timeline-denied-panel.png'
       })
@@ -145,10 +162,13 @@ function displayDetail(delivery) {
       // .attr("class", "truckIconDiamond")
       .attr('preserveAspectRatio', 'xMidYMid slice')
       // .attr("viewBox","0 0 " + 1236 + " " + 522)
-      .attr('transform', function(d) { return 'translate(' + 0 + ',' + detailDeliveryRectY + ')' })
+      .attr('transform', function(d) {
+        return 'translate(' + 0 + ',' + detailDeliveryRectY + ')'
+      })
   }
 
-  var detailDeliveryStationLabel = detailSvg.append('text')
+  var detailDeliveryStationLabel = detailSvg
+    .append('text')
     .attr('x', 10)
     .attr('y', detailDeliveryRectY - 10)
     .text(function(d) {
@@ -158,19 +178,29 @@ function displayDetail(delivery) {
     .attr('font-size', stationTextHeight + 'px')
 
   // Positioning
-  var detailDeliveryInfoGroup = detailSvg.append('g')
-    .attr('transform', 'translate(' + (outerWidth - 344 - 20) + ',' + (detailDeliveryRectY - 50) + ')')
+  var detailDeliveryInfoGroup = detailSvg
+    .append('g')
+    .attr(
+      'transform',
+      'translate(' +
+        (outerWidth - 344 - 20) +
+        ',' +
+        (detailDeliveryRectY - 50) +
+        ')'
+    )
 
   // Styling
   if (delivery.status === 'denied') {
-    var detailDeliveryInfoRect = detailDeliveryInfoGroup.append('rect')
+    var detailDeliveryInfoRect = detailDeliveryInfoGroup
+      .append('rect')
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', 344)
       .attr('height', 65)
       .attr('class', 'detailInfoRectDenied')
   } else {
-    var detailDeliveryInfoRect = detailDeliveryInfoGroup.append('rect')
+    var detailDeliveryInfoRect = detailDeliveryInfoGroup
+      .append('rect')
       .attr('x', 0)
       .attr('y', 0)
       .attr('width', 344)
@@ -179,14 +209,16 @@ function displayDetail(delivery) {
   }
 
   // POC Info
-  var detailDeliveryInfoPOC = detailDeliveryInfoGroup.append('text')
+  var detailDeliveryInfoPOC = detailDeliveryInfoGroup
+    .append('text')
     .attr('x', 16)
     .attr('y', 26)
     .text(delivery.primaryPocName)
     .attr('class', 'detailInfoPOC')
     .attr('font-size', 16 + 'px')
 
-  var detailDeliveryInfoCompanyName = detailDeliveryInfoGroup.append('text')
+  var detailDeliveryInfoCompanyName = detailDeliveryInfoGroup
+    .append('text')
     .attr('x', 16)
     .attr('y', 46)
     .text(delivery.vendorName + ' ' + delivery.infoBoxCurrStation)
@@ -195,30 +227,42 @@ function displayDetail(delivery) {
 
   var arriveTimeText = ''
   if (delivery.arriveAt) {
-    arriveTimeText = 'A ' + delivery.arriveAt.getHours() + ':' + ('0' + delivery.arriveAt.getMinutes()).slice(-2)
+    arriveTimeText =
+      'A ' +
+      delivery.arriveAt.getHours() +
+      ':' +
+      ('0' + delivery.arriveAt.getMinutes()).slice(-2)
   }
 
   function getWidthOfText(txt, fontname, fontsize) {
     if (getWidthOfText.c === undefined) {
-      getWidthOfText.c = document.createElement('canvas');
-      getWidthOfText.ctx = getWidthOfText.c.getContext('2d');
+      getWidthOfText.c = document.createElement('canvas')
+      getWidthOfText.ctx = getWidthOfText.c.getContext('2d')
     }
-    getWidthOfText.ctx.font = fontsize + ' ' + fontname;
-    return getWidthOfText.ctx.measureText(txt).width;
+    getWidthOfText.ctx.font = fontsize + ' ' + fontname
+    return getWidthOfText.ctx.measureText(txt).width
   }
 
-  var detailDeliveryInfoArrivaltime = detailDeliveryInfoGroup.append('text')
+  var detailDeliveryInfoArrivaltime = detailDeliveryInfoGroup
+    .append('text')
     .attr('text-anchor', 'END')
-    .attr('x', ((detectIE()) ? 300 : 339) - getWidthOfText(arriveTimeText, 'Maven Pro', 16))
+    .attr(
+      'x',
+      (detectIE() ? 300 : 339) - getWidthOfText(arriveTimeText, 'Maven Pro', 16)
+    )
     .attr('y', 26)
     .text(arriveTimeText)
     .attr('class', 'detailInfoArrivaltime')
     .attr('font-size', 16 + 'px')
 
   // Delay information
-  var detailDeliveryInfoDelay = detailDeliveryInfoGroup.append('text')
+  var detailDeliveryInfoDelay = detailDeliveryInfoGroup
+    .append('text')
     .attr('text-anchor', 'END')
-    .attr('x', ((detectIE()) ? 300 : 339) - getWidthOfText(arriveTimeText, 'Maven Pro', 16))
+    .attr(
+      'x',
+      (detectIE() ? 300 : 339) - getWidthOfText(arriveTimeText, 'Maven Pro', 16)
+    )
     .attr('y', 46)
     .text(function() {
       if (delivery.delay > 15) {
@@ -239,46 +283,70 @@ function displayDetail(delivery) {
     .attr('font-size', 16 + 'px')
 
   // Positioning the delay text
-  detailDeliveryDataGroup = detailSvg.append('g')
+  detailDeliveryDataGroup = detailSvg
+    .append('g')
     .attr('class', 'detailDelivery')
-    .attr('transform', 'translate(' + detailStartingX + ',' + detailDeliveryRectY + ')')
+    .attr(
+      'transform',
+      'translate(' + detailStartingX + ',' + detailDeliveryRectY + ')'
+    )
 
   // Setup Axis and the time label
-  var detailDeliveryYAxisGroup = detailDeliveryDataGroup.append('g')
+  var detailDeliveryYAxisGroup = detailDeliveryDataGroup
+    .append('g')
     .attr('class', 'y axis')
-  detailDeliveryYAxisGroup.append('line')
+  detailDeliveryYAxisGroup
+    .append('line')
     .attr('class', 'yAxis')
     .attr('x1', xScale(_now))
     .attr('y1', 30)
     .attr('x2', xScale(_now))
     .attr('y2', Math.max(_locationHeight + _X_AXIS_HEIGHT, outerHeight))
-  detailDeliveryYAxisGroup.append('rect')
-    .attr('x', xScale(_now) - (120 / 2))
+  detailDeliveryYAxisGroup
+    .append('rect')
+    .attr('x', xScale(_now) - 120 / 2)
     .attr('y', 14)
     .attr('width', 120)
     .attr('height', 16)
     .attr('class', 'yAxisDateTimeBox')
-  detailDeliveryYAxisGroup.append('text')
+  detailDeliveryYAxisGroup
+    .append('text')
     .attr('x', xScale(_now))
     .attr('y', 27)
     .attr('text-anchor', 'middle')
     .text(function(d, i) {
-      return (nowMonth + 1) + '.' + nowDay + '.' + nowYear + ' // ' + nowHours + '.' + nowMinutes
+      return (
+        nowMonth +
+        1 +
+        '.' +
+        nowDay +
+        '.' +
+        nowYear +
+        ' // ' +
+        nowHours +
+        '.' +
+        nowMinutes
+      )
     })
     .attr('class', 'yAxisDateTimeText')
     .attr('font-size', 14 + 'px')
-  detailDeliveryYAxisGroup.append('svg:path')
+  detailDeliveryYAxisGroup
+    .append('svg:path')
     .attr('d', function(d) {
       return customShapes['dBook'](4)
     })
     .attr('class', 'yAxisDateTimeArrow')
     .attr('transform', function(d) {
-      return 'translate(' + xScale(_now) + ',' + (30) + ')'
+      return 'translate(' + xScale(_now) + ',' + 30 + ')'
     })
 
-  var detailDeliveryDataScheduledGroup = detailDeliveryDataGroup.append('g')
+  var detailDeliveryDataScheduledGroup = detailDeliveryDataGroup
+    .append('g')
     .attr('class', 'detailScheduled')
-    .attr('transform', 'translate(' + 0 + ',' + (detailPadding + eventHeight) + ')')
+    .attr(
+      'transform',
+      'translate(' + 0 + ',' + (detailPadding + eventHeight) + ')'
+    )
 
   // Lines
   detailDeliveryDataScheduledGroup
@@ -295,11 +363,10 @@ function displayDetail(delivery) {
       var oneMinute = 1000 * 60
 
       if (utils.inSubstepLocation(d)) {
-        workflow.append('line')
+        workflow
+          .append('line')
           .attr('x1', function(d, i) {
-            return xScale(
-              d.originalETA
-            )
+            return xScale(d.originalETA)
           })
           .attr('y1', 0)
           .attr('x2', function(d) {
@@ -311,34 +378,39 @@ function displayDetail(delivery) {
           .attr('class', function(d) {
             // if (d.originalETA > _now) {
             return 'detailScheduledLine2 notReached'
-              // }
-              // return 'detailScheduledLine2'
+            // }
+            // return 'detailScheduledLine2'
           })
 
-        workflow.append('line')
+        workflow
+          .append('line')
           .attr('x1', function(d, i) {
-            return xScale(
-              d.originalETA.getTime() + nonsearchEPT * oneMinute
-            )
+            return xScale(d.originalETA.getTime() + nonsearchEPT * oneMinute)
           })
           .attr('y1', 0)
           .attr('x2', function(d) {
             return xScale(
-              d.originalETA.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute - 60000
+              d.originalETA.getTime() +
+                nonsearchEPT * oneMinute +
+                searchEPT * oneMinute -
+                60000
             )
           })
           .attr('y2', 0)
           .attr('class', function(d) {
             // if (d.originalETA > _now) {
             return 'detailScheduledLine2 notReached'
-              // }
-              // return 'detailScheduledLine2'
+            // }
+            // return 'detailScheduledLine2'
           })
 
-        workflow.append('line')
+        workflow
+          .append('line')
           .attr('x1', function(d, i) {
             return xScale(
-              d.originalETA.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute
+              d.originalETA.getTime() +
+                nonsearchEPT * oneMinute +
+                searchEPT * oneMinute
             )
           })
           .attr('y1', 0)
@@ -348,7 +420,11 @@ function displayDetail(delivery) {
               return xScale(nextWorkflow.originalETA.getTime() - 60000)
             } else {
               return xScale(
-                d.originalETA.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
+                d.originalETA.getTime() +
+                  nonsearchEPT * oneMinute +
+                  searchEPT * oneMinute +
+                  releaseEPT * oneMinute -
+                  60000
               )
             }
           })
@@ -356,59 +432,81 @@ function displayDetail(delivery) {
           .attr('class', function(d) {
             // if (d.originalETA > _now) {
             return 'detailScheduledLine2 notReached'
-              // }
-              // return 'detailScheduledLine2'
+            // }
+            // return 'detailScheduledLine2'
           })
 
-        workflow.append('svg:path')
-          .attr('d', function(d) { return customShapes['lBook'](4); })
+        workflow
+          .append('svg:path')
+          .attr('d', function(d) {
+            return customShapes['lBook'](4)
+          })
           .attr('transform', function(d) {
             return 'translate(' + xScale(d.originalETA) + ',' + 0 + ')'
           })
           .attr('fill', '#797F88')
 
-        workflow.append('svg:path')
-          .attr('d', function(d) { return customShapes['rBook'](4); })
+        workflow
+          .append('svg:path')
+          .attr('d', function(d) {
+            return customShapes['rBook'](4)
+          })
           .attr('transform', function(d) {
             if (d.step < delivery.values.length) {
               var nextWorkflow = _.find(delivery.values, { step: d.step + 1 })
               var endTime = nextWorkflow.originalETA.getTime() - 60000
             } else {
-              var endTime = d.originalETA.getTime() + nonsearchEPT * oneMinute + searchEPT * oneMinute + releaseEPT * oneMinute - 60000
+              var endTime =
+                d.originalETA.getTime() +
+                nonsearchEPT * oneMinute +
+                searchEPT * oneMinute +
+                releaseEPT * oneMinute -
+                60000
             }
             return 'translate(' + xScale(endTime) + ',' + 0 + ')'
           })
           .attr('fill', '#797F88')
       } else {
-        workflow.append('line')
+        workflow
+          .append('line')
           .attr('x1', function(d, i) {
             return xScale(d.originalETA)
           })
           .attr('y1', 0)
           .attr('x2', function(d, i) {
-            return xScale(
-              d.originalETA.getTime() + EPT * 60000 - 60000
-            )
+            return xScale(d.originalETA.getTime() + EPT * 60000 - 60000)
           })
           .attr('y2', 0)
           .attr('class', function(d) {
             // if (d.originalETA > _now) {
             return 'detailScheduledLine2 notReached'
-              // }
-              // return 'detailScheduledLine2'
+            // }
+            // return 'detailScheduledLine2'
           })
 
-        workflow.append('svg:path')
-          .attr('d', function(d) { return customShapes['lBook'](4); })
+        workflow
+          .append('svg:path')
+          .attr('d', function(d) {
+            return customShapes['lBook'](4)
+          })
           .attr('transform', function(d) {
             return 'translate(' + xScale(d.originalETA) + ',' + 0 + ')'
           })
           .attr('fill', '#797F88')
 
-        workflow.append('svg:path')
-          .attr('d', function(d) { return customShapes['rBook'](4); })
+        workflow
+          .append('svg:path')
+          .attr('d', function(d) {
+            return customShapes['rBook'](4)
+          })
           .attr('transform', function(d) {
-            return 'translate(' + xScale(d.originalETA.getTime() + EPT * 60000 - 60000) + ',' + 0 + ')'
+            return (
+              'translate(' +
+              xScale(d.originalETA.getTime() + EPT * 60000 - 60000) +
+              ',' +
+              0 +
+              ')'
+            )
           })
           .attr('fill', '#797F88')
       }
@@ -429,11 +527,10 @@ function displayDetail(delivery) {
       var oneMinute = 1000 * 60
 
       if (utils.inSubstepLocation(d)) {
-        workflow.append('text')
+        workflow
+          .append('text')
           .attr('x', function(d) {
-            return xScale(
-              d.originalETA
-            )
+            return xScale(d.originalETA)
           })
           .attr('y', -3)
           .text(function(d, i) {
@@ -443,14 +540,15 @@ function displayDetail(delivery) {
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
-        workflow.append('text')
+        workflow
+          .append('text')
           .attr('x', function(d) {
-            return xScale(
-              d.originalETA.getTime() + nonsearchEPT * 60000
-            )
+            return xScale(d.originalETA.getTime() + nonsearchEPT * 60000)
           })
           .attr('y', function(d) {
-            var distance = xScale(d.originalETA.getTime() + nonsearchEPT * 60000) - xScale(d.originalETA)
+            var distance =
+              xScale(d.originalETA.getTime() + nonsearchEPT * 60000) -
+              xScale(d.originalETA)
             if (distance < 24) {
               return 13
             } else {
@@ -463,23 +561,36 @@ function displayDetail(delivery) {
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
-        workflow.append('text')
+        workflow
+          .append('text')
           .attr('x', function(d) {
             return xScale(
               d.originalETA.getTime() + nonsearchEPT * 60000 + searchEPT * 60000
             )
           })
           .attr('y', function(d) {
-            var distance2 = xScale(d.originalETA.getTime() + nonsearchEPT * 60000) - xScale(d.originalETA)
+            var distance2 =
+              xScale(d.originalETA.getTime() + nonsearchEPT * 60000) -
+              xScale(d.originalETA)
             if (distance2 >= 24) {
-              var distance32 = xScale(d.originalETA.getTime() + nonsearchEPT * 60000 + searchEPT * 60000) - xScale(d.originalETA.getTime() + nonSearchEPT * 60000)
+              var distance32 =
+                xScale(
+                  d.originalETA.getTime() +
+                    nonsearchEPT * 60000 +
+                    searchEPT * 60000
+                ) - xScale(d.originalETA.getTime() + nonSearchEPT * 60000)
               if (distance32 > 10) {
                 return -3
               } else {
                 return 13
               }
             } else {
-              var distance31 = xScale(d.originalETA.getTime() + nonsearchEPT * 60000 + searchEPT * 60000) - xScale(d.originalETA)
+              var distance31 =
+                xScale(
+                  d.originalETA.getTime() +
+                    nonsearchEPT * 60000 +
+                    searchEPT * 60000
+                ) - xScale(d.originalETA)
               if (distance31 >= 24) {
                 return -3
               } else {
@@ -493,7 +604,8 @@ function displayDetail(delivery) {
           .attr('class', 'detailScheduledLabels')
           .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
       } else {
-        workflow.append('text')
+        workflow
+          .append('text')
           .attr('x', function(d) {
             return xScale(d.originalETA)
           })
@@ -512,9 +624,13 @@ function displayDetail(delivery) {
       }
     })
 
-  var detailDeliveryDataActualGroup = detailDeliveryDataGroup.append('g')
+  var detailDeliveryDataActualGroup = detailDeliveryDataGroup
+    .append('g')
     .attr('class', 'detailScheduled')
-    .attr('transform', 'translate(' + 0 + ',' + (detailPadding + eventHeight + eventHeight) + ')')
+    .attr(
+      'transform',
+      'translate(' + 0 + ',' + (detailPadding + eventHeight + eventHeight) + ')'
+    )
 
   var prevData = {}
   detailDeliveryDataActualGroup
@@ -563,13 +679,26 @@ function displayDetail(delivery) {
 
         var yPos = -3
         if (utils.inSubstepLocation(d)) {
-          var substep1State = utils.calculateDelayState(startedAt, nonsearchEnd, nonsearchEPT)
-          var substep2State = utils.calculateDelayState(nonsearchEnd, searchEnd, searchEPT)
-          var substep3State = utils.calculateDelayState(searchEnd, endedAt, releaseEPT)
+          var substep1State = utils.calculateDelayState(
+            startedAt,
+            nonsearchEnd,
+            nonsearchEPT
+          )
+          var substep2State = utils.calculateDelayState(
+            nonsearchEnd,
+            searchEnd,
+            searchEPT
+          )
+          var substep3State = utils.calculateDelayState(
+            searchEnd,
+            endedAt,
+            releaseEPT
+          )
 
           var currentSubStep = utils.getCurrentSubstep(d)
 
-          workflow.append('text')
+          workflow
+            .append('text')
             .attr('x', function(d) {
               if (currentSubStep === 0) {
                 return xScale(d.eta)
@@ -586,7 +715,8 @@ function displayDetail(delivery) {
             })
             .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
-          workflow.append('text')
+          workflow
+            .append('text')
             .attr('x', function(d) {
               var xPos = null
               if (currentSubStep === 0) {
@@ -621,7 +751,8 @@ function displayDetail(delivery) {
             })
             .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
 
-          workflow.append('text')
+          workflow
+            .append('text')
             .attr('x', function(d) {
               var xPos = null
               if (currentSubStep === -1) {
@@ -629,7 +760,9 @@ function displayDetail(delivery) {
               } else if (currentSubStep === 0) {
                 xPos = d.eta.getTime() + (d.nonSearchEPT + d.searchEPT) * 60000
               } else if (currentSubStep === 1) {
-                xPos = d['started-at'].getTime() + (d.nonSearchEPT + d.searchEPT) * 60000
+                xPos =
+                  d['started-at'].getTime() +
+                  (d.nonSearchEPT + d.searchEPT) * 60000
               } else if (currentSubStep === 2) {
                 // Because step 2 is still in progress, step 2's ETA would be now + searchEPT
                 xPos = _now.getTime() + d.searchEPT * 60000
@@ -680,9 +813,9 @@ function displayDetail(delivery) {
               return 'detailActualLabels step3 ' // + substep3State
             })
             .attr('font-size', _DS.TIMELINE_PORT_LABEL_SIZE)
-
         } else {
-          workflow.append('text')
+          workflow
+            .append('text')
             .attr('x', function(d) {
               return xScale(startedAt || d.eta)
             })
@@ -699,7 +832,8 @@ function displayDetail(delivery) {
       })
   }
 
-  detailDeliveryDataGroup.append('image')
+  detailDeliveryDataGroup
+    .append('image')
     .attr('xlink:href', function(i) {
       return 'img/' + delivery.vehicleType + '.png'
     })
@@ -708,14 +842,26 @@ function displayDetail(delivery) {
     .attr('x', -1 * (vehicleShapeH / 2))
     .attr('y', -1 * (vehicleShapeH / 2))
     .attr('class', 'truckIconDiamond')
-    .attr('transform', function(d) { return 'translate(' + xScale(_now) + ',' + (detailPadding + eventHeight + eventHeight) + ')' })
+    .attr('transform', function(d) {
+      return (
+        'translate(' +
+        xScale(_now) +
+        ',' +
+        (detailPadding + eventHeight + eventHeight) +
+        ')'
+      )
+    })
 
   var deliveryEvents = _.filter(_DS.events, { deliveryId: delivery.key })
   var deliveryContacts = []
 
-  var detailDeliveryDataEventsGroup = detailDeliveryDataGroup.append('g')
+  var detailDeliveryDataEventsGroup = detailDeliveryDataGroup
+    .append('g')
     .attr('class', 'detailScheduled')
-    .attr('transform', 'translate(' + 0 + ',' + (detailPadding + eventHeight * 4) + ')')
+    .attr(
+      'transform',
+      'translate(' + 0 + ',' + (detailPadding + eventHeight * 4) + ')'
+    )
 
   deliveryEvents = utils.prepareEventsForRendering(deliveryEvents)
 
@@ -728,9 +874,7 @@ function displayDetail(delivery) {
       return d.responsible
     })
     .attr('x1', function(d) {
-      return xScale(
-        d.timestamp.getTime()
-      )
+      return xScale(d.timestamp.getTime())
     })
     .attr('y1', function(d) {
       return eventHeight * d.yIndex
@@ -748,15 +892,19 @@ function displayDetail(delivery) {
     .attr('class', function(d) {
       return 'detailEventLine ' + d.name
     })
-    .style('stroke-dasharray', ('1, 1'))
+    .style('stroke-dasharray', '1, 1')
 
   detailDeliveryDataEventsGroup
     .selectAll('.detailEventStart')
     .data(deliveryEvents)
     .enter()
     .append('circle')
-    .attr('cx', function(d) { return xScale(d.timestamp) })
-    .attr('cy', function(d) { return eventHeight * d.yIndex })
+    .attr('cx', function(d) {
+      return xScale(d.timestamp)
+    })
+    .attr('cy', function(d) {
+      return eventHeight * d.yIndex
+    })
     .attr('r', 3)
     .attr('class', function(d) {
       return 'detailEventStart ' + d.name
@@ -771,15 +919,27 @@ function displayDetail(delivery) {
       var eventEnd = d3.select(this)
       if (d.endTimestamp !== null) {
         eventEnd
-          .attr('cx', function(d) { return xScale(d.endTimestamp) })
-          .attr('cy', function(d) { return eventHeight * d.yIndex })
+          .attr('cx', function(d) {
+            return xScale(d.endTimestamp)
+          })
+          .attr('cy', function(d) {
+            return eventHeight * d.yIndex
+          })
           .attr('r', 3)
           .attr('class', 'detailEventEnd')
       }
     })
 
-  var detailCommunicationLabelsGroup = detailSvg.append('g')
-    .attr('transform', 'translate(' + stationTextPadding.left + ',' + (detailDeliveryRectY - 50 + detailPadding + eventHeight * 2 - 7) + ')')
+  var detailCommunicationLabelsGroup = detailSvg
+    .append('g')
+    .attr(
+      'transform',
+      'translate(' +
+        stationTextPadding.left +
+        ',' +
+        (detailDeliveryRectY - 50 + detailPadding + eventHeight * 2 - 7) +
+        ')'
+    )
     .attr('class', 'detailCommunicationLabelsGroup')
 
   // The schedule and actual labels
@@ -789,9 +949,13 @@ function displayDetail(delivery) {
     .enter()
     .append('text')
     .attr('x', stationTextPadding.left)
-    .attr('y', function(d, i) { return eventHeight * (i + 1) })
+    .attr('y', function(d, i) {
+      return eventHeight * (i + 1)
+    })
     // .attr("y", function(d,i) { return (detailDeliveryRectY - 50) + (detailPadding + eventHeight*(i+1) + eventHeight*2 ) - 7})
-    .text(function(d, i) { return d })
+    .text(function(d, i) {
+      return d
+    })
     .attr('class', 'detailCommunicationDefaultLabel name')
     .attr('font-size', 14 + 'px')
 
@@ -801,9 +965,15 @@ function displayDetail(delivery) {
     .data(_POSTS)
     .enter()
     .append('text')
-    .attr('x', function(d, i) { return stationTextPadding.left; })
-    .attr('y', function(d, i) { return eventHeight * (i + 1) + eventHeight * 3 })
-    .text(function(d) { return d.fullName })
+    .attr('x', function(d, i) {
+      return stationTextPadding.left
+    })
+    .attr('y', function(d, i) {
+      return eventHeight * (i + 1) + eventHeight * 3
+    })
+    .text(function(d) {
+      return d.fullName
+    })
     .attr('class', 'detailCommunicationLabel name')
     .attr('font-size', 14 + 'px')
 }
@@ -827,5 +997,8 @@ function calculateInfoboxCurrStation(delivery) {
 
 function dismissDeliveryDetail() {
   _DS.isDetailDisplayed = false
-  d3.select('#detailSvg').style('opacity', 0.0).remove()
+  d3
+    .select('#detailSvg')
+    .style('opacity', 0.0)
+    .remove()
 }

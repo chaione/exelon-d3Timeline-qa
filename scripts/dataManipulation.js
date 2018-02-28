@@ -46,18 +46,27 @@ function pairEvents(apiResponse) {
 
 function processApiData(workflowsData) {
   // group by delivery, and return an array
-  var deliveriesData = d3.nest()
-    .key(function(d) { return d.deliveryId })
+  var deliveriesData = d3
+    .nest()
+    .key(function(d) {
+      return d.deliveryId
+    })
     .entries(workflowsData)
 
   // update deliveries w/ data
   _.each(deliveriesData, function(delivery) {
     var deliveryRaw = _.find(_DS.deliveries, { id: delivery.key })
-    var vehicle = _.find(_VEHICLES, { id: deliveryRaw.relationships.vehicle.data.id })
+    var vehicle = _.find(_VEHICLES, {
+      id: deliveryRaw.relationships.vehicle.data.id
+    })
     var deliveryStatus = deliveryRaw.attributes.status
     var locationName = utils.getLocationNameFromRawDelivery(delivery)
 
-    delivery.vehicleType = utils.getVehicleImageName(vehicle, deliveryStatus, locationName)
+    delivery.vehicleType = utils.getVehicleImageName(
+      vehicle,
+      deliveryStatus,
+      locationName
+    )
     delivery.vendorName = _.find(_DS.vendors, { id: vehicle.vendorId }).name
     delivery.currentLocation = deliveryRaw.attributes['current-location']
   })
@@ -88,7 +97,8 @@ function processApiData(workflowsData) {
   // Comment out for now, not seem to use it any where
   // _currentDeliveryDelayById = generateCurrentDeliveryDelayById(deliveriesData)
 
-  _DS.locationWithDeliveries = d3.nest()
+  _DS.locationWithDeliveries = d3
+    .nest()
     .key(function(d) {
       return d.currentLocation.id
     })
@@ -102,7 +112,9 @@ function processApiData(workflowsData) {
       if (parseInt(locationX.key) === 0) {
         delivery.yIndex = j
       } else {
-        var locationIndex = _.findIndex(_DS.locations, { id: parseInt(locationX.key) })
+        var locationIndex = _.findIndex(_DS.locations, {
+          id: parseInt(locationX.key)
+        })
 
         delivery.yIndex = _DS.locations[locationIndex - 1].stackedCount + j
       }
@@ -116,8 +128,10 @@ function processApiData(workflowsData) {
       var tempDelivery = tempStation.values[j]
 
       var deniedEvents = _.filter(_DS.events, function(event) {
-        return event.deliveryId === tempDelivery.key &&
+        return (
+          event.deliveryId === tempDelivery.key &&
           (event.name === 's1_deny_entry' || event.name === 'sp_deny_entry')
+        )
       })
       var status
       if (deniedEvents.length > 0) {
@@ -150,7 +164,7 @@ function retrieveDeliveries() {
     url: url + 'locations',
     headers: {
       'X-SITE-ID': siteId,
-      'Authorization': 'Bearer ' + bearerToken
+      Authorization: 'Bearer ' + bearerToken
     },
     success: function(apiReponse) {
       _DS.locations = utils.cleanupLocationData(apiReponse.data)
@@ -159,7 +173,7 @@ function retrieveDeliveries() {
         url: url + 'deliveries',
         headers: {
           'X-SITE-ID': siteId,
-          'Authorization': 'Bearer ' + bearerToken
+          Authorization: 'Bearer ' + bearerToken
         },
         success: function(apiResponse) {
           stopRefreshing()
@@ -169,20 +183,29 @@ function retrieveDeliveries() {
           //   _.filter(apiResponse.included, {type: 'locations'})
           // )
 
-          _DS.vendors = _.map(_.filter(apiResponse.included, { type: 'vendors' }), function(vendor) {
-            return {
-              id: vendor.id,
-              name: vendor.attributes.name
+          _DS.vendors = _.map(
+            _.filter(apiResponse.included, { type: 'vendors' }),
+            function(vendor) {
+              return {
+                id: vendor.id,
+                name: vendor.attributes.name
+              }
             }
-          })
+          )
 
-          _VEHICLES = _.map(_.filter(apiResponse.included, { type: 'vehicles' }), function(vehicle) {
-            var result = { id: vehicle.id, vendorId: vehicle.relationships.vendor.data.id }
-            _.each(vehicle.attributes, function(value, key) {
-              result[key] = value
-            })
-            return result
-          })
+          _VEHICLES = _.map(
+            _.filter(apiResponse.included, { type: 'vehicles' }),
+            function(vehicle) {
+              var result = {
+                id: vehicle.id,
+                vendorId: vehicle.relationships.vendor.data.id
+              }
+              _.each(vehicle.attributes, function(value, key) {
+                result[key] = value
+              })
+              return result
+            }
+          )
 
           _pocsAPIData = {}
           var pocs = _.filter(apiResponse.included, { type: 'pocs' })
@@ -194,41 +217,59 @@ function retrieveDeliveries() {
 
           var deliveryIDs = _.map(_DS.deliveries, 'id') // For edge cases where workflows have deliveries that are not included in the deliveries all endpoint
           var apiWorkflows = _.filter(apiResponse.included, function(workflow) {
-            return workflow.type === 'workflows' && _.includes(deliveryIDs, workflow.relationships.delivery.data.id)
+            return (
+              workflow.type === 'workflows' &&
+              _.includes(deliveryIDs, workflow.relationships.delivery.data.id)
+            )
           })
 
           var cleandWorkflows = apiWorkflows.map(function(workflow) {
             var deliveryId = workflow.relationships.delivery['data']['id']
             var deliveryRaw = _.find(_DS.deliveries, { id: deliveryId })
             var boaID = deliveryRaw.relationships.boa.data.id
-            var destinationName = _.find(apiResponse.included, { type: 'boas', id: boaID }).attributes.boa['destination.name']
+            var destinationName = _.find(apiResponse.included, {
+              type: 'boas',
+              id: boaID
+            }).attributes.boa['destination.name']
             var route
-              // if (!destinationName) {
-              //   route = _.find(LOCATION_ORDER, function (route) {
-              //     return route.length === _.filter(apiWorkflows, function (wf) {
-              //       return wf.relationships.delivery['data']['id'] === deliveryId
-              //     }).length
-              //   })
-              // } else {
+            // if (!destinationName) {
+            //   route = _.find(LOCATION_ORDER, function (route) {
+            //     return route.length === _.filter(apiWorkflows, function (wf) {
+            //       return wf.relationships.delivery['data']['id'] === deliveryId
+            //     }).length
+            //   })
+            // } else {
             route = _.find(_DS.routes, { name: destinationName })
-              //}
+            //}
 
-            workflow.attributes.locationOrder = _.map(_DS.LOCATION_ORDER, function(portName) {
-              return _.find(_DS.locations, { abbr: portName }).id
-            })
+            workflow.attributes.locationOrder = _.map(
+              _DS.LOCATION_ORDER,
+              function(portName) {
+                return _.find(_DS.locations, { abbr: portName }).id
+              }
+            )
 
             workflow.attributes.id = workflow['id']
             workflow.attributes.deliveryId = parseInt(deliveryId)
 
             var importantDates = [
               'started-at',
-              'arrived-at', 'ended-at',
-              'nonsearch-end', 'search-end'
+              'arrived-at',
+              'ended-at',
+              'nonsearch-end',
+              'search-end'
             ]
             _.each(importantDates, function(item) {
-              workflow.attributes[item] = utils.getNullOrDate(workflow.attributes[item])
+              workflow.attributes[item] = utils.getNullOrDate(
+                workflow.attributes[item]
+              )
             })
-            var unusedAttributes = ['nonsearch-ept', 'search-ept', 'release-ept', 'estimated-processing-time']
+            var unusedAttributes = [
+              'nonsearch-ept',
+              'search-ept',
+              'release-ept',
+              'estimated-processing-time'
+            ]
             workflow.attributes = _.omit(workflow.attributes, unusedAttributes)
 
             return workflow.attributes
@@ -247,7 +288,7 @@ function retrieveDeliveries() {
         }
       })
     }
-  });
+  })
 }
 
 function calculateDeliveryLocation(deliveriesData) {
