@@ -155,15 +155,16 @@ var _VEHICLE_TYPE_TO_IMG = {
 // var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3NTc2ODU4N30.-LkRzNzaZtkVD_C8XxS-aYKJNAhQM44X_z3h-kbWyGM'
 
 // QA
-// var url = 'https://exelon-api-qa.herokuapp.com/v1/'
-// var siteId = 1
-// var bearerToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMyMDU5Nn0.CEuKdJVBDvoDOGksBmQWMxsnc7CtV5zp59H7IrxNGhc'
+var url = 'https://exelon-api-qa.herokuapp.com/v1/'
+var siteId = 1
+var bearerToken =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3MDMyMDU5Nn0.CEuKdJVBDvoDOGksBmQWMxsnc7CtV5zp59H7IrxNGhc'
 
 // Production
-var url = 'https://vsap-ccc-02v.exelonds.com/v1/'
-var siteId = 10000
-var bearerToken =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3Mzg2MjM2Mn0.HhyVOggZ6CoEM7D9x2tWGJtl1a6Onb9StghSONhVjHA'
+// var url = 'https://vsap-ccc-02v.exelonds.com/v1/'
+// var siteId = 10000
+// var bearerToken =
+//   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicm9sZSIsImlhdCI6MTQ3Mzg2MjM2Mn0.HhyVOggZ6CoEM7D9x2tWGJtl1a6Onb9StghSONhVjHA'
 
 var titleHeight = 83
 // Calculated variables
