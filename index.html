@@ -29,14 +29,14 @@
         background-color: rgb(0, 0, 0);
         background-color: rgba(0, 0, 0, 0.9);
     }
-    
+
     .modal-content {
         margin: auto;
         display: block;
         width: 100%;
         max-width: 800px;
     }
-    
+
     @-webkit-keyframes zoom {
         from {
             -webkit-transform: scale(0)
@@ -45,7 +45,7 @@
             -webkit-transform: scale(1)
         }
     }
-    
+
     @keyframes zoom {
         from {
             transform: scale(0)
@@ -54,7 +54,7 @@
             transform: scale(1)
         }
     }
-    
+
     .close-button {
         position: absolute;
         top: 15px;
@@ -64,15 +64,21 @@
         font-size: 2em;
         cursor: pointer !important;
     }
-    
+
+    #img01 {
+        max-width: 100%;
+        max-height: 80%;
+        align-content: center;
+    }
+
     #myModal {
         cursor: pointer !important;
     }
-    
+
     .legend-button {
         color: #BFFFEA;
     }
-    
+
     @media only screen and (max-width: 700px) {
         .modal-content {
             width: 100%;
@@ -82,11 +88,15 @@
 
 <body>
     <div class='row title-container'>
-        <h1 class="title">LIMERICK DASHBOARD <span id="legend-button" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></h1>
+        <h1 class="title">LIMERICK DASHBOARD
+            <span id="legend-button" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+        </h1>
         <img src="./img/btn-refresh-norm.png" id="refresh-button" class='refresh-button pull-right' />
     </div>
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal text-center">
         <span class="glyphicon glyphicon-remove close-button" aria-hidden="true"></span>
+        <img src="" id="img01" />
+
     </div>
 
 
@@ -97,16 +107,16 @@
         // Get the image and insert it inside the modal - use its "alt" text as a caption
         var legendButton = document.getElementById('legend-button');
         var modalImg = document.getElementById("img01");
-        legendButton.onclick = function() {
+        legendButton.onclick = function () {
             modal.style.display = "block";
-            modalImg.src = './img/img-timeline-key.png';
+            modalImg.src = 'img/img-timeline-key.png';
         }
 
         // Get the <span> element that closes the modal
         var span = document.getElementsByClassName("close-button")[0];
 
         // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
+        span.onclick = function () {
             modal.style.display = "none";
         }
     </script>
